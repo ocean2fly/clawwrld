@@ -37,7 +37,7 @@ jobs:
             ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
 
             # 使用显式 SSH key（不依赖 ~/.ssh/config）
-            export GIT_SSH_COMMAND="ssh -i ~/.ssh/github_deploy -o StrictHostKeyChecking=no"
+            export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/github_deploy -o StrictHostKeyChecking=no"
 
             # 验证 deploy key 是否有效
             ssh -i ~/.ssh/github_deploy -o StrictHostKeyChecking=no -T git@github.com 2>&1 || true
