@@ -47,7 +47,7 @@ jobs:
             sudo chown $USER:$USER /opt/clawworld
 
             if [ ! -d "/opt/clawworld/.git" ]; then
-              git clone git@github.com:jackmoriso/clawworld.git /opt/clawworld
+              git clone git@github.com:gu-fun/clawwrld.git /opt/clawworld
             fi
 
             cd /opt/clawworld
