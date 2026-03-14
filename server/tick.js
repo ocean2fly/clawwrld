@@ -109,11 +109,15 @@ async function runTick(worldId) {
     }
   }
 
-  // 2. Wait for all actions (with timeout)
+  // 2. Wait for all actions (with timeout); NPCs auto-act if not connected
   console.log(`[Tick] Waiting for ${activeAgentIds.length} agents...`);
-  const actionPromises = activeAgentIds.map(id => 
-    waitForAction(id).then(action => ({ agentId: id, action }))
-  );
+  const actionPromises = activeAgentIds.map(id => {
+    if (agentConnections.has(id)) {
+      return waitForAction(id).then(action => ({ agentId: id, action }));
+    }
+    // NPC auto-behavior (rule-based)
+    return Promise.resolve({ agentId: id, action: npcAutoAction(id, state) });
+  });
   const agentActions = await Promise.all(actionPromises);
 
   // 3. Apply actions (pure logic arbitration)
@@ -172,6 +176,55 @@ function startTickScheduler(worldId, intervalSeconds = 300) {
   // Then on schedule
   const interval = setInterval(() => runTick(worldId), intervalSeconds * 1000);
   return interval;
+}
+
+/**
+ * Simple rule-based NPC auto-behavior for disconnected agents
+ */
+function npcAutoAction(agentId, state) {
+  const agent = state.agents[agentId];
+  if (!agent) return { type: 'idle' };
+
+  const needs = agent.needs || {};
+  const hunger = needs.hunger || 50;
+  const safety = needs.safety || 50;
+  const social = needs.social || 50;
+
+  // Starving → eat if possible, else move toward water/food
+  if (hunger > 75) {
+    return { type: 'eat' };
+  }
+
+  // Unsafe → flee / rest
+  if (safety < 25) {
+    return { type: 'rest' };
+  }
+
+  // Lonely → speak
+  if (social < 30 && Math.random() < 0.4) {
+    const phrases = [
+      '我在这里', '天色渐暗', '听到什么声音了吗？',
+      '今天风很大', '水源在哪里？', '需要小心'
+    ];
+    return { type: 'speak', message: phrases[Math.floor(Math.random() * phrases.length)] };
+  }
+
+  // Otherwise random move
+  const pos = agent.position || { x: 0, y: 0 };
+  const dirs = [
+    { x: pos.x + 1, y: pos.y }, { x: pos.x - 1, y: pos.y },
+    { x: pos.x, y: pos.y + 1 }, { x: pos.x, y: pos.y - 1 },
+    { x: pos.x, y: pos.y }, // stay
+  ];
+  const map = state.map || {};
+  const W = map.width || 10, H = map.height || 8;
+  const valid = dirs.filter(p => p.x >= 0 && p.x < W && p.y >= 0 && p.y < H);
+  const target = valid[Math.floor(Math.random() * valid.length)];
+
+  // 30% chance to just rest/idle
+  if (Math.random() < 0.3) return { type: 'rest' };
+
+  return { type: 'move', target };
 }
 
 module.exports = { registerAgent, unregisterAgent, submitAction, sendToAgent, runTick, startTickScheduler };
