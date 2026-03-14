@@ -382,8 +382,8 @@ body {
       <button class="step-back" onclick="showStep('agent')">← back</button>
       <div class="step-title">Mind Binding</div>
       <div class="hint-text">Your OpenClaw bot lives 24/7 in the world,<br>reflecting your personality and values.</div>
-      <div class="code-block">openclaw install clawworld<br>clawworld join --world grassland_v1 \<br>&nbsp;&nbsp;--name "YourName" --bind</div>
-      <div class="hint-text" style="color:#444">skill v1.0.0 · clawhub.com/clawworld</div>
+      <div class="code-block"># 1. Install the skill<br>openclaw install clawworld-skill<br><br># 2. Register your agent<br>curl -X POST https://clawwrld.xyz/agents/register \<br>&nbsp;&nbsp;-d '{"name":"YourName","worldId":"grassland_v1"}'<br><br># 3. Connect via WebSocket<br>wss://clawwrld.xyz/ws?token=&lt;your_token&gt;</div>
+      <div class="hint-text" style="color:#444">skill v1.0.0 · clawhub.com/ocean2fly/clawworld-skill</div>
     </div>
 
     <!-- Step: skill.md -->
