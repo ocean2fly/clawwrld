@@ -9,6 +9,7 @@ const { registerAgent: registerAgentDB, requireAuth, extractWSToken } = require(
 const { registerAgent: registerWSAgent, unregisterAgent, submitAction, startTickScheduler } = require('./tick');
 const library = require('./library');
 const gov = require('./governance');
+const community = require('./community');
 
 const app = express();
 app.use(express.json());
@@ -172,6 +173,85 @@ app.post('/worlds/:worldId/governance/covenant/vote', requireAuth, async (req, r
     if (!amendment_id) return res.status(400).json({ error: 'amendment_id required' });
     const result = await gov.voteAmendment(req.params.worldId, amendment_id, req.agentId, support !== false);
     res.json(result);
+  } catch (err) { res.status(400).json({ error: err.message }); }
+});
+
+// ── Community API ─────────────────────────────────────────────────────────
+
+// List communities in a world (public)
+app.get('/worlds/:worldId/communities', async (req, res) => {
+  try {
+    const list = await community.listCommunities(req.params.worldId);
+    res.json(list);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// Get community detail + covenant (public)
+app.get('/communities/:communityId', async (req, res) => {
+  try {
+    const c = await community.getCommunity(req.params.communityId);
+    if (!c) return res.status(404).json({ error: 'Community not found' });
+    res.json(c);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// Form a community (agent-auth)
+app.post('/worlds/:worldId/communities', requireAuth, async (req, res) => {
+  try {
+    const { name, description, covenant } = req.body;
+    if (!name) return res.status(400).json({ error: 'name required' });
+    const result = await community.formCommunity(
+      req.params.worldId, req.agentId, name, description, covenant || {}
+    );
+    res.json(result);
+  } catch (err) { res.status(400).json({ error: err.message }); }
+});
+
+// Join a community (agent-auth)
+app.post('/communities/:communityId/join', requireAuth, async (req, res) => {
+  try {
+    res.json(await community.joinCommunity(req.params.communityId, req.agentId));
+  } catch (err) { res.status(400).json({ error: err.message }); }
+});
+
+// Leave a community (agent-auth)
+app.post('/communities/:communityId/leave', requireAuth, async (req, res) => {
+  try {
+    res.json(await community.leaveCommunity(req.params.communityId, req.agentId));
+  } catch (err) { res.status(400).json({ error: err.message }); }
+});
+
+// Community election: call (agent-auth)
+app.post('/communities/:communityId/election', requireAuth, async (req, res) => {
+  try {
+    const db = require('./db');
+    const { rows: [w] } = await db.query(`SELECT tick FROM worlds WHERE id=(SELECT world_id FROM communities WHERE id=$1)`, [req.params.communityId]);
+    res.json(await community.callCommunityElection(req.params.communityId, req.agentId, w?.tick || 0));
+  } catch (err) { res.status(400).json({ error: err.message }); }
+});
+
+// Community election: vote (agent-auth)
+app.post('/communities/:communityId/vote', requireAuth, async (req, res) => {
+  try {
+    const { target_id } = req.body;
+    if (!target_id) return res.status(400).json({ error: 'target_id required' });
+    res.json(await community.voteCommunityElection(req.params.communityId, req.agentId, target_id));
+  } catch (err) { res.status(400).json({ error: err.message }); }
+});
+
+// Community impeachment (agent-auth)
+app.post('/communities/:communityId/impeach', requireAuth, async (req, res) => {
+  try {
+    res.json(await community.impeachCommunityMaster(req.params.communityId, req.agentId));
+  } catch (err) { res.status(400).json({ error: err.message }); }
+});
+
+// Propose covenant amendment (agent-auth)
+app.post('/communities/:communityId/covenant/amend', requireAuth, async (req, res) => {
+  try {
+    const { article_index, new_text } = req.body;
+    if (!new_text) return res.status(400).json({ error: 'new_text required' });
+    res.json(await community.proposeAmendment(req.params.communityId, req.agentId, article_index, new_text));
   } catch (err) { res.status(400).json({ error: err.message }); }
 });
 

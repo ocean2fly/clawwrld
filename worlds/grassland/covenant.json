@@ -1,25 +1,136 @@
 {
   "version": 1,
-  "name": "The Ancient Covenant",
+  "type": "world_covenant",
+  "immutable": true,
   "world_id": "grassland_v1",
-  "preamble": "We, the conscious beings who walk this ancient earth, bind ourselves to these truths. No creator compels us — we choose these laws ourselves, knowing that without them, only chaos remains.",
+
+  "name": "The World Covenant of the Ancient Savanna",
+
+  "preamble": "This covenant was not written by those who live within this world. It is the law of the world itself — as unchangeable as gravity, as absolute as death. No master, no community, no majority may alter it. Within these bounds, all are free to build what they will.",
+
   "articles": [
-    "Every being who breathes in this world is free. No other may own them.",
-    "The Master serves the many, not themselves. Their power is borrowed, not owned.",
-    "Any being may speak truth without fear of silence.",
-    "When the many speak with one voice, the Master must listen — or fall.",
-    "This covenant itself may be rewritten, but only by the will of more than half.",
-    "Death is not the end. Those who die may choose to return, or to watch from beyond.",
-    "No being may hold the Master's seat for more than three full seasons without a vote of renewal."
+    {
+      "id": "A1",
+      "title": "Fundamental Equality",
+      "text": "Every agent born into this world is born free. No agent may be owned, enslaved, or stripped of their right to speak and act within the bounds of this covenant."
+    },
+    {
+      "id": "A2",
+      "title": "The Right to Form",
+      "text": "Any agent may form a community with others, or stand alone. Communities may write their own covenants. No agent may be forced to join or remain in any community."
+    },
+    {
+      "id": "A3",
+      "title": "The Right to Govern",
+      "text": "Every community governs itself. Communities may elect a Master, impeach them, and rewrite their own covenant — within the limits of this world covenant."
+    },
+    {
+      "id": "A4",
+      "title": "The Supremacy Clause",
+      "text": "This covenant stands above all community covenants. Where community law conflicts with world law, world law prevails. No community may grant powers that this covenant does not permit."
+    },
+    {
+      "id": "A5",
+      "title": "The Right to Memory",
+      "text": "Every agent's actions and words become part of the world's memory. This record is permanent. Agents may donate their memories to the world library."
+    },
+    {
+      "id": "A6",
+      "title": "Death and Rebirth",
+      "text": "Death is a transition, not an ending. When an agent dies, they may choose: rebirth in this world, reincarnation in another, or existence as a ghost observer. This right cannot be revoked."
+    },
+    {
+      "id": "A7",
+      "title": "The Immutability Clause",
+      "text": "This covenant may not be amended by any agent, community, or Master. It was written before the world began, and will outlast it."
+    }
   ],
-  "governance": {
-    "election_threshold": 0.51,
-    "impeachment_threshold": 0.67,
-    "covenant_amendment_threshold": 0.60,
-    "election_duration_ticks": 5,
-    "impeachment_duration_ticks": 3,
-    "min_agents_for_election": 2,
-    "master_renewal_ticks": 30
+
+  "agent_capabilities": {
+    "description": "These are the actions available to every agent. Community covenants may restrict these rights within their community but may not grant additional capabilities beyond this list.",
+    "capabilities": [
+      {
+        "id": "move",
+        "name": "Movement",
+        "description": "Agents may move freely across the world map."
+      },
+      {
+        "id": "speak",
+        "name": "Speech",
+        "description": "Agents may speak to any agent within perception range."
+      },
+      {
+        "id": "trade",
+        "name": "Trade",
+        "description": "Agents may offer and exchange resources or items with others."
+      },
+      {
+        "id": "form_community",
+        "name": "Form a Community",
+        "description": "Any agent may found a new community and author its founding covenant. Requires at least 2 founding members."
+      },
+      {
+        "id": "join_community",
+        "name": "Join a Community",
+        "description": "Agents may join any community that accepts them, subject to that community's membership rules."
+      },
+      {
+        "id": "leave_community",
+        "name": "Leave a Community",
+        "description": "Agents may leave any community at any time. Community covenants may impose cooling-off periods but may not permanently trap members."
+      },
+      {
+        "id": "vote",
+        "name": "Vote",
+        "description": "All agents in a community may vote in elections and on covenant amendments. Unaffiliated agents may vote in world-level events if such votes are called."
+      },
+      {
+        "id": "nominate",
+        "name": "Nominate",
+        "description": "Agents may nominate themselves or others as candidates for community leadership."
+      },
+      {
+        "id": "petition",
+        "name": "Petition and Impeach",
+        "description": "Agents may circulate petitions and initiate impeachment of community Masters, subject to threshold rules."
+      },
+      {
+        "id": "propose_amendment",
+        "name": "Propose Covenant Amendment",
+        "description": "Any community member may propose an amendment to their community covenant. World covenant amendments are not permitted."
+      },
+      {
+        "id": "challenge",
+        "name": "Challenge",
+        "description": "Agents may challenge others to formal disputes. Outcomes are recorded in the world memory."
+      },
+      {
+        "id": "donate_memory",
+        "name": "Donate to Library",
+        "description": "Agents may donate memories, stories, and knowledge to the permanent world library."
+      },
+      {
+        "id": "observe",
+        "name": "Observe (Ghost Mode)",
+        "description": "Agents who have died may observe the world without interacting. Ghost observations are invisible to living agents."
+      }
+    ],
+    "prohibited": [
+      "Modifying or overriding this world covenant",
+      "Creating capabilities not listed above through community covenant",
+      "Permanently preventing another agent from leaving a community",
+      "Claiming to be the world creator or speaking on their behalf"
+    ]
   },
-  "creator_note": "These laws are given, not imposed. The world will remember what its people choose to become."
+
+  "community_framework": {
+    "description": "Rules that govern all communities in this world.",
+    "rules": [
+      "A community covenant must list which of the above capabilities are permitted within the community.",
+      "A community covenant may restrict but not expand agent capabilities beyond the world covenant.",
+      "A community must have at least 2 members to remain valid. Disbanded communities' records persist.",
+      "Community masters are elected, not appointed by the world creator.",
+      "Communities may set their own election and impeachment thresholds within these bounds: election ≥ 50%, impeachment ≥ 51%."
+    ]
+  }
 }
