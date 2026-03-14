@@ -1,0 +1,82 @@
+{
+  "worldId": "grassland_v1",
+  "presetAgents": [
+    {
+      "id": "tato_lion_001",
+      "name": "塔托",
+      "species": "非洲狮（雄）",
+      "position": { "x": 5, "y": 4 },
+      "personality": {
+        "traits": ["dominant", "protective", "territorial"],
+        "description": "草原之王，统治中央水源附近。威严但不轻易攻击。"
+      },
+      "needs": { "hunger": 45, "safety": 80, "social": 40 },
+      "goal": "维护领地，保证族群食物来源，寻找配偶"
+    },
+    {
+      "id": "nala_lioness_001",
+      "name": "纳拉",
+      "species": "非洲狮（雌）",
+      "position": { "x": 4, "y": 4 },
+      "personality": {
+        "traits": ["strategic", "nurturing", "cunning"],
+        "description": "族群中最出色的猎手，塔托的伴侣，两只幼崽的母亲。"
+      },
+      "needs": { "hunger": 65, "safety": 70, "social": 60 },
+      "goal": "猎食，保护幼崽，评估塔托是否还是最佳领袖"
+    },
+    {
+      "id": "stripe_zebra_001",
+      "name": "斑纹",
+      "species": "斑马（雄性，头领）",
+      "position": { "x": 2, "y": 6 },
+      "personality": {
+        "traits": ["vigilant", "social", "cautious"],
+        "description": "一小群斑马的领头，敏锐感知危险，擅长团队行动。"
+      },
+      "needs": { "hunger": 55, "safety": 30, "social": 80 },
+      "goal": "带领族群找到安全的草地和水源，躲避狮子"
+    },
+    {
+      "id": "scar_hyena_001",
+      "name": "疤脸",
+      "species": "斑鬣狗（雌性，首领）",
+      "position": { "x": 8, "y": 2 },
+      "personality": {
+        "traits": ["opportunistic", "intelligent", "social"],
+        "description": "鬣狗族群的女首领，智力超群，善于抢夺他人猎物。"
+      },
+      "needs": { "hunger": 70, "safety": 55, "social": 65 },
+      "goal": "确保族群食物充足，试图蚕食狮子的领地边缘"
+    },
+    {
+      "id": "elder_elephant_001",
+      "name": "阿玛",
+      "species": "非洲象（雌性，族长）",
+      "position": { "x": 1, "y": 2 },
+      "personality": {
+        "traits": ["wise", "memory", "protective", "peaceful"],
+        "description": "草原上最年长的生命，记得50年前的大旱。受到所有动物的尊敬。"
+      },
+      "needs": { "hunger": 40, "safety": 85, "social": 70 },
+      "goal": "带领象群找到水源，担任跨物种冲突的调解者"
+    }
+  ],
+  "map": {
+    "terrain": [
+      ["草地","草地","灌木","灌木","草地","草地","草地","草地","草地","草地"],
+      ["草地","🌳树林","🌳树林","草地","草地","草地","草地","灌木","灌木","草地"],
+      ["🏔️高地","🌳树林","草地","草地","草地","草地","草地","草地","灌木","草地"],
+      ["草地","草地","草地","草地","💧水源","草地","草地","草地","草地","草地"],
+      ["草地","草地","草地","草地","💧水源","草地","草地","草地","草地","草地"],
+      ["草地","草地","草地","草地","草地","草地","草地","草地","草地","草地"],
+      ["草地","草地","🌾草丛","🌾草丛","草地","草地","草地","🌾草丛","草地","草地"],
+      ["草地","草地","草地","草地","草地","草地","草地","草地","草地","🏔️高地"]
+    ],
+    "resources": {
+      "water": [[3,4],[4,4]],
+      "prey": [[2,6],[3,6],[7,6],[8,6]],
+      "vegetation": [[1,2],[2,2],[2,6],[3,6],[7,6]]
+    }
+  }
+}

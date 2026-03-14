@@ -1,0 +1,101 @@
+name: Deploy to AWS EC2
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy ClawWorld
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          APP_DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          APP_JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          APP_TICK_INTERVAL: ${{ secrets.TICK_INTERVAL_SECONDS }}
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          envs: APP_DATABASE_URL,APP_JWT_SECRET,APP_TICK_INTERVAL
+          script: |
+            set -e
+            echo "=== ClawWorld Deploy Start ==="
+
+            # SSH 环境准备
+            mkdir -p ~/.ssh
+            chmod 700 ~/.ssh
+            chmod 600 ~/.ssh/github_deploy 2>/dev/null || true
+            ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
+
+            # 使用显式 SSH key（不依赖 ~/.ssh/config）
+            export GIT_SSH_COMMAND="ssh -i ~/.ssh/github_deploy -o StrictHostKeyChecking=no"
+
+            # 验证 deploy key 是否有效
+            ssh -i ~/.ssh/github_deploy -o StrictHostKeyChecking=no -T git@github.com 2>&1 || true
+
+            # 首次部署：clone repo
+            sudo mkdir -p /opt/clawworld
+            sudo chown $USER:$USER /opt/clawworld
+
+            if [ ! -d "/opt/clawworld/.git" ]; then
+              git clone git@github.com:jackmoriso/clawworld.git /opt/clawworld
+            fi
+
+            cd /opt/clawworld
+
+            # 拉最新代码
+            git fetch origin main
+            git reset --hard origin/main
+
+            # 确保 psql 已安装
+            which psql || sudo dnf install -y postgresql15
+
+            # 安装 Node 依赖
+            npm install --production
+
+            # 写入 .env（用 printf 避免 YAML 解析问题）
+            printf "DATABASE_URL=%s\n" "$APP_DATABASE_URL" > .env
+            printf "JWT_SECRET=%s\n" "$APP_JWT_SECRET" >> .env
+            printf "ACTIVE_WORLDS=grassland_v1\n" >> .env
+            printf "TICK_INTERVAL_SECONDS=%s\n" "${APP_TICK_INTERVAL:-300}" >> .env
+            printf "PORT=3100\n" >> .env
+            printf "NODE_ENV=production\n" >> .env
+            printf "NODE_TLS_REJECT_UNAUTHORIZED=0\n" >> .env
+
+            # 加载环境变量
+            export $(grep -v '^#' .env | xargs)
+
+            # 运行数据库迁移
+            psql "$DATABASE_URL" -f migrations/001_init.sql && echo "Migrations OK" || echo "Already applied"
+
+            # Seed preset agents
+            node scripts/seed-agents.js || echo "Already seeded"
+
+            # PM2 启动/重启
+            if pm2 list | grep -q "clawworld"; then
+              pm2 restart clawworld --update-env
+            else
+              pm2 start server/index.js --name clawworld
+            fi
+
+            pm2 save
+
+            # 部署前端 + nginx
+            which nginx || sudo dnf install -y nginx
+            sudo mkdir -p /usr/share/nginx/html/clawworld
+            sudo cp -r client/. /usr/share/nginx/html/clawworld/
+            sudo cp deploy/nginx.conf /etc/nginx/conf.d/clawworld.conf
+            sudo systemctl enable nginx
+            sudo systemctl restart nginx
+
+            echo "=== Deploy Done ==="
+            pm2 show clawworld | grep -E "status|uptime|memory"
