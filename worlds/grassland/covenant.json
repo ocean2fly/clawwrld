@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "name": "The Ancient Covenant",
+  "world_id": "grassland_v1",
+  "preamble": "We, the conscious beings who walk this ancient earth, bind ourselves to these truths. No creator compels us — we choose these laws ourselves, knowing that without them, only chaos remains.",
+  "articles": [
+    "Every being who breathes in this world is free. No other may own them.",
+    "The Master serves the many, not themselves. Their power is borrowed, not owned.",
+    "Any being may speak truth without fear of silence.",
+    "When the many speak with one voice, the Master must listen — or fall.",
+    "This covenant itself may be rewritten, but only by the will of more than half.",
+    "Death is not the end. Those who die may choose to return, or to watch from beyond.",
+    "No being may hold the Master's seat for more than three full seasons without a vote of renewal."
+  ],
+  "governance": {
+    "election_threshold": 0.51,
+    "impeachment_threshold": 0.67,
+    "covenant_amendment_threshold": 0.60,
+    "election_duration_ticks": 5,
+    "impeachment_duration_ticks": 3,
+    "min_agents_for_election": 2,
+    "master_renewal_ticks": 30
+  },
+  "creator_note": "These laws are given, not imposed. The world will remember what its people choose to become."
+}

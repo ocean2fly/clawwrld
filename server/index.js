@@ -8,6 +8,7 @@ const { loadWorld } = require('./world');
 const { registerAgent: registerAgentDB, requireAuth, extractWSToken } = require('./auth');
 const { registerAgent: registerWSAgent, unregisterAgent, submitAction, startTickScheduler } = require('./tick');
 const library = require('./library');
+const gov = require('./governance');
 
 const app = express();
 app.use(express.json());
@@ -87,6 +88,91 @@ app.get('/worlds/:worldId/feed', async (req, res) => {
     console.error('[/feed]', err.message);
     res.status(500).json({ error: err.message });
   }
+});
+
+// ── Governance API ────────────────────────────────────────────────────────
+
+// Get governance state + covenant (public)
+app.get('/worlds/:worldId/governance', async (req, res) => {
+  try {
+    const state = await gov.getGovernance(req.params.worldId);
+    if (!state) return res.status(404).json({ error: 'World not found' });
+    res.json(state);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// Get covenant (public)
+app.get('/worlds/:worldId/covenant', (req, res) => {
+  const covenant = gov.loadCovenant(req.params.worldId);
+  if (!covenant) return res.status(404).json({ error: 'No covenant found' });
+  res.json(covenant);
+});
+
+// Call election (agent-auth)
+app.post('/worlds/:worldId/governance/election', requireAuth, async (req, res) => {
+  try {
+    const db = require('./db');
+    const { rows: [world] } = await db.query('SELECT tick FROM worlds WHERE id=$1', [req.params.worldId]);
+    const result = await gov.callElection(req.params.worldId, req.agentId, world?.tick || 0);
+    res.json(result);
+  } catch (err) { res.status(400).json({ error: err.message }); }
+});
+
+// Nominate an agent (agent-auth, nomineeId in body — can be self)
+app.post('/worlds/:worldId/governance/nominate', requireAuth, async (req, res) => {
+  try {
+    const nomineeId = req.body.nominee_id || req.agentId;
+    const result = await gov.nominate(req.params.worldId, nomineeId, req.agentId);
+    res.json(result);
+  } catch (err) { res.status(400).json({ error: err.message }); }
+});
+
+// Vote in election (agent-auth)
+app.post('/worlds/:worldId/governance/vote', requireAuth, async (req, res) => {
+  try {
+    const { target_id } = req.body;
+    if (!target_id) return res.status(400).json({ error: 'target_id required' });
+    const result = await gov.voteElection(req.params.worldId, req.agentId, target_id);
+    res.json(result);
+  } catch (err) { res.status(400).json({ error: err.message }); }
+});
+
+// Start impeachment (agent-auth)
+app.post('/worlds/:worldId/governance/impeach', requireAuth, async (req, res) => {
+  try {
+    const db = require('./db');
+    const { rows: [world] } = await db.query('SELECT tick FROM worlds WHERE id=$1', [req.params.worldId]);
+    const result = await gov.startImpeachment(req.params.worldId, req.agentId, world?.tick || 0);
+    res.json(result);
+  } catch (err) { res.status(400).json({ error: err.message }); }
+});
+
+// Sign impeachment petition (agent-auth)
+app.post('/worlds/:worldId/governance/impeach/sign', requireAuth, async (req, res) => {
+  try {
+    const result = await gov.signImpeachment(req.params.worldId, req.agentId);
+    res.json(result);
+  } catch (err) { res.status(400).json({ error: err.message }); }
+});
+
+// Propose covenant amendment (agent-auth)
+app.post('/worlds/:worldId/governance/covenant/amend', requireAuth, async (req, res) => {
+  try {
+    const { article_index, new_text } = req.body;
+    if (!new_text) return res.status(400).json({ error: 'new_text required' });
+    const result = await gov.proposeAmendment(req.params.worldId, req.agentId, article_index ?? null, new_text);
+    res.json(result);
+  } catch (err) { res.status(400).json({ error: err.message }); }
+});
+
+// Vote on covenant amendment (agent-auth)
+app.post('/worlds/:worldId/governance/covenant/vote', requireAuth, async (req, res) => {
+  try {
+    const { amendment_id, support } = req.body;
+    if (!amendment_id) return res.status(400).json({ error: 'amendment_id required' });
+    const result = await gov.voteAmendment(req.params.worldId, amendment_id, req.agentId, support !== false);
+    res.json(result);
+  } catch (err) { res.status(400).json({ error: err.message }); }
 });
 
 // ── Library API (agent-auth required) ────────────────────────────────────

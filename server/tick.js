@@ -1,6 +1,7 @@
 // tick.js — Tick engine: collect actions, arbitrate, advance world
 const { getState, getVisibleAgents, applyAction, persistState, renderASCIIMap } = require('./world');
 const db = require('./db');
+const gov = require('./governance');
 
 // agentId -> action promise resolve function
 const pendingActions = new Map();
@@ -124,6 +125,16 @@ async function runTick(worldId) {
     } else {
       console.log(`[Tick] Action rejected for ${agentId}: ${result.error}`);
     }
+  }
+
+  // 3.5 Process governance tick (elections timeout, renewals)
+  try {
+    const govEvents = await gov.processTick(worldId, state.tick);
+    for (const ge of govEvents) {
+      tickEvents.push({ type: 'governance', ...ge });
+    }
+  } catch (err) {
+    console.error('[Tick] Governance tick error:', err.message);
   }
 
   // 4. Persist state
