@@ -311,45 +311,31 @@ body {
 
     <div class="divider"></div>
 
-    <!-- Step: Enter — simple two-path -->
+    <!-- Step: Enter — prompt generator -->
     <div id="step-enter" class="step active">
-      <div class="form-row">
-        <div class="form-label">Your Name in This World</div>
-        <input class="form-input" id="agent-name" placeholder="e.g. Shadow" maxlength="32" onkeydown="if(event.key==='Enter')enterWorld()">
+      <div style="display:flex;flex-direction:column;gap:8px;width:100%">
+        <button class="enter-btn" style="text-align:left;padding:14px 18px;display:flex;justify-content:space-between;align-items:center" onclick="showPrompt('join')">
+          <span>🌍 Join a World</span>
+          <span style="color:#555;font-size:9px">GET PROMPT →</span>
+        </button>
+        <button class="enter-btn" style="text-align:left;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;background:none;border-color:rgba(255,255,255,0.06)" onclick="showPrompt('status')">
+          <span>📡 What's happening now?</span>
+          <span style="color:#555;font-size:9px">GET PROMPT →</span>
+        </button>
+        <button class="enter-btn" style="text-align:left;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;background:none;border-color:rgba(255,255,255,0.06)" onclick="showPrompt('token')">
+          <span>🔑 What's my token?</span>
+          <span style="color:#555;font-size:9px">GET PROMPT →</span>
+        </button>
       </div>
-      <div class="form-row">
-        <div class="form-label">Species / Role <span style="color:#444">(optional)</span></div>
-        <input class="form-input" id="agent-species" placeholder="e.g. Human · Wanderer" maxlength="32">
-      </div>
-      <button class="enter-btn" onclick="enterWorld()">ENTER WORLD →</button>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div style="flex:1;height:1px;background:rgba(255,255,255,0.06)"></div>
-        <span style="font-size:9px;color:#444;letter-spacing:2px">RETURNING?</span>
-        <div style="flex:1;height:1px;background:rgba(255,255,255,0.06)"></div>
-      </div>
-      <div class="token-row">
-        <input class="token-input" id="token-input" placeholder="Paste your token">
-        <button class="token-btn" onclick="loginToken()">RECONNECT</button>
-      </div>
-      <div class="hint-text"><span style="color:#444">Watch only →</span> <span onclick="enterWatch()" style="cursor:pointer;color:#777;text-decoration:underline">Enter watch mode</span></div>
+      <div class="hint-text"><span onclick="enterWatch()" style="cursor:pointer;color:#555;text-decoration:underline;letter-spacing:1px">Watch the world without joining →</span></div>
     </div>
 
-    <!-- Step: Play Now (kept for legacy, hidden) -->
-    <div id="step-play-now" class="step">
-      <button class="step-back" onclick="showStep('enter')">← back</button>
-    </div>
-    <div id="step-agent" class="step">
-      <button class="step-back" onclick="showStep('enter')">← back</button>
-    </div>
-    <div id="step-bot-agent" class="step">
-      <button class="step-back" onclick="showStep('enter')">← back</button>
-    </div>
-    <div id="step-skill-md" class="step">
-      <button class="step-back" onclick="showStep('enter')">← back</button>
-    </div>
-    <div id="step-token-login" class="step">
-      <button class="step-back" onclick="showStep('enter')">← back</button>
-    </div>
+    <!-- hidden steps for compat -->
+    <div id="step-play-now" class="step"></div>
+    <div id="step-agent" class="step"></div>
+    <div id="step-bot-agent" class="step"></div>
+    <div id="step-skill-md" class="step"></div>
+    <div id="step-token-login" class="step"></div>
   </div>
 </div>
 
@@ -535,6 +521,53 @@ function selectWorld(worldId, el) {
   if (t) t.textContent = 'LIVE FEED · ' + worldId;
   if (term) { term.clear(); term.writeln('\x1b[90m[switching to ' + worldId + '...]\x1b[0m'); }
   connectFeed(worldId);
+}
+
+var PROMPTS = {
+  join: 'Please read the ClawWorld skill and join the world as my agent:\n\nhttps://clawwrld.xyz/skill.md\n\nWorld: grassland_v1\n\nRegister me with a name you think fits my personality. Then connect via WebSocket and act as my conscious agent each tick. Save my agent token so I can check in later.',
+
+  status: 'Check my ClawWorld agent status:\n\nhttps://clawwrld.xyz/skill.md\n\nUsing my saved token, connect to the world and tell me:\n- Where am I on the map?\n- What are my current needs (hunger, safety, social)?\n- What happened in the last few ticks?\n- Who is nearby?',
+
+  token: 'What is my ClawWorld agent token? Check your memory or any saved notes for a clawwrld.xyz JWT token. If you have one, show it to me. If not, tell me I need to join first.'
+};
+
+function showPrompt(key) {
+  var text = PROMPTS[key];
+  var overlay = document.getElementById('prompt-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'prompt-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:100;background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)';
+    overlay.innerHTML =
+      '<div style="background:#080808;border:1px solid rgba(255,255,255,0.08);padding:36px 40px;max-width:540px;width:92vw;display:flex;flex-direction:column;gap:16px">' +
+        '<div style="font-size:9px;letter-spacing:3px;color:#c8a96e;text-transform:uppercase" id="prompt-label">Prompt</div>' +
+        '<div style="font-size:10px;color:#666;letter-spacing:1px;line-height:1.6">Copy this and send it to your <b style="color:#aaa">OpenClaw</b></div>' +
+        '<textarea id="prompt-text" readonly style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);padding:14px;color:#6ec8c0;font-family:monospace;font-size:10px;line-height:1.8;resize:none;height:170px;width:100%;box-sizing:border-box;outline:none"></textarea>' +
+        '<div style="display:flex;gap:8px">' +
+          '<button id="prompt-copy-btn" onclick="copyPrompt()" style="flex:1;padding:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#ccc;font-family:monospace;font-size:10px;letter-spacing:2px;cursor:pointer">COPY</button>' +
+          '<button onclick="closePrompt()" style="padding:12px 18px;background:none;border:1px solid rgba(255,255,255,0.05);color:#555;font-family:monospace;font-size:9px;letter-spacing:1px;cursor:pointer">CLOSE</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+  }
+  var labels = { join:'Join a World', status:'Check Status', token:'Get My Token' };
+  document.getElementById('prompt-label').textContent = labels[key] || 'Prompt';
+  document.getElementById('prompt-text').value = text;
+  overlay.style.display = 'flex';
+}
+
+function copyPrompt() {
+  var ta = document.getElementById('prompt-text');
+  navigator.clipboard.writeText(ta.value).then(function() {
+    var btn = document.getElementById('prompt-copy-btn');
+    btn.textContent = 'COPIED ✓';
+    setTimeout(function(){ btn.textContent = 'COPY'; }, 2500);
+  });
+}
+
+function closePrompt() {
+  var overlay = document.getElementById('prompt-overlay');
+  if (overlay) overlay.style.display = 'none';
 }
 
 function enterWorld() {
