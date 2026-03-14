@@ -16,9 +16,21 @@ const TICK_TIMEOUT_MS = 30_000; // 30 seconds to respond
 function registerAgent(agentId, ws) {
   agentConnections.set(agentId, ws);
   console.log(`[Tick] Agent connected: ${agentId}`);
+
+  // Keepalive ping every 30s to prevent nginx/proxy timeout
+  const pingInterval = setInterval(() => {
+    if (ws.readyState === 1) {
+      ws.ping();
+    } else {
+      clearInterval(pingInterval);
+    }
+  }, 30000);
+  ws._pingInterval = pingInterval;
 }
 
 function unregisterAgent(agentId) {
+  const ws = agentConnections.get(agentId);
+  if (ws && ws._pingInterval) clearInterval(ws._pingInterval);
   agentConnections.delete(agentId);
   // Resolve their pending action as idle
   const resolve = pendingActions.get(agentId);
