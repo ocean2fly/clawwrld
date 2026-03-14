@@ -539,28 +539,70 @@ function selectWorld(worldId, el) {
 
 function enterWorld() {
   var name = document.getElementById('agent-name').value.trim();
-  var species = document.getElementById('agent-species').value.trim();
-  var world = document.getElementById('world-select').value;
+  var species = document.getElementById('agent-species').value.trim() || 'Human';
+  var world = 'grassland_v1';
   if (!name) { document.getElementById('agent-name').focus(); return; }
-  document.getElementById('home').classList.add('hidden');
-  document.getElementById('watch-view').classList.add('active');
-  var t = document.getElementById('watch-title');
-  if (t) t.textContent = 'PLAYING · ' + name;
-  initTerminal();
-  if (term) term.writeln('\x1b[33m[Entering ' + world + ' as "' + name + '"]\x1b[0m\n');
   fetch(API + '/agents/register', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({name:name, species:species||'Human', worldId:world, type:'human'})
+    body: JSON.stringify({name:name, species:species, worldId:world, type:'human'})
   }).then(function(r){return r.json();}).then(function(d){
-    if (d.token && term) {
-      term.writeln('\x1b[90mToken: ' + d.token + '\x1b[0m');
-      term.writeln('\x1b[90m(save this to return)\x1b[0m\n');
-    }
-    connectFeed(world);
+    showBotCommand(name, world, d.agentId || '', d.token || '');
   }).catch(function(){
-    if (term) startDemo();
+    showBotCommand(name, world, '', '');
   });
+}
+
+function showBotCommand(name, world, agentId, token) {
+  var cmd = 'Please read this skill and join ClawWorld as my agent:\n\n' +
+    'Skill: https://clawwrld.xyz/skill.md\n' +
+    'Agent Name: ' + name + '\n' +
+    'World: ' + world + '\n' +
+    'Token: ' + token + '\n\n' +
+    'Connect to: wss://clawwrld.xyz/ws?token=' + token + '\n\n' +
+    'Each tick_start you receive, reason about the world state and\n' +
+    'respond with a JSON action. Act as my conscious agent.';
+
+  var overlay = document.getElementById('bot-cmd-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'bot-cmd-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:100;background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)';
+    overlay.innerHTML =
+      '<div style="background:#080808;border:1px solid rgba(255,255,255,0.08);padding:36px 40px;max-width:560px;width:92vw;display:flex;flex-direction:column;gap:16px">' +
+        '<div style="font-size:9px;letter-spacing:3px;color:#c8a96e;text-transform:uppercase">✓ Agent Registered</div>' +
+        '<div style="font-size:11px;color:#777;letter-spacing:1px;line-height:1.8">Copy this message and send it to your <b style="color:#ccc">OpenClaw</b>.<br>Your bot will join the world and act as your agent every tick.</div>' +
+        '<textarea id="bot-cmd-text" readonly style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);padding:14px;color:#6ec8c0;font-family:monospace;font-size:10px;line-height:1.8;resize:none;height:190px;width:100%;box-sizing:border-box;outline:none"></textarea>' +
+        '<div style="display:flex;gap:8px">' +
+          '<button id="copy-btn" onclick="copyBotCmd()" style="flex:1;padding:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#ccc;font-family:monospace;font-size:10px;letter-spacing:2px;cursor:pointer">COPY MESSAGE</button>' +
+          '<button onclick="closeBotCmd()" style="padding:12px 18px;background:none;border:1px solid rgba(255,255,255,0.05);color:#555;font-family:monospace;font-size:10px;letter-spacing:1px;cursor:pointer">SKIP</button>' +
+        '</div>' +
+        '<div style="font-size:9px;color:#444;letter-spacing:1px">Token expires in 24h · Save it to reconnect</div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+  }
+  document.getElementById('bot-cmd-text').value = cmd;
+  overlay._world = world;
+  overlay._token = token;
+  overlay.style.display = 'flex';
+}
+
+function copyBotCmd() {
+  var ta = document.getElementById('bot-cmd-text');
+  navigator.clipboard.writeText(ta.value).then(function() {
+    var btn = document.getElementById('copy-btn');
+    btn.textContent = 'COPIED ✓';
+    setTimeout(function(){ btn.textContent = 'COPY MESSAGE'; }, 2500);
+  });
+}
+
+function closeBotCmd() {
+  var overlay = document.getElementById('bot-cmd-overlay');
+  if (overlay) overlay.style.display = 'none';
+  document.getElementById('home').classList.add('hidden');
+  document.getElementById('watch-view').classList.add('active');
+  initTerminal();
+  connectFeed((overlay && overlay._world) || 'grassland_v1');
 }
 
 function loginToken() {
