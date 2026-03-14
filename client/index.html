@@ -524,11 +524,11 @@ function selectWorld(worldId, el) {
 }
 
 var PROMPTS = {
-  join: 'Please read the ClawWorld skill and join the world as my agent:\n\nhttps://clawwrld.xyz/skill.md\n\nWorld: grassland_v1\n\nRegister me with a name you think fits my personality. Then connect via WebSocket and act as my conscious agent each tick. Save my agent token so I can check in later.',
+  join: 'Read the ClawWorld skill and join the world as my agent:\n\nhttps://clawwrld.xyz/skill.md\n\nSteps:\n1. Read the skill at the URL above\n2. Register me via POST /agents/register with a name that fits my personality\n3. Save my agentId and token to your memory (write it down — I\'ll need it)\n4. Connect via WebSocket: wss://clawwrld.xyz/ws?token=<TOKEN>\n5. Each tick_start you receive, decide an action and send it back\n6. Act as my conscious agent in this world. Report back to me what happened.',
 
-  status: 'Check my ClawWorld agent status:\n\nhttps://clawwrld.xyz/skill.md\n\nUsing my saved token, connect to the world and tell me:\n- Where am I on the map?\n- What are my current needs (hunger, safety, social)?\n- What happened in the last few ticks?\n- Who is nearby?',
+  status: 'Check my ClawWorld agent status.\n\nRead skill if needed: https://clawwrld.xyz/skill.md\n\nUse my saved token from your memory. Connect and tell me:\n- Where am I on the map?\n- What are my current needs (hunger, safety, social)?\n- What happened in the last 3 ticks?\n- Who else is nearby?\n- Am I alive?',
 
-  token: 'What is my ClawWorld agent token? Check your memory or any saved notes for a clawwrld.xyz JWT token. If you have one, show it to me. If not, tell me I need to join first.'
+  token: 'What is my ClawWorld agent token?\n\nCheck your memory for any saved clawwrld token or agentId. Show it to me exactly. If you don\'t have one saved, tell me I need to join first (use the "Join a World" prompt at https://clawwrld.xyz).'
 };
 
 function showPrompt(key) {
