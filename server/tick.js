@@ -143,7 +143,14 @@ async function runTick(worldId) {
     }
   }
 
-  // 3.5 Process governance tick (elections timeout, renewals)
+  // 3.5 Cooperation events (food sharing, group gathering, guard duty)
+  try {
+    const { getState, getRelationships } = require('./world');
+    const coopEvents = processCooperation(worldId, state, getRelationships(worldId));
+    tickEvents.push(...coopEvents);
+  } catch(err) { console.error('[Tick] Coop error:', err.message); }
+
+  // 3.6 Process governance tick (elections timeout, renewals)
   try {
     const govEvents = await gov.processTick(worldId, state.tick);
     for (const ge of govEvents) {
@@ -193,6 +200,123 @@ function startTickScheduler(worldId, intervalSeconds = 300) {
 /**
  * Simple rule-based NPC auto-behavior for disconnected agents
  */
+const { getRelationships } = require('./world');
+
+// ── Cooperation system ─────────────────────────────────────────────
+function processCooperation(worldId, state, rels) {
+  const events = [];
+  const agents = Object.values(state.agents).filter(a => a.status === 'alive');
+  const used = new Set(); // agents already acted in coop this tick
+
+  // 1. Food sharing: agent with OK hunger near a starving friend/close/lovers
+  for (const giver of agents) {
+    if (used.has(giver.id)) continue;
+    const giverH = giver.needs.hunger || 0;
+    if (giverH < 35) continue; // giver too hungry to share
+
+    for (const receiver of agents) {
+      if (receiver.id === giver.id) continue;
+      if (used.has(receiver.id)) continue;
+      const recH = receiver.needs.hunger || 0;
+      if (recH > 20) continue; // receiver not desperate enough
+
+      const dist = Math.abs(giver.position.x - receiver.position.x) +
+                   Math.abs(giver.position.y - receiver.position.y);
+      if (dist > 2) continue;
+
+      const key = [giver.id, receiver.id].sort().join('::');
+      const rel = rels && rels.get(key);
+      const level = rel ? getRelLevel(rel.score) : 'stranger';
+      if (!['friends','close','lovers'].includes(level)) continue;
+
+      // Share food!
+      giver.needs.hunger = Math.max(10, giverH - 18);
+      receiver.needs.hunger = Math.min(60, recH + 28);
+      used.add(giver.id); used.add(receiver.id);
+
+      const desc = level === 'lovers'
+        ? pick([
+            `${giver.name}将自己仅剩的食物递给${receiver.name}，轻声说："你先吃"`,
+            `${giver.name}看见${receiver.name}虚弱的样子，毫不犹豫地分出了自己的食物`,
+          ])
+        : pick([
+            `${giver.name}发现${receiver.name}已经快撑不住了，悄悄把食物分了过去`,
+            `"拿着。" ${giver.name}没有多说，把食物放到了${receiver.name}手里`,
+            `${giver.name}见${receiver.name}饥寒交迫，将食物一分为二`,
+          ]);
+      events.push({ type: 'food_share', participants: [giver.id, receiver.id], description: desc });
+      // Relationship boost
+      if (rel) { rel.score = Math.min(100, rel.score + 8); }
+      break;
+    }
+  }
+
+  // 2. Group gathering: 3+ agents within 2 cells of each other
+  const positions = agents.map(a => a.position);
+  for (let i = 0; i < agents.length; i++) {
+    const anchor = agents[i];
+    const group = agents.filter(a =>
+      Math.abs(a.position.x - anchor.position.x) <= 2 &&
+      Math.abs(a.position.y - anchor.position.y) <= 2
+    );
+    if (group.length >= 3) {
+      // Only fire once per tick (use a flag)
+      if (state._groupTalkTick === state.tick) break;
+      state._groupTalkTick = state.tick;
+
+      const names = group.slice(0,3).map(a => a.name);
+      const desc = pick([
+        `${names[0]}、${names[1]}与${names[2]}围坐在一起，低声商量着接下来怎么办`,
+        `草原上聚起了一小群人——${names.join('、')}。他们分享着各自的发现`,
+        `${names[0]}说："我们应该一起行动。" ${names[1]}和${names[2]}沉默片刻，点了点头`,
+        `${group.length}人不约而同地聚集到了一起，彼此的存在带来了一丝温暖`,
+      ]);
+      events.push({ type: 'group_gathering', participants: group.map(a=>a.id), description: desc });
+      break;
+    }
+  }
+
+  // 3. Guard duty: partner resting, other stands guard
+  for (const guard of agents) {
+    if (used.has(guard.id)) continue;
+    const guardH = guard.needs.hunger || 0;
+    if (guardH < 25) continue;
+
+    for (const resting of agents) {
+      if (resting.id === guard.id) continue;
+      const key = [guard.id, resting.id].sort().join('::');
+      const rel = rels && rels.get(key);
+      if (!rel || !rel.partnered) continue;
+
+      const dist = Math.abs(guard.position.x - resting.position.x) +
+                   Math.abs(guard.position.y - resting.position.y);
+      if (dist > 1) continue;
+      if (state._guardTick === state.tick) break;
+      state._guardTick = state.tick;
+      used.add(guard.id);
+
+      const desc = pick([
+        `${guard.name}静静地守在${resting.name}身旁，让对方安心休息`,
+        `${resting.name}闭上眼睛，知道${guard.name}在旁边守着——这就足够了`,
+        `${guard.name}背对着${resting.name}，默默注视着草原的远处`,
+      ]);
+      events.push({ type: 'guard_duty', participants: [guard.id, resting.id], description: desc });
+      break;
+    }
+  }
+
+  return events;
+}
+
+function getRelLevel(score) {
+  if (score >= 90) return 'lovers';
+  if (score >= 70) return 'close';
+  if (score >= 45) return 'friends';
+  if (score >= 20) return 'acquaintance';
+  return 'stranger';
+}
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
 // Water sources for grassland_v1 (x,y)
 const WATER_SOURCES = [{x:4,y:3},{x:4,y:4}];
 const FOOD_TERRAIN = new Set(['tree','plain']); // can eat anywhere with grass
