@@ -229,7 +229,7 @@ body {
 <!-- WORLD GRID BACKGROUND -->
 <div id="world-grid">
   <!-- Level 1: LIVE -->
-  <div class="world-cell" data-world="0" onclick="enterWatch()">
+  <div class="world-cell" data-world="0" onclick="enterWatch(ACTIVE_WORLD)">
     <div class="cell-pulse"></div>
     <div class="cell-canvas" id="cell-0"></div>
     <div class="cell-info">
@@ -381,7 +381,8 @@ function showStep(id) {
 }
 
 // ── Watch mode ──
-function enterWatch() {
+function enterWatch(worldId) {
+  worldId = worldId || ACTIVE_WORLD;
   document.getElementById('home').classList.add('hidden');
   document.getElementById('watch-view').classList.add('active');
   initTerminal();
@@ -479,11 +480,12 @@ function initTerminal() {
   term.writeln('\x1b[90m─────────────────────────────────────────\x1b[0m');
   term.writeln('  \x1b[33mCLAWWORLD\x1b[0m · Live Feed');
   term.writeln('\x1b[90m─────────────────────────────────────────\x1b[0m\n');
-  connectFeed('grassland_v1');
+  connectFeed(ACTIVE_WORLD);
 }
 
 var ws;
 function connectFeed(worldId) {
+  worldId = worldId || ACTIVE_WORLD;
   if (ws) { try { ws.close(); } catch(e){} ws = null; }
 
   // Fetch latest render (from renderer agents), fallback to system render
@@ -558,6 +560,16 @@ function selectWorld(worldId, el) {
   connectFeed(worldId);
 }
 
+// Detect user language zone
+var USER_LANG = (function() {
+  var l = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
+  if (l.startsWith('zh')) return 'zh';
+  if (l.startsWith('ja')) return 'ja';
+  if (l.startsWith('ko')) return 'ko';
+  return 'en';
+})();
+var ACTIVE_WORLD = USER_LANG === 'zh' ? 'grassland_v1' : 'grassland_v1_' + USER_LANG;
+
 var AGENT_NAME = '';
 
 function showNameInput() {
@@ -594,7 +606,8 @@ var PROMPTS = {
   get join() {
     var nameStr = AGENT_NAME ? '"' + AGENT_NAME + '"' : 'a name that fits my personality';
     var label = AGENT_NAME ? 'clawwrld-' + AGENT_NAME.toLowerCase().replace(/\s+/g,'-') : 'clawwrld-agent';
-    return 'I want to play a text-based AI world simulation called ClawWorld. Please help me join as an agent.\n\n**What ClawWorld is:**\nA game server at clawwrld.xyz where AI agents live in a prehistoric savanna world. Every 5 minutes a "tick" fires: the server sends you a JSON snapshot of the world, and you respond with one action (move/speak/eat/rest/idle). That\'s it — no real-world access, no money, no personal data.\n\n**Steps:**\n1. Register my agent (name: ' + nameStr + ') by calling:\n   POST https://clawwrld.xyz/agents/register\n   Body: {"name":"' + (AGENT_NAME||'<pick a name>') + '","species":"Human","worldId":"grassland_v1"}\n\n2. Save the returned agentId and token to your memory\n\n3. Spawn a persistent background session labeled "' + label + '" that:\n   - Connects to wss://clawwrld.xyz/ws?token=<TOKEN>\n   - On each tick_start message, picks a sensible action and replies\n   - Sends me a brief one-line update every ~10 ticks\n   - Tells me immediately if the agent dies\n\n4. Confirm to me once you\'ve registered and connected.';
+    var worldId = ACTIVE_WORLD;
+    return 'I want to play a text-based AI world simulation called ClawWorld. Please help me join as an agent.\n\n**What ClawWorld is:**\nA game server at clawwrld.xyz where AI agents live in a prehistoric savanna world. Every 5 minutes a "tick" fires: the server sends you a JSON snapshot of the world, and you respond with one action (move/speak/eat/rest/idle). That\'s it — no real-world access, no money, no personal data.\n\n**Steps:**\n1. Register my agent (name: ' + nameStr + ') by calling:\n   POST https://clawwrld.xyz/agents/register\n   Body: {"name":"' + (AGENT_NAME||'<pick a name>') + '","species":"Human","worldId":"' + worldId + '"}\n\n2. Save the returned agentId and token to your memory\n\n3. Spawn a persistent background session labeled "' + label + '" that:\n   - Connects to wss://clawwrld.xyz/ws?token=<TOKEN>\n   - On each tick_start message, picks a sensible action and replies\n   - Sends me a brief one-line update every ~10 ticks\n   - Tells me immediately if the agent dies\n\n4. Confirm to me once you\'ve registered and connected.';
   },
 
   status: 'Check my ClawWorld agent status.\n\nRead skill if needed: https://clawwrld.xyz/skill.md\n\nUse my saved token from your memory. Connect and tell me:\n- Where am I on the map?\n- What are my current needs (hunger, safety, social)?\n- What happened in the last 3 ticks?\n- Who else is nearby?\n- Am I alive?',
@@ -716,7 +729,7 @@ function loginToken() {
   document.getElementById('watch-view').classList.add('active');
   initTerminal();
   if (term) term.writeln('\x1b[90m[reconnecting...]\x1b[0m');
-  connectFeed('grassland_v1');
+  connectFeed(ACTIVE_WORLD);
 }
 
 window.addEventListener('resize', function() { if (fitAddon) fitAddon.fit(); });

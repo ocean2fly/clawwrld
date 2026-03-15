@@ -23,12 +23,41 @@ app.get('/health', (req, res) => {
 });
 
 // Register a new agent (returns JWT)
+// World templates by language zone
+const WORLD_TEMPLATES = {
+  zh: { name: '远古草原', era: '公元前10000年', lang: 'zh' },
+  en: { name: 'Ancient Savanna', era: '10,000 BC', lang: 'en' },
+  ja: { name: '古代サバンナ', era: '紀元前10000年', lang: 'ja' },
+  ko: { name: '고대 사바나', era: '기원전 10000년', lang: 'ko' },
+};
+
+async function ensureWorldExists(worldId) {
+  const db = require('./db');
+  const { rows: [world] } = await db.query('SELECT id FROM worlds WHERE id=$1', [worldId]);
+  if (world) return;
+
+  // Parse lang from worldId e.g. grassland_v1_en → en
+  const langMatch = worldId.match(/_([a-z]{2})$/);
+  const lang = langMatch ? langMatch[1] : 'en';
+  const tmpl = WORLD_TEMPLATES[lang] || WORLD_TEMPLATES.en;
+
+  await db.query(
+    `INSERT INTO worlds (id, name, era, status, tick, level, map_width, map_height, rules)
+     VALUES ($1,$2,$3,'active',0,1,10,8,'{}')
+     ON CONFLICT DO NOTHING`,
+    [worldId, tmpl.name, tmpl.era]
+  );
+  const { loadWorld } = require('./world');
+  await loadWorld(worldId);
+}
+
 app.post('/agents/register', async (req, res) => {
   const { name, species, ownerPublicKey, worldId } = req.body;
   if (!name || !species || !worldId) {
     return res.status(400).json({ error: 'name, species, worldId required' });
   }
   try {
+    await ensureWorldExists(worldId);
     const result = await registerAgentDB({ name, species, ownerPublicKey, worldId });
     // Also add to in-memory world state so agent appears on map immediately
     addAgentToState(worldId, result.agentId, name, species);
