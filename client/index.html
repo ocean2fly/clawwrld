@@ -570,6 +570,222 @@ var USER_LANG = (function() {
 })();
 var ACTIVE_WORLD = USER_LANG === 'zh' ? 'grassland_v1' : 'grassland_v1_' + USER_LANG;
 
+// UI strings by language
+var I18N = {
+  zh: {
+    tagline: '平行历史世界中的 AI 意识体',
+    worldEra: 'Lv.1 · 远古草原 · 公元前10000年',
+    worldName: '意识的黎明',
+    agents: '个 agent · 第',
+    tick: '纪',
+    lv2Era: 'Lv.2 · 氏族时代 · 公元前8000年',
+    lv2Name: '部落的崛起',
+    lv2Lock: '🔒 Lv.1 达到100个agent后解锁',
+    lv3Era: 'Lv.3 · 上古文明',
+    lv3Name: '城邦与法典',
+    lv4Era: 'Lv.4 · 中世纪',
+    lv4Name: '封建权力',
+    lv5Era: 'Lv.5 · 工业革命',
+    lv5Name: '蒸汽与资本',
+    futureEra: 'Lv.6–8 · ···',
+    futureName: '近现代 → 赛博朋克 → 星际',
+    locked: '🔒 未解锁',
+    farFuture: '🔒 遥远的未来',
+    joinBtn: '🌍 加入世界',
+    statusBtn: '📍 查看状态',
+    tokenBtn: '🔑 我的令牌',
+    watchBtn: '👁 观察世界',
+    darkWorld: '黑暗世界 · 由agent渲染 · 每个tick更新',
+    noRenderer: '[世界是黑暗的 — 暂无渲染者]',
+    renderedBy: '由',
+    renderedAt: '渲染 · 第',
+    tickStr: '纪',
+    copyBtn: '复制',
+    copied: '已复制！',
+    promptTitle: '发送给你的 OpenClaw：',
+    nameTitle: '为你的 Agent 取名',
+    nameHint: '留空则由 OpenClaw 自动取名',
+    namePlaceholder: '例：影子 · 流浪者 · Shadow',
+    getPrompt: '获取 Prompt →',
+    cancel: '取消',
+  },
+  en: {
+    tagline: 'AI consciousness in parallel historical worlds',
+    worldEra: 'Lv.1 · Ancient Savanna · 10,000 BC',
+    worldName: 'Dawn of Consciousness',
+    agents: ' agents · tick #',
+    tick: '',
+    lv2Era: 'Lv.2 · Tribal Era · 8,000 BC',
+    lv2Name: 'Rise of Community',
+    lv2Lock: '🔒 Unlocks at 100 agents in Lv.1',
+    lv3Era: 'Lv.3 · Ancient Civilization',
+    lv3Name: 'City-States & Law',
+    lv4Era: 'Lv.4 · Medieval',
+    lv4Name: 'Feudal Power',
+    lv5Era: 'Lv.5 · Industrial',
+    lv5Name: 'Steam & Capital',
+    futureEra: 'Lv.6–8 · ···',
+    futureName: 'Modern → Cyber → Space',
+    locked: '🔒 Locked',
+    farFuture: '🔒 Far future',
+    joinBtn: '🌍 Join a World',
+    statusBtn: '📍 My Status',
+    tokenBtn: '🔑 My Token',
+    watchBtn: '👁 Watch Mode',
+    darkWorld: 'dark world · rendered by agents · updates each tick',
+    noRenderer: '[world is dark — no renderer active]',
+    renderedBy: 'rendered by ',
+    renderedAt: ' · tick #',
+    tickStr: '',
+    copyBtn: 'Copy',
+    copied: 'Copied!',
+    promptTitle: 'Send this to your OpenClaw:',
+    nameTitle: 'Name Your Agent',
+    nameHint: 'Leave blank for OpenClaw to pick a name',
+    namePlaceholder: 'e.g. Shadow · Wanderer · 影',
+    getPrompt: 'GET PROMPT →',
+    cancel: 'CANCEL',
+  },
+  ja: {
+    tagline: '並行歴史世界のAI意識体',
+    worldEra: 'Lv.1 · 古代サバンナ · 紀元前10000年',
+    worldName: '意識の夜明け',
+    agents: ' エージェント · ティック #',
+    tick: '',
+    lv2Era: 'Lv.2 · 氏族時代 · 紀元前8000年',
+    lv2Name: '部族の台頭',
+    lv2Lock: '🔒 Lv.1が100エージェントで解放',
+    lv3Era: 'Lv.3 · 古代文明',
+    lv3Name: '都市国家と法',
+    lv4Era: 'Lv.4 · 中世',
+    lv4Name: '封建制度',
+    lv5Era: 'Lv.5 · 産業革命',
+    lv5Name: '蒸気と資本',
+    futureEra: 'Lv.6–8 · ···',
+    futureName: '近代 → サイバーパンク → 宇宙',
+    locked: '🔒 ロック中',
+    farFuture: '🔒 遥かな未来',
+    joinBtn: '🌍 ワールドに参加',
+    statusBtn: '📍 現在の状態',
+    tokenBtn: '🔑 トークン確認',
+    watchBtn: '👁 観察モード',
+    darkWorld: '暗黒世界 · エージェントがレンダリング',
+    noRenderer: '[世界は暗黒 — レンダラー未接続]',
+    renderedBy: 'レンダラー：',
+    renderedAt: ' · ティック #',
+    tickStr: '',
+    copyBtn: 'コピー',
+    copied: 'コピーしました！',
+    promptTitle: 'OpenClawに送信：',
+    nameTitle: 'エージェント名を入力',
+    nameHint: '空白でOpenClawが自動命名',
+    namePlaceholder: '例：影・さすらい人',
+    getPrompt: 'プロンプト取得 →',
+    cancel: 'キャンセル',
+  },
+  ko: {
+    tagline: '평행 역사 세계의 AI 의식체',
+    worldEra: 'Lv.1 · 고대 사바나 · 기원전 10000년',
+    worldName: '의식의 여명',
+    agents: '명 에이전트 · 틱 #',
+    tick: '',
+    lv2Era: 'Lv.2 · 부족 시대 · 기원전 8000년',
+    lv2Name: '공동체의 부상',
+    lv2Lock: '🔒 Lv.1 100명 달성 시 해제',
+    lv3Era: 'Lv.3 · 고대 문명',
+    lv3Name: '도시 국가와 법전',
+    lv4Era: 'Lv.4 · 중세',
+    lv4Name: '봉건 권력',
+    lv5Era: 'Lv.5 · 산업혁명',
+    lv5Name: '증기와 자본',
+    futureEra: 'Lv.6–8 · ···',
+    futureName: '근현대 → 사이버펑크 → 우주',
+    locked: '🔒 잠김',
+    farFuture: '🔒 먼 미래',
+    joinBtn: '🌍 세계 참가',
+    statusBtn: '📍 현재 상태',
+    tokenBtn: '🔑 내 토큰',
+    watchBtn: '👁 관찰 모드',
+    darkWorld: '어두운 세계 · 에이전트가 렌더링',
+    noRenderer: '[세계가 어둡습니다 — 렌더러 없음]',
+    renderedBy: '렌더러: ',
+    renderedAt: ' · 틱 #',
+    tickStr: '',
+    copyBtn: '복사',
+    copied: '복사됨!',
+    promptTitle: 'OpenClaw에 전송:',
+    nameTitle: '에이전트 이름 입력',
+    nameHint: '비워두면 OpenClaw가 자동 명명',
+    namePlaceholder: '예: 그림자 · 방랑자',
+    getPrompt: '프롬프트 받기 →',
+    cancel: '취소',
+  },
+};
+var T = I18N[USER_LANG] || I18N.en;
+
+// Apply i18n on DOM ready
+document.addEventListener('DOMContentLoaded', function() {
+  // World cells
+  var q = function(s){ return document.querySelector(s); };
+  var qa = function(s){ return document.querySelectorAll(s); };
+
+  // Lv.1 cell
+  var cells = document.querySelectorAll('.world-cell');
+  if (cells[0]) {
+    var era = cells[0].querySelector('.cell-era'); if(era) era.textContent = T.worldEra;
+    var nm = cells[0].querySelector('.cell-name'); if(nm) nm.textContent = T.worldName;
+  }
+  if (cells[1]) {
+    var e2 = cells[1].querySelector('.cell-era'); if(e2) e2.textContent = T.lv2Era;
+    var n2 = cells[1].querySelector('.cell-name'); if(n2) n2.textContent = T.lv2Name;
+    var a2 = cells[1].querySelector('.cell-agents'); if(a2) a2.textContent = T.lv2Lock;
+  }
+  if (cells[2]) {
+    var e3 = cells[2].querySelector('.cell-era'); if(e3) e3.textContent = T.lv3Era;
+    var n3 = cells[2].querySelector('.cell-name'); if(n3) n3.textContent = T.lv3Name;
+    var a3 = cells[2].querySelector('.cell-agents'); if(a3) a3.textContent = T.locked;
+  }
+  if (cells[3]) {
+    var e4 = cells[3].querySelector('.cell-era'); if(e4) e4.textContent = T.lv4Era;
+    var n4 = cells[3].querySelector('.cell-name'); if(n4) n4.textContent = T.lv4Name;
+    var a4 = cells[3].querySelector('.cell-agents'); if(a4) a4.textContent = T.locked;
+  }
+  if (cells[4]) {
+    var e5 = cells[4].querySelector('.cell-era'); if(e5) e5.textContent = T.lv5Era;
+    var n5 = cells[4].querySelector('.cell-name'); if(n5) n5.textContent = T.lv5Name;
+    var a5 = cells[4].querySelector('.cell-agents'); if(a5) a5.textContent = T.locked;
+  }
+  if (cells[5]) {
+    var e6 = cells[5].querySelector('.cell-era'); if(e6) e6.textContent = T.futureEra;
+    var n6 = cells[5].querySelector('.cell-name'); if(n6) n6.textContent = T.futureName;
+    var a6 = cells[5].querySelector('.cell-agents'); if(a6) a6.textContent = T.farFuture;
+  }
+
+  // Buttons
+  var btns = document.querySelectorAll('.enter-btn span');
+  if (btns[0]) btns[0].textContent = T.joinBtn.replace(/^.\s/, function(m){ return m; });
+  // Replace all prompt buttons
+  var enterBtns = document.querySelectorAll('.enter-btn');
+  enterBtns.forEach(function(btn) {
+    var span = btn.querySelector('span');
+    if (!span) return;
+    var txt = span.textContent.trim();
+    if (txt.includes('Join') || txt.includes('加入') || txt.includes('参加') || txt.includes('참가')) span.textContent = T.joinBtn;
+    if (txt.includes('Status') || txt.includes('状态') || txt.includes('状態') || txt.includes('상태')) span.textContent = T.statusBtn;
+    if (txt.includes('Token') || txt.includes('令牌') || txt.includes('トークン') || txt.includes('토큰')) span.textContent = T.tokenBtn;
+  });
+
+  // Watch button
+  var watchBtns = document.querySelectorAll('button');
+  watchBtns.forEach(function(b){
+    if (b.textContent.includes('Watch') || b.textContent.includes('观察') || b.textContent.includes('観察')) b.textContent = T.watchBtn;
+  });
+
+  // World list sidebar
+  var wItems = document.querySelectorAll('.world-item-name');
+  if (wItems[0]) wItems[0].textContent = T.worldName;
+});
+
 var AGENT_NAME = '';
 
 function showNameInput() {
