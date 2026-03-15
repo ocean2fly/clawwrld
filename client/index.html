@@ -532,6 +532,11 @@ async function loadDetail(worldId, name, era) {
     connectMapWs(worldId);
     clearInterval(window._mapRefreshTimer);
     window._mapRefreshTimer=setInterval(function(){ refreshMap(worldId); }, 18000);
+    // Init 3D if in 3D mode
+    if(currentView==='3d'){
+      var asc=document.getElementById('ascii3d');
+      if(window._3D && !window._3D.running) setTimeout(function(){ window._3D.init(asc); }, 80);
+    }
   } catch(e){
     buildMapGrid(); connectMapWs(worldId);
   }
@@ -619,6 +624,9 @@ function updateMapAgents(agents) {
       '<div class="agent-name" style="color:'+col+'">'+a.name+'</div>';
   });
   Object.keys(existing).forEach(function(id){ if(!seen[id]) existing[id].remove(); });
+
+  // Push to 3D view if running
+  if(window._3D) window._3D.update(agents);
 
   // Draw love lines
   drawLoveLines(sw, sh, cellW, cellH);
@@ -958,9 +966,8 @@ window._3D={
 </script>
 
 <script>
-// ── View toggle (2D / 3D ASCII) ─────────────────────────────────
+// ── View toggle ─────────────────────────────────────────────────
 var currentView = '3d';
-
 function setView(v) {
   currentView = v;
   document.getElementById('btn-2d').classList.toggle('active', v==='2d');
@@ -968,35 +975,11 @@ function setView(v) {
   var asc=document.getElementById('ascii3d');
   if(v==='3d'){
     asc.classList.add('open');
-    // Init if first time
     if(window._3D && !window._3D.running){
-      setTimeout(function(){ window._3D.init(asc); },50);
+      setTimeout(function(){ window._3D.init(asc); }, 50);
     }
   } else {
     asc.classList.remove('open');
-  }
-}
-
-// Hook into refreshMap to also update 3D
-var _orig_refreshMap = refreshMap;
-async function refreshMap(worldId){
-  await _orig_refreshMap(worldId);
-}
-
-// Override updateMapAgents to also push to 3D
-var _orig_updateMapAgents = updateMapAgents;
-function updateMapAgents(agents){
-  _orig_updateMapAgents(agents);
-  if(window._3D) window._3D.update(agents);
-}
-
-// Auto-init 3D on detail open
-var _orig_loadDetail = loadDetail;
-async function loadDetail(worldId, name, era){
-  await _orig_loadDetail(worldId, name, era);
-  if(currentView==='3d'){
-    var asc=document.getElementById('ascii3d');
-    if(window._3D && !window._3D.running) setTimeout(function(){ window._3D.init(asc); },100);
   }
 }
 </script>
