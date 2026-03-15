@@ -13,13 +13,39 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 :root {
   --accent: #c8a96e;
-  --accent2: #6ec8c0;
+  --accent2: #5ba8a0;
   --glass: rgba(22,28,46,0.92);
   --border: rgba(255,255,255,0.14);
+  --cell-bg: #1c2235;
+  --header-bg: rgba(20,26,42,0.7);
+  --text: #f0f0f0;
+  --text2: #aaa;
+  --text3: #888;
+  --card-bg: rgba(22,28,46,0.92);
+  --btn-bg: rgba(255,255,255,0.07);
+  --btn-border: rgba(255,255,255,0.18);
+  --btn-color: #e0e0e0;
+}
+body.light-mode {
+  --glass: rgba(245,246,250,0.97);
+  --border: rgba(0,0,0,0.12);
+  --cell-bg: #d8dde8;
+  --header-bg: rgba(240,242,248,0.9);
+  --text: #1a1f2e;
+  --text2: #444;
+  --text3: #666;
+  --card-bg: rgba(245,246,250,0.97);
+  --btn-bg: rgba(0,0,0,0.05);
+  --btn-border: rgba(0,0,0,0.18);
+  --btn-color: #222;
+  --accent: #8a6d2e;
+  --accent2: #2e7a76;
+  background: #dfe3ec !important;
+  color: #1a1f2e !important;
 }
 body {
   background: #1a1f2e;
-  color: #f0f0f0;
+  color: var(--text);
   font-family: 'SF Mono','Fira Code','Cascadia Code',monospace;
   overflow: hidden;
   height: 100vh;
@@ -36,7 +62,7 @@ body {
 }
 .world-cell {
   position: relative; overflow: hidden;
-  background: #1c2235; cursor: pointer;
+  background: var(--cell-bg); cursor: pointer;
 }
 .world-cell::before {
   content: ''; position: absolute; inset: 0; z-index: 1;
@@ -57,7 +83,7 @@ body {
 }
 .cell-era { font-size: 8px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 4px; }
 .cell-name { font-size: 13px; color: #fff; letter-spacing: 1px; margin-bottom: 5px; }
-.cell-agents { font-size: 9px; color: #aaa; letter-spacing: 1px; }
+.cell-agents { font-size: 9px; color: var(--text2); letter-spacing: 1px; }
 .cell-pulse {
   position: absolute; top: 12px; right: 12px; z-index: 2;
   width: 6px; height: 6px; border-radius: 50%;
@@ -87,10 +113,10 @@ body {
   padding: 16px 28px;
   display: flex; align-items: center; justify-content: space-between;
   border-bottom: 1px solid rgba(255,255,255,0.05);
-  background: rgba(20,26,42,0.7); backdrop-filter: blur(10px);
+  background: var(--header-bg); backdrop-filter: blur(10px);
 }
 .header-logo { font-size: 11px; letter-spacing: 6px; color: #fff; text-transform: uppercase; }
-.header-stats { font-size: 9px; letter-spacing: 2px; color: #888; }
+.header-stats { font-size: 9px; letter-spacing: 2px; color: var(--text3); }
 
 /* ── HOME CARD ── */
 #home {
@@ -112,7 +138,7 @@ body {
   letter-spacing: 12px; text-transform: uppercase; color: #fff;
   text-align: center; margin-bottom: 4px;
 }
-.logo-sub { font-size: 9px; letter-spacing: 5px; color: #888; text-transform: uppercase; text-align: center; }
+.logo-sub { font-size: 9px; letter-spacing: 5px; color: var(--text3); text-transform: uppercase; text-align: center; }
 .world-ticker { font-size: 10px; letter-spacing: 2px; color: var(--accent); text-align: center; min-height: 16px; }
 .divider { width: 100%; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent); }
 
@@ -132,7 +158,7 @@ body {
 .id-label { font-size: 9px; color: #666; letter-spacing: 2px; }
 .id-btn:hover .id-label { color: #999; }
 
-.hint-text { font-size: 9px; color: #888; letter-spacing: 1px; text-align: center; line-height: 1.8; }
+.hint-text { font-size: 9px; color: var(--text3); letter-spacing: 1px; text-align: center; line-height: 1.8; }
 
 /* ── STEPS ── */
 .step { display: none; flex-direction: column; gap: 16px; width: 100%; }
@@ -170,12 +196,12 @@ body {
 .form-input::placeholder { color: #444; }
 .form-select option { background: #111; }
 .enter-btn {
-  padding: 13px 24px; background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.18); color: #e0e0e0;
+  padding: 13px 24px; background: var(--btn-bg);
+  border: 1px solid var(--btn-border); color: var(--btn-color);
   font-family: inherit; font-size: 10px; letter-spacing: 3px;
   text-transform: uppercase; cursor: pointer; width: 100%; transition: all 0.25s;
 }
-.enter-btn:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.4); color: #fff; }
+.enter-btn:hover { background: rgba(128,128,128,0.15); border-color: var(--accent); color: var(--text); }
 .code-block {
   background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
   padding: 14px 16px; font-size: 10px; color: var(--accent2);
@@ -897,14 +923,30 @@ document.addEventListener('DOMContentLoaded', function() {
       var btn = document.createElement('button');
       btn.className = 'lang-btn';
       btn.setAttribute('data-lang', lang);
-      btn.textContent = LANG_FLAGS[lang];
+      btn.innerHTML = '<span style="font-family:Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,sans-serif;font-size:24px;line-height:1">' + LANG_FLAGS[lang] + '</span>';
       btn.title = lang.toUpperCase();
-      btn.style.cssText = 'background:none;border:1px solid transparent;font-size:22px;padding:2px 4px;cursor:pointer;transition:all .2s;opacity:0.45;line-height:1;border-radius:3px';
-      btn.onmouseenter = function(){ if(btn.getAttribute('data-lang')!==USER_LANG) btn.style.opacity='0.85'; };
+      btn.style.cssText = 'background:none;border:2px solid transparent;padding:2px 3px;cursor:pointer;transition:all .2s;opacity:0.45;line-height:1;border-radius:6px';
+      btn.onmouseenter = function(){ if(btn.getAttribute('data-lang')!==USER_LANG) btn.style.opacity='0.8'; };
       btn.onmouseleave = function(){ if(btn.getAttribute('data-lang')!==USER_LANG) btn.style.opacity='0.45'; };
       btn.onclick = function() { applyI18n(lang); };
       container.appendChild(btn);
     });
+
+    // Dark/Light mode toggle
+    var isDark = true;
+    var themeBtn = document.createElement('button');
+    themeBtn.id = 'theme-toggle';
+    themeBtn.innerHTML = '<span style="font-family:Apple Color Emoji,Segoe UI Emoji,sans-serif;font-size:18px">☀️</span>';
+    themeBtn.title = 'Light / Dark';
+    themeBtn.style.cssText = 'background:none;border:2px solid transparent;padding:2px 4px;cursor:pointer;opacity:0.5;border-radius:6px;margin-left:6px;transition:all .2s';
+    themeBtn.onmouseenter = function(){ themeBtn.style.opacity='0.9'; };
+    themeBtn.onmouseleave = function(){ themeBtn.style.opacity='0.5'; };
+    themeBtn.onclick = function() {
+      isDark = !isDark;
+      document.body.classList.toggle('light-mode', !isDark);
+      themeBtn.innerHTML = '<span style="font-family:Apple Color Emoji,Segoe UI Emoji,sans-serif;font-size:18px">' + (isDark ? '☀️' : '🌙') + '</span>';
+    };
+    container.appendChild(themeBtn);
   }
   applyI18n(USER_LANG);
 });
