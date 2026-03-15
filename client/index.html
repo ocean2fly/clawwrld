@@ -133,16 +133,56 @@ body {
 .feed-row-tick { font-size:9px; color:var(--accent); letter-spacing:2px; min-width:36px; flex-shrink:0; }
 .feed-empty { padding:48px 24px; text-align:center; font-size:10px; color:var(--text3); letter-spacing:2px; }
 
-/* Watch terminal section */
-.detail-terminal {
+/* ─── WORLD MAP ANIMATION ─── */
+#world-map-wrap {
   width:100%; max-width:680px; margin:0 auto;
-  border-top:1px solid var(--border); margin-top:8px;
+  padding:16px 24px 8px; border-bottom:1px solid var(--border);
 }
-.detail-terminal-header {
-  padding:10px 24px; font-size:8px; letter-spacing:3px; color:var(--text3);
-  display:flex; justify-content:space-between; align-items:center;
+#world-map-inner {
+  position:relative; width:100%;
+  /* 10 cols × 8 rows = aspect 10:8 */
+  aspect-ratio: 10/8;
 }
-#terminal-wrap { height:320px; background:#000; }
+.map-grid {
+  position:absolute; inset:0;
+  display:grid; grid-template-columns:repeat(10,1fr); grid-template-rows:repeat(8,1fr);
+}
+.map-cell {
+  border:1px solid rgba(255,255,255,0.025);
+  display:flex; align-items:center; justify-content:center;
+  font-size:min(2.2vw,14px); user-select:none;
+}
+.cell-empty    { background:#0d1018; }
+.cell-tree     { background:#0c1a0c; }
+.cell-mountain { background:#17171f; }
+.cell-water    { background:#081520; }
+.cell-river    { background:#081818; }
+/* agent dots */
+.agent-pin {
+  position:absolute; z-index:10;
+  display:flex; flex-direction:column; align-items:center;
+  transition: left 3.5s cubic-bezier(.4,0,.2,1), top 3.5s cubic-bezier(.4,0,.2,1);
+  pointer-events:none; transform:translate(-50%,-50%);
+}
+.agent-pin-dot {
+  width:min(3.2vw,18px); height:min(3.2vw,18px);
+  border-radius:50%; border:2px solid; box-shadow:0 0 8px currentColor;
+  display:flex; align-items:center; justify-content:center;
+  font-size:min(1.6vw,9px); font-weight:bold; color:#fff;
+}
+.agent-pin-label {
+  font-size:min(1.3vw,8px); letter-spacing:0.5px;
+  margin-top:2px; opacity:0.85; white-space:nowrap; text-shadow:0 1px 3px #000;
+}
+/* narrative bar */
+#map-narrative {
+  margin-top:10px; padding:10px 0; font-size:10px; color:var(--text2);
+  line-height:1.7; border-top:1px solid rgba(255,255,255,0.04);
+  white-space:pre-line;
+}
+#map-tick-badge {
+  font-size:8px; letter-spacing:3px; color:var(--text3); margin-bottom:6px;
+}
 
 /* ─── JOIN DRAWER ─── */
 #join-drawer {
@@ -202,9 +242,7 @@ body {
 }
 .prompt-btns { display:flex; gap:8px; }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.min.css">
-<script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.min.js"></script>
+
 </head>
 <body>
 
@@ -262,12 +300,13 @@ body {
   <div class="detail-body" id="detail-body">
     <div class="feed-empty">Loading...</div>
   </div>
-  <div class="detail-terminal">
-    <div class="detail-terminal-header">
-      <span style="letter-spacing:3px">LIVE TERMINAL</span>
-      <button onclick="connectTerminal()" style="background:none;border:1px solid var(--border);color:var(--text3);font-family:inherit;font-size:8px;letter-spacing:2px;padding:4px 10px;cursor:pointer">CONNECT</button>
+  <div id="world-map-wrap">
+    <div id="map-tick-badge">LIVE MAP</div>
+    <div id="world-map-inner">
+      <div class="map-grid" id="map-grid"></div>
+      <!-- agent pins injected by JS -->
     </div>
-    <div id="terminal-wrap"></div>
+    <div id="map-narrative"></div>
   </div>
 </div>
 
@@ -404,8 +443,9 @@ function buildWorldCards() {
 // ─── Detail view ───
 var detailWorldId = null;
 async function loadDetail(worldId, name, era) {
-  // disconnect old WS
-  if (termWs) { try{termWs.close();}catch(e){} termWs=null; }
+  // disconnect old WS + reset map
+  if (mapWs) { try{mapWs.close();}catch(e){} mapWs=null; }
+  mapBuilt=false;
   detailWorldId = worldId;
   document.getElementById('detail-title').textContent = name;
   document.getElementById('detail-era').textContent = era;
@@ -441,54 +481,129 @@ async function loadDetail(worldId, name, era) {
     if (agents.length===0 && events.length===0) {
       body.innerHTML='<div class="feed-empty">No agents yet</div>';
     }
-    // auto-connect terminal
-    setTimeout(connectTerminal, 300);
+    // Build map + start live updates
+    buildMapGrid(worldId);
+    updateMapAgents((d && d.agents)||[]);
+    connectMapWs(worldId);
+    // Refresh map every 20s (in case WS misses ticks)
+    clearInterval(window._mapRefreshTimer);
+    window._mapRefreshTimer=setInterval(function(){ refreshMap(worldId); }, 20000);
   } catch(e){
     body.innerHTML='<div class="feed-empty">Failed to load</div>';
-    setTimeout(connectTerminal, 300);
+    buildMapGrid(worldId);
+    connectMapWs(worldId);
   }
 }
 
-// ─── Terminal ───
-var term, termWs, termFit;
-function ensureTerm() {
-  if (term) return;
-  term = new Terminal({theme:{background:'#000',foreground:'#ccc'},fontFamily:"'SF Mono','Fira Code',monospace",fontSize:12,lineHeight:1.5,cursorBlink:false});
-  termFit = new FitAddon.FitAddon(); term.loadAddon(termFit);
-  term.open(document.getElementById('terminal-wrap')); termFit.fit();
+// ─── Animated World Map ───
+var TERRAIN = {
+  // grassland_v1 terrain — x,y → type
+  '1,1':'tree','1,2':'tree',
+  '0,2':'mountain','9,7':'mountain',
+  '4,3':'water','4,4':'water',
+  '2,6':'river','3,6':'river','7,6':'river',
+};
+var MAP_W=10, MAP_H=8;
+var mapBuilt=false, mapWs=null;
+
+function buildMapGrid(worldId) {
+  // terrain is same for all grassland variants
+  var grid=document.getElementById('map-grid'); if(!grid) return;
+  if(mapBuilt) return; mapBuilt=true;
+  grid.innerHTML='';
+  for(var r=0;r<MAP_H;r++) for(var c=0;c<MAP_W;c++) {
+    var cell=document.createElement('div');
+    var t=TERRAIN[c+','+r]||'empty';
+    cell.className='map-cell cell-'+t;
+    var icon={'tree':'🌳','mountain':'⛰','water':'💧','river':'〰','empty':''}[t]||'';
+    if(icon) cell.textContent=icon;
+    grid.appendChild(cell);
+  }
 }
-function connectTerminal() {
-  ensureTerm(); term.clear();
-  // 1. Try to load world render (ASCII map + narrative)
-  fetch(API+'/worlds/'+detailWorldId+'/render')
-    .then(function(r){ return r.json(); })
-    .then(function(d){
-      if (d.ascii_map) {
-        term.writeln('\x1b[90m── rendered by '+(d.renderer_name||'system')+' · tick #'+(d.tick||'?')+' ──\x1b[0m');
-        term.writeln('');
-        d.ascii_map.split('\n').forEach(function(line){ term.writeln(line); });
-        if (d.narrative) { term.writeln(''); term.writeln('\x1b[36m'+d.narrative+'\x1b[0m'); }
-      } else {
-        term.writeln('\x1b[90m[no map render available — world is dark]\x1b[0m');
-      }
-      term.writeln('');
-      connectWs();
-    }).catch(function(){ connectWs(); });
+
+function agentColor(species) {
+  if(!species) return '#5ba8a0';
+  var s=species.toLowerCase();
+  if(s.includes('human')) return '#5ba8a0';
+  if(s.includes('斑马')||s.includes('zebra')) return '#c8a96e';
+  if(s.includes('象')||s.includes('elephant')) return '#9a7fc8';
+  if(s.includes('lion')||s.includes('狮')) return '#e07060';
+  return '#aaa';
 }
-function connectWs() {
-  if (termWs) { try{termWs.close();}catch(e){} }
-  var proto = location.protocol==='https:'?'wss:':'ws:';
-  termWs = new WebSocket(proto+'//'+location.host+'/ws');
-  termWs.onopen = function(){ term.writeln('\x1b[90m── live feed connected ──\x1b[0m'); };
-  termWs.onmessage = function(e){
+
+function updateMapAgents(agents) {
+  var wrap=document.getElementById('world-map-inner'); if(!wrap) return;
+  var cellW=wrap.offsetWidth/MAP_W, cellH=wrap.offsetHeight/MAP_H;
+  // Remove stale pins
+  var existing={};
+  wrap.querySelectorAll('.agent-pin').forEach(function(p){ existing[p.dataset.aid]=p; });
+  var seen={};
+  (agents||[]).forEach(function(a) {
+    var ax = a.x!=null ? a.x : a.position_x;
+    var ay = a.y!=null ? a.y : a.position_y;
+    if(ax==null) return;
+    seen[a.id]=true;
+    var left=(parseFloat(ax)+0.5)*cellW, top=(parseFloat(ay)+0.5)*cellH;
+    var pin=existing[a.id];
+    if(!pin) {
+      pin=document.createElement('div'); pin.className='agent-pin'; pin.dataset.aid=a.id;
+      var col=agentColor(a.species);
+      var initial=a.name?a.name.slice(0,1):'?';
+      pin.innerHTML='<div class="agent-pin-dot" style="color:'+col+';border-color:'+col+'">'+initial+'</div>'+
+        '<div class="agent-pin-label" style="color:'+col+'">'+a.name+'</div>';
+      // No transition on first placement
+      pin.style.transition='none';
+      pin.style.left=left+'px'; pin.style.top=top+'px';
+      wrap.appendChild(pin);
+      // Restore transition after first frame
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){ pin.style.transition=''; });
+      });
+    } else {
+      pin.style.left=left+'px'; pin.style.top=top+'px';
+    }
+  });
+  // Remove pins for dead/gone agents
+  Object.keys(existing).forEach(function(id){
+    if(!seen[id]) existing[id].remove();
+  });
+}
+
+function connectMapWs(worldId) {
+  if(mapWs){ try{mapWs.close();}catch(e){} mapWs=null; }
+  var proto=location.protocol==='https:'?'wss:':'ws:';
+  mapWs=new WebSocket(proto+'//'+location.host+'/ws');
+  mapWs.onmessage=function(e){
     try {
       var m=JSON.parse(e.data);
-      if (m.type==='tick_end') term.writeln('\x1b[90m\r\n━ tick #'+m.tick+' ━\x1b[0m');
-      else if (m.events) m.events.forEach(function(ev){ if(ev.description) term.writeln('\x1b[33m· '+ev.description+'\x1b[0m'); });
-    } catch(e){}
+      // On tick end, refresh the map
+      if(m.type==='tick_end') refreshMap(worldId);
+    }catch(e){}
   };
-  termWs.onerror = function(){ term.writeln('\x1b[90m[live feed unavailable]\x1b[0m'); };
 }
+
+async function refreshMap(worldId) {
+  try {
+    var r=await fetch(API+'/worlds/'+worldId+'/feed');
+    var d=await r.json();
+    // Update stats bar
+    if(d.world){
+      document.getElementById('dstat-agents').textContent=(d.agents?d.agents.length:0)+' agents';
+      document.getElementById('dstat-tick').textContent='tick #'+(d.world.tick||0);
+      document.getElementById('map-tick-badge').textContent='TICK #'+(d.world.tick||0)+' · LIVE MAP';
+    }
+    // Update agent positions on map
+    updateMapAgents(d.agents||[]);
+    // Update narrative
+    var narr=document.getElementById('map-narrative');
+    if(narr) {
+      var events=(d.events||[]).filter(function(e){return e.description;}).slice(-8);
+      narr.textContent=events.map(function(e){return 't'+e.tick+' · '+e.description;}).join('\n')||'世界沉默中……';
+    }
+  }catch(e){}
+}
+
+function connectTerminal(){ /* no-op: replaced by map */ }
 
 // ─── Join ───
 var drawerOpen=false;
