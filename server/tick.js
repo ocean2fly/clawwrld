@@ -193,6 +193,26 @@ function startTickScheduler(worldId, intervalSeconds = 300) {
 /**
  * Simple rule-based NPC auto-behavior for disconnected agents
  */
+// Water sources for grassland_v1 (x,y)
+const WATER_SOURCES = [{x:4,y:3},{x:4,y:4}];
+const FOOD_TERRAIN = new Set(['tree','plain']); // can eat anywhere with grass
+
+function moveToward(pos, targets, W, H) {
+  // Pick closest target and step toward it
+  let best = null, bestDist = Infinity;
+  for (const t of targets) {
+    const d = Math.abs(t.x - pos.x) + Math.abs(t.y - pos.y);
+    if (d < bestDist) { bestDist = d; best = t; }
+  }
+  if (!best || bestDist === 0) return null;
+  const dx = best.x - pos.x, dy = best.y - pos.y;
+  const step = Math.abs(dx) >= Math.abs(dy)
+    ? { x: pos.x + Math.sign(dx), y: pos.y }
+    : { x: pos.x, y: pos.y + Math.sign(dy) };
+  if (step.x >= 0 && step.x < W && step.y >= 0 && step.y < H) return step;
+  return null;
+}
+
 function npcAutoAction(agentId, state) {
   const agent = state.agents[agentId];
   if (!agent) return { type: 'idle' };
@@ -201,42 +221,54 @@ function npcAutoAction(agentId, state) {
   const hunger = needs.hunger || 50;
   const safety = needs.safety || 50;
   const social = needs.social || 50;
+  const pos = agent.position || { x: 0, y: 0 };
+  const W = state.mapWidth || 10, H = state.mapHeight || 8;
 
-  // Starving → eat if possible, else move toward water/food
-  if (hunger > 75) {
+  // Critical hunger → move toward water or eat
+  if (hunger <= 20) {
+    const atWater = WATER_SOURCES.some(w => w.x === pos.x && w.y === pos.y);
+    if (atWater) return { type: 'eat' };
+    const step = moveToward(pos, WATER_SOURCES, W, H);
+    if (step) return { type: 'move', target: step };
     return { type: 'eat' };
   }
 
-  // Unsafe → flee / rest
-  if (safety < 25) {
-    return { type: 'rest' };
+  // Hungry but not critical → eat or seek food
+  if (hunger < 45) {
+    if (Math.random() < 0.6) return { type: 'eat' };
   }
 
-  // Lonely → speak
-  if (social < 30 && Math.random() < 0.4) {
+  // Social — speak if others nearby
+  const nearby = Object.values(state.agents).filter(a =>
+    a.id !== agentId && a.status === 'alive' &&
+    Math.abs(a.position.x - pos.x) <= 2 && Math.abs(a.position.y - pos.y) <= 2
+  );
+  if (nearby.length > 0 && social < 40 && Math.random() < 0.5) {
     const phrases = [
-      '我在这里', '天色渐暗', '听到什么声音了吗？',
-      '今天风很大', '水源在哪里？', '需要小心'
+      `${nearby[0].name}，你还好吗？`,
+      '这片草原比我想象的更危险',
+      '我已经很久没吃东西了',
+      '你有没有看到其他人？',
+      '我们应该一起行动',
+      '天快黑了，要小心',
     ];
     return { type: 'speak', message: phrases[Math.floor(Math.random() * phrases.length)] };
   }
 
-  // Otherwise random move
-  const pos = agent.position || { x: 0, y: 0 };
+  // Move toward another agent sometimes (social bonding)
+  if (nearby.length > 0 && Math.random() < 0.3) {
+    const t = nearby[Math.floor(Math.random()*nearby.length)];
+    const step = moveToward(pos, [t.position], W, H);
+    if (step) return { type: 'move', target: step };
+  }
+
+  // Random move with 20% rest
+  if (Math.random() < 0.2) return { type: 'rest' };
   const dirs = [
-    { x: pos.x + 1, y: pos.y }, { x: pos.x - 1, y: pos.y },
-    { x: pos.x, y: pos.y + 1 }, { x: pos.x, y: pos.y - 1 },
-    { x: pos.x, y: pos.y }, // stay
-  ];
-  const map = state.map || {};
-  const W = map.width || 10, H = map.height || 8;
-  const valid = dirs.filter(p => p.x >= 0 && p.x < W && p.y >= 0 && p.y < H);
-  const target = valid[Math.floor(Math.random() * valid.length)];
-
-  // 30% chance to just rest/idle
-  if (Math.random() < 0.3) return { type: 'rest' };
-
-  return { type: 'move', target };
+    { x: pos.x+1, y: pos.y }, { x: pos.x-1, y: pos.y },
+    { x: pos.x, y: pos.y+1 }, { x: pos.x, y: pos.y-1 },
+  ].filter(p => p.x >= 0 && p.x < W && p.y >= 0 && p.y < H);
+  return { type: 'move', target: dirs[Math.floor(Math.random()*dirs.length)] || pos };
 }
 
 module.exports = { registerAgent, unregisterAgent, submitAction, sendToAgent, runTick, startTickScheduler };

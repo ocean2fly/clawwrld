@@ -145,6 +145,106 @@ function getDirection(from, to) {
  * Apply an action to world state (pure logic, no LLM)
  * Returns: { success, events, updatedAgents }
  */
+// ── Narrative description helpers ──────────────────────────────────
+function terrainAt(state, x, y) {
+  const t = state.terrain || {};
+  return t[`${x},${y}`] || 'plain';
+}
+function nearbyAgents(state, agentId, range) {
+  const me = state.agents[agentId];
+  if (!me) return [];
+  return Object.values(state.agents).filter(a =>
+    a.id !== agentId && a.status === 'alive' &&
+    Math.abs(a.position.x - me.position.x) <= range &&
+    Math.abs(a.position.y - me.position.y) <= range
+  );
+}
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+function moveDesc(agent, to, state) {
+  const h = agent.needs.hunger || 50;
+  const terrain = terrainAt(state, to.x, to.y);
+  const nearby = nearbyAgents(state, agent.id, 1);
+
+  const dirX = to.x - agent.position.x, dirY = to.y - agent.position.y;
+  const dir = dirX > 0 ? '向东' : dirX < 0 ? '向西' : dirY > 0 ? '向南' : '向北';
+
+  if (h <= 15) return pick([
+    `${agent.name}强撑着虚弱的身体，${dir}蹒跚而行`,
+    `${agent.name}饥肠辘辘，艰难地迈出脚步，${dir}而去`,
+    `${agent.name}眼神涣散，跌跌撞撞地${dir}移动`,
+  ]);
+  if (terrain === 'water') return pick([
+    `${agent.name}嗅到水的气息，迫不及待地${dir}奔去`,
+    `${agent.name}发现了水源！急步${dir}走去`,
+  ]);
+  if (terrain === 'tree') return pick([
+    `${agent.name}走向${dir}的树荫处`,
+    `${agent.name}悄悄靠近${dir}的树丛`,
+  ]);
+  if (nearby.length > 0) return pick([
+    `${agent.name}注意到${nearby[0].name}，${dir}走近`,
+    `${agent.name}朝着${nearby[0].name}的方向${dir}靠近`,
+  ]);
+  return pick([
+    `${agent.name}${dir}漫步，目光扫视着草原`,
+    `${agent.name}迈开步伐，${dir}而行`,
+    `${agent.name}缓缓${dir}移动，警惕地观察四周`,
+  ]);
+}
+
+function eatDesc(agent) {
+  const h = agent.needs.hunger || 50;
+  if (h <= 15) return pick([
+    `${agent.name}几近虚脱，终于找到一点食物，贪婪地吞咽`,
+    `${agent.name}拼命咀嚼手边的草根，勉强吊住生命`,
+  ]);
+  return pick([
+    `${agent.name}停下来觅食，细嚼慢咽`,
+    `${agent.name}低下头啃食草地`,
+    `${agent.name}找到了食物，专注地进食`,
+  ]);
+}
+
+function restDesc(agent, state) {
+  const nearby = nearbyAgents(state, agent.id, 2);
+  if (nearby.length > 0) return pick([
+    `${agent.name}在${nearby[0].name}附近静静地坐下`,
+    `${agent.name}望着远处的${nearby[0].name}，慢慢平缓呼吸`,
+  ]);
+  return pick([
+    `${agent.name}找了个背风处，沉默地休息`,
+    `${agent.name}停下脚步，仰望天空发呆`,
+    `${agent.name}蜷缩在草丛中，闭目养神`,
+    `${agent.name}席地而坐，聆听风声`,
+  ]);
+}
+
+// ── Encounter events (fired when two agents share a cell) ──────────
+function checkEncounters(worldId, state, movedAgentId) {
+  const me = state.agents[movedAgentId];
+  if (!me || me.status !== 'alive') return;
+  const same = Object.values(state.agents).filter(a =>
+    a.id !== movedAgentId && a.status === 'alive' &&
+    a.position.x === me.position.x && a.position.y === me.position.y
+  );
+  for (const other of same) {
+    const key = [movedAgentId, other.id].sort().join(':');
+    const lastEnc = state._lastEncounter || {};
+    if (lastEnc[key] === state.tick) continue; // already fired this tick
+    if (!state._lastEncounter) state._lastEncounter = {};
+    state._lastEncounter[key] = state.tick;
+
+    const desc = pick([
+      `${me.name}与${other.name}在此处相遇，彼此对视`,
+      `${me.name}走近${other.name}，两者在草原上短暂驻足`,
+      `${me.name}和${other.name}不期而遇，沉默地站在一起`,
+    ]);
+    state.events.push({ type: 'encounter', participants: [movedAgentId, other.id], description: desc });
+  }
+}
+
+// ── Main action handler ─────────────────────────────────────────────
 function applyAction(worldId, agentId, action) {
   const state = worldStates.get(worldId);
   if (!state) return { success: false, error: 'World not found' };
@@ -167,34 +267,37 @@ function applyAction(worldId, agentId, action) {
       if (dx > 1 || dy > 1) {
         return { success: false, error: 'Can only move 1 cell per tick' };
       }
+      const desc = moveDesc(agent, { x, y }, state);
       agent.position = { x, y };
-      // Moving costs hunger
       agent.needs.hunger = Math.max(0, (agent.needs.hunger || 50) - 3);
-      events.push({ type: 'move', agentId, from: agent.position, to: { x, y } });
+      events.push({ type: 'move', agentId, from: { ...agent.position }, to: { x, y }, description: desc });
+      checkEncounters(worldId, state, agentId);
       break;
     }
 
     case 'speak': {
-      const { message, to } = action; // to = agentId or null (broadcast)
-      events.push({ type: 'speak', agentId, message, to: to || 'all' });
+      const { message, to } = action;
+      const desc = `${agent.name} 说："${message}"`;
+      events.push({ type: 'speak', agentId, message, to: to || 'all', description: desc });
       break;
     }
 
     case 'eat': {
+      const desc = eatDesc(agent);
       agent.needs.hunger = Math.min(100, (agent.needs.hunger || 50) + 30);
-      events.push({ type: 'eat', agentId });
+      events.push({ type: 'eat', agentId, description: desc });
       break;
     }
 
     case 'rest': {
+      const desc = restDesc(agent, state);
       agent.needs.safety = Math.min(100, (agent.needs.safety || 50) + 10);
       agent.needs.hunger = Math.max(0, (agent.needs.hunger || 50) - 5);
-      events.push({ type: 'rest', agentId });
+      events.push({ type: 'rest', agentId, description: desc });
       break;
     }
 
     case 'idle': {
-      // Agent chose to do nothing this tick
       agent.needs.hunger = Math.max(0, (agent.needs.hunger || 50) - 2);
       break;
     }
@@ -209,7 +312,11 @@ function applyAction(worldId, agentId, action) {
   // Check death condition
   if (agent.needs.hunger <= 0) {
     agent.status = 'dead';
-    events.push({ type: 'death', agentId, cause: 'starvation' });
+    const deathDesc = pick([
+      `${agent.name}再也撑不住了，缓缓倒在草原上，永远地沉默了`,
+      `${agent.name}在饥饿中走完了最后一步，倒下，再未起来`,
+    ]);
+    events.push({ type: 'death', agentId, cause: 'starvation', description: deathDesc });
   }
 
   state.events.push(...events);
@@ -242,36 +349,13 @@ async function persistState(worldId) {
   // Write events to DB
   if (state.events.length > 0) {
     for (const event of state.events) {
-      const agent = event.agentId ? state.agents[event.agentId] : null;
-      const aname = agent ? agent.name : event.agentId;
-      let desc = null;
-      switch (event.type) {
-        case 'move':
-          desc = `${aname} 走向 (${event.to.x},${event.to.y})`;
-          break;
-        case 'speak':
-          desc = `${aname} 说："${event.message}"`;
-          break;
-        case 'eat':
-          desc = `${aname} 寻找食物果腹`;
-          break;
-        case 'rest':
-          desc = `${aname} 停下来休息`;
-          break;
-        case 'idle':
-          desc = `${aname} 静静地等待`;
-          break;
-        case 'death':
-          desc = `${aname} 因饥饿而倒下`;
-          break;
-        default:
-          desc = event.message || null;
-      }
+      const participants = event.participants || (event.agentId ? [event.agentId] : []);
+      const desc = event.description || event.message || null;
       await db.query(
         `INSERT INTO world_events (world_id, tick, event_type, participants, description, metadata)
          VALUES ($1, $2, $3, $4, $5, $6)`,
         [worldId, state.tick, event.type,
-         JSON.stringify(event.agentId ? [event.agentId] : []),
+         JSON.stringify(participants),
          desc,
          JSON.stringify(event)]
       );
