@@ -114,6 +114,28 @@ app.post('/worlds/:worldId/render', requireAuth, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// System narrative generator (no LLM — rule-based prose)
+function generateNarrative(state) {
+  const agents = Object.values(state.agents || {}).filter(a => a.status === 'alive');
+  if (agents.length === 0) return '世界空旷，静默如初。风吹过草原，没有留下任何痕迹。';
+  const tick = state.tick || 0;
+  // Pick 2-3 agents to describe
+  const pick = agents.slice(0, Math.min(3, agents.length));
+  const lines = pick.map(a => {
+    const h = a.needs && a.needs.hunger || 50;
+    const pos = a.position || {};
+    const locDesc = pos.y <= 2 ? '草原北端' : pos.y >= 6 ? '河流附近' : pos.x <= 2 ? '山脚下' : '草原深处';
+    let state_desc;
+    if (h <= 5)       state_desc = '已极度饥饿，步伐虚弱';
+    else if (h <= 20) state_desc = '感到饥肠辘辘';
+    else if (h >= 80) state_desc = '精力充沛，四处游荡';
+    else              state_desc = '在四处打量着环境';
+    return `${a.name}（${(a.species||'').split('（')[0]}）在${locDesc}，${state_desc}。`;
+  });
+  const timeDesc = tick % 6 < 3 ? '晨光照耀着远古草原' : '暮色悄悄笼罩大地';
+  return `第 ${tick} 纪。${timeDesc}。\n\n${lines.join('\n')}`;
+}
+
 // Get latest render for human Watch mode (public)
 app.get('/worlds/:worldId/render', async (req, res) => {
   try {
@@ -125,12 +147,16 @@ app.get('/worlds/:worldId/render', async (req, res) => {
        WHERE r.world_id = $1 ORDER BY r.tick DESC, r.id DESC LIMIT 1`,
       [worldId]
     );
+    const { renderASCIIMap, getState } = require('./world');
+    const asciiMap = renderASCIIMap(worldId);
+    const state = getState(worldId);
+    // System-generated narrative from live state
+    const sysNarrative = state ? generateNarrative(state) : null;
     if (!render) {
-      // Fallback: generate from raw world state
-      const { renderASCIIMap } = require('./world');
-      return res.json({ tick: null, ascii_map: renderASCIIMap(worldId), narrative: null, renderer_name: 'system' });
+      return res.json({ tick: state ? state.tick : null, ascii_map: asciiMap, narrative: sysNarrative, renderer_name: 'system' });
     }
-    res.json(render);
+    // Always freshen ascii_map and narrative from live state
+    res.json({ ...render, ascii_map: asciiMap, narrative: render.narrative || sysNarrative });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
