@@ -202,6 +202,13 @@ body {
   background:rgba(10,12,18,0.95); padding:0 16px;
   display:flex; flex-direction:column; justify-content:center; gap:4px;
 }
+.estrip-row {
+  display:flex; gap:8px; font-size:10px; color:var(--text2);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.estrip-sp, .estrip-tick {
+  color:var(--accent); min-width:40px; font-size:9px; letter-spacing:1px; flex-shrink:0;
+}
 .event-line {
   font-size:clamp(9px,1.4vw,11px); color:var(--text2);
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
@@ -510,6 +517,17 @@ async function loadDetail(worldId, name, era) {
       document.getElementById('detail-bar-right').textContent=(d.agents?d.agents.length:0)+' agents · t'+(d.world.tick||0);
     }
     var agents = d.agents||[], events=(d.events||[]).filter(function(e){return e.description;});
+    // Populate event strip with agents + recent events
+    var strip = document.getElementById('event-strip');
+    var html = '';
+    agents.forEach(function(a){
+      var sp=(a.species||'?'); if(sp.length>6) sp=sp.slice(0,6)+'…';
+      html += '<div class="estrip-row"><span class="estrip-sp">'+sp+'</span><span>'+a.name+'</span></div>';
+    });
+    events.slice(-8).forEach(function(e){
+      html += '<div class="estrip-row"><span class="estrip-tick">t'+e.tick+'</span><span>'+e.description+'</span></div>';
+    });
+    if(strip) strip.innerHTML = html || '<div style="opacity:.4;font-size:9px;padding:8px">No agents yet</div>';
     buildMapGrid();
     updateMapAgents((d && d.agents)||[]);
     connectMapWs(worldId);
