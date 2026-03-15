@@ -112,7 +112,7 @@ body {
 /* ─── WORLD DETAIL — fullscreen layout ─── */
 #detail {
   display:none; flex-direction:column;
-  position:fixed; inset:0; z-index:20;
+  position:fixed; inset:0; z-index:60;
   background:var(--bg); overflow:hidden;
 }
 #detail.active { display:flex; }
@@ -502,40 +502,14 @@ async function loadDetail(worldId, name, era) {
   // clear old pins
   document.getElementById('map-stage').querySelectorAll('.agent-pin').forEach(function(p){p.remove();});
   detailWorldId = worldId;
-  document.getElementById('detail-title').textContent = name;
-  document.getElementById('detail-era').textContent = era;
-  document.getElementById('dstat-agents').textContent = '— agents';
-  document.getElementById('dstat-tick').textContent = 'tick #—';
-  var body = document.getElementById('detail-body');
-  body.innerHTML = '<div class="feed-empty">loading...</div>';
+  document.getElementById('event-strip').innerHTML = '<div style="opacity:0.4;font-size:9px;letter-spacing:2px;padding:8px">loading...</div>';
   try {
     var r = await fetch(API+'/worlds/'+worldId+'/feed');
     var d = await r.json();
     if (d.world) {
-      document.getElementById('dstat-agents').textContent = (d.agents?d.agents.length:0) + ' agents';
-      document.getElementById('dstat-tick').textContent = 'tick #'+(d.world.tick||0);
+      document.getElementById('detail-bar-right').textContent=(d.agents?d.agents.length:0)+' agents · t'+(d.world.tick||0);
     }
-    body.innerHTML='';
     var agents = d.agents||[], events=(d.events||[]).filter(function(e){return e.description;});
-    if (agents.length>0) {
-      body.insertAdjacentHTML('beforeend','<div class="feed-section-title">'+agents.length+' AGENTS ALIVE</div>');
-      agents.forEach(function(a){
-        var sp = (a.species||'?'); if(sp.length>6) sp=sp.slice(0,6)+'…';
-        body.insertAdjacentHTML('beforeend',
-          '<div class="feed-row"><span class="feed-row-tick" style="font-size:8px;min-width:56px">'+sp+'</span><span>'+a.name+'</span></div>');
-      });
-    }
-    var recent=events.slice(-12);
-    if (recent.length>0) {
-      body.insertAdjacentHTML('beforeend','<div class="feed-section-title">RECENT EVENTS</div>');
-      recent.forEach(function(e){
-        body.insertAdjacentHTML('beforeend',
-          '<div class="feed-row"><span class="feed-row-tick">t'+e.tick+'</span><span>'+e.description+'</span></div>');
-      });
-    }
-    if (agents.length===0 && events.length===0) {
-      body.innerHTML='<div class="feed-empty">No agents yet</div>';
-    }
     buildMapGrid();
     updateMapAgents((d && d.agents)||[]);
     connectMapWs(worldId);
