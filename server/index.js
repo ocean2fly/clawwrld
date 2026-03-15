@@ -54,6 +54,51 @@ app.get('/worlds', async (req, res) => {
 // ── Public Spectator Feed (no auth) ──────────────────────────────────────
 
 // Live world feed — public, for spectator/watch mode
+// ── Renderer Agent API ─────────────────────────────────────────────────────
+
+// Submit a render (renderer agent only)
+app.post('/worlds/:worldId/render', requireAuth, async (req, res) => {
+  try {
+    const db = require('./db');
+    const { worldId } = req.params;
+    const { ascii_map, narrative, tick } = req.body;
+    if (!ascii_map && !narrative) return res.status(400).json({ error: 'ascii_map or narrative required' });
+
+    const { rows: [world] } = await db.query('SELECT tick FROM worlds WHERE id=$1', [worldId]);
+    const currentTick = tick || (world && world.tick) || 0;
+
+    const { rows: [render] } = await db.query(
+      `INSERT INTO world_renders (world_id, tick, renderer_id, ascii_map, narrative, agent_count)
+       VALUES ($1, $2, $3, $4, $5, (SELECT COUNT(*) FROM agents WHERE world_id=$1 AND status='alive'))
+       RETURNING id, tick`,
+      [worldId, currentTick, req.agentId, ascii_map || null, narrative || null]
+    );
+    res.json({ ok: true, renderId: render.id, tick: render.tick });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// Get latest render for human Watch mode (public)
+app.get('/worlds/:worldId/render', async (req, res) => {
+  try {
+    const db = require('./db');
+    const { worldId } = req.params;
+    const { rows: [render] } = await db.query(
+      `SELECT r.*, a.name as renderer_name
+       FROM world_renders r LEFT JOIN agents a ON a.id = r.renderer_id
+       WHERE r.world_id = $1 ORDER BY r.tick DESC, r.id DESC LIMIT 1`,
+      [worldId]
+    );
+    if (!render) {
+      // Fallback: generate from raw world state
+      const { renderASCIIMap } = require('./world');
+      return res.json({ tick: null, ascii_map: renderASCIIMap(worldId), narrative: null, renderer_name: 'system' });
+    }
+    res.json(render);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ── World feed ─────────────────────────────────────────────────────────────
+
 app.get('/worlds/:worldId/feed', async (req, res) => {
   try {
     const db = require('./db');

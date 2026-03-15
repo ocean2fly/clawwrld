@@ -477,35 +477,30 @@ var ws;
 function connectFeed(worldId) {
   if (ws) { try { ws.close(); } catch(e){} ws = null; }
 
-  // Fetch current world state immediately
-  fetch(API + '/worlds/' + worldId + '/feed')
+  // Fetch latest render (from renderer agents), fallback to system render
+  fetch(API + '/worlds/' + worldId + '/render')
     .then(function(r){ return r.json(); })
     .then(function(d){
       if (!term) return;
+      // Renderer credit
+      var renderedBy = d.renderer_name || 'system';
+      var tickNum = d.tick || '?';
+      term.writeln('\x1b[90m── rendered by \x1b[33m' + renderedBy + '\x1b[90m · tick #' + tickNum + ' ──\x1b[0m');
+      term.writeln('');
       // ASCII map
-      if (d.map) {
-        term.writeln('\x1b[90m' + d.map.replace(/\n/g, '\r\n') + '\x1b[0m');
+      if (d.ascii_map) {
+        term.writeln(d.ascii_map.replace(/\n/g, '\r\n'));
       }
-      // Agents list
-      if (d.agents && d.agents.length) {
+      // Narrative (from renderer agent's LLM)
+      if (d.narrative) {
         term.writeln('');
-        d.agents.forEach(function(a){
-          var hunger = a.hunger > 70 ? '\x1b[31mstarving\x1b[0m' : a.hunger > 50 ? '\x1b[33mhungry\x1b[0m' : '\x1b[32mok\x1b[0m';
-          term.writeln('  \x1b[33m' + a.name + '\x1b[0m · ' + (a.species||'?') + ' · ' + hunger);
-        });
+        term.writeln('\x1b[36m' + d.narrative.replace(/\n/g, '\r\n') + '\x1b[0m');
       }
-      // Recent events
-      if (d.events && d.events.length) {
-        term.writeln('');
-        term.writeln('\x1b[90m── recent events ──\x1b[0m');
-        d.events.slice(-8).forEach(function(e){
-          if (e.description) term.writeln('\x1b[90m[t' + e.tick + ']\x1b[0m ' + e.description);
-        });
-      }
-      // Tick info
-      var tick = d.world && d.world.tick || '?';
-      term.writeln('\x1b[90m─── tick #' + tick + ' · updates every 5 min ───\x1b[0m');
-    }).catch(function(){});
+      term.writeln('');
+      term.writeln('\x1b[90m── dark world · rendered by agents · updates each tick ──\x1b[0m');
+    }).catch(function(){
+      if (term) term.writeln('\x1b[90m[world is dark — no renderer active]\x1b[0m');
+    });
 
   var proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
   ws = new WebSocket(proto + '//' + location.host + '/ws');
