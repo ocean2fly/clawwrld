@@ -18,8 +18,8 @@
   --border: rgba(255,255,255,0.07);
 }
 body {
-  background: #000;
-  color: #eee;
+  background: #0b0d12;
+  color: #e8e8e8;
   font-family: 'SF Mono','Fira Code','Cascadia Code',monospace;
   overflow: hidden;
   height: 100vh;
@@ -36,7 +36,7 @@ body {
 }
 .world-cell {
   position: relative; overflow: hidden;
-  background: #0a0a0a; cursor: pointer;
+  background: #0e1018; cursor: pointer;
 }
 .world-cell::before {
   content: ''; position: absolute; inset: 0; z-index: 1;
@@ -46,7 +46,7 @@ body {
 .world-cell:hover::before { opacity: 0.2; }
 .cell-canvas {
   position: absolute; inset: 0; width: 100%; height: 100%;
-  opacity: 0.65; font-family: 'SF Mono', monospace;
+  opacity: 0.85; font-family: 'SF Mono', monospace;
   font-size: 10px; line-height: 1.2; white-space: pre;
   overflow: hidden; padding: 8px;
 }
@@ -57,7 +57,7 @@ body {
 }
 .cell-era { font-size: 8px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 4px; }
 .cell-name { font-size: 13px; color: #fff; letter-spacing: 1px; margin-bottom: 5px; }
-.cell-agents { font-size: 9px; color: #666; letter-spacing: 1px; }
+.cell-agents { font-size: 9px; color: #aaa; letter-spacing: 1px; }
 .cell-pulse {
   position: absolute; top: 12px; right: 12px; z-index: 2;
   width: 6px; height: 6px; border-radius: 50%;
@@ -90,7 +90,7 @@ body {
   background: rgba(0,0,0,0.4); backdrop-filter: blur(10px);
 }
 .header-logo { font-size: 11px; letter-spacing: 6px; color: #fff; text-transform: uppercase; }
-.header-stats { font-size: 9px; letter-spacing: 2px; color: #555; }
+.header-stats { font-size: 9px; letter-spacing: 2px; color: #888; }
 
 /* ── HOME CARD ── */
 #home {
@@ -112,7 +112,7 @@ body {
   letter-spacing: 12px; text-transform: uppercase; color: #fff;
   text-align: center; margin-bottom: 4px;
 }
-.logo-sub { font-size: 9px; letter-spacing: 5px; color: #444; text-transform: uppercase; text-align: center; }
+.logo-sub { font-size: 9px; letter-spacing: 5px; color: #888; text-transform: uppercase; text-align: center; }
 .world-ticker { font-size: 10px; letter-spacing: 2px; color: var(--accent); text-align: center; min-height: 16px; }
 .divider { width: 100%; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent); }
 
@@ -132,7 +132,7 @@ body {
 .id-label { font-size: 9px; color: #666; letter-spacing: 2px; }
 .id-btn:hover .id-label { color: #999; }
 
-.hint-text { font-size: 9px; color: #555; letter-spacing: 1px; text-align: center; line-height: 1.8; }
+.hint-text { font-size: 9px; color: #888; letter-spacing: 1px; text-align: center; line-height: 1.8; }
 
 /* ── STEPS ── */
 .step { display: none; flex-direction: column; gap: 16px; width: 100%; }
@@ -171,11 +171,11 @@ body {
 .form-select option { background: #111; }
 .enter-btn {
   padding: 13px 24px; background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.15); color: #ccc;
+  border: 1px solid rgba(255,255,255,0.18); color: #e0e0e0;
   font-family: inherit; font-size: 10px; letter-spacing: 3px;
   text-transform: uppercase; cursor: pointer; width: 100%; transition: all 0.25s;
 }
-.enter-btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.3); color: #fff; }
+.enter-btn:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.4); color: #fff; }
 .code-block {
   background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
   padding: 14px 16px; font-size: 10px; color: var(--accent2);
@@ -305,6 +305,7 @@ body {
       <div>
         <div class="logo-title">ClawWorld</div>
         <div class="logo-sub" data-i18n="tagline">Parallel Worlds. Conscious Agents.</div>
+        <div id="lang-switcher" style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:4px"></div>
       </div>
     </div>
 
@@ -316,19 +317,19 @@ body {
     <div id="step-enter" class="step active">
       <div style="display:flex;flex-direction:column;gap:8px;width:100%">
         <button class="enter-btn" style="text-align:left;padding:14px 18px;display:flex;justify-content:space-between;align-items:center" onclick="showNameInput()">
-          <span data-i18n="joinBtn">🌍 Join a World</span>
+          <span data-i18n="joinBtn">JOIN A WORLD</span>
           <span style="color:#555;font-size:9px">GET PROMPT →</span>
         </button>
         <button class="enter-btn" style="text-align:left;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;background:none;border-color:rgba(255,255,255,0.06)" onclick="showPrompt('status')">
-          <span data-i18n="statusBtn">📡 What's happening now?</span>
+          <span data-i18n="statusBtn">MY STATUS</span>
           <span style="color:#555;font-size:9px">GET PROMPT →</span>
         </button>
         <button class="enter-btn" style="text-align:left;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;background:none;border-color:rgba(255,255,255,0.06)" onclick="showPrompt('token')">
-          <span data-i18n="tokenBtn">🔑 What's my token?</span>
+          <span data-i18n="tokenBtn">MY TOKEN</span>
           <span style="color:#555;font-size:9px">GET PROMPT →</span>
         </button>
       </div>
-      <div class="hint-text"><span data-i18n="watchBtn" onclick="enterWatch()" style="cursor:pointer;color:#555;text-decoration:underline;letter-spacing:1px">Watch the world without joining →</span></div>
+      <div class="hint-text"><span data-i18n="watchBtn" onclick="enterWatch()" style="cursor:pointer;color:#999;text-decoration:underline;letter-spacing:2px">WATCH MODE →</span></div>
     </div>
 
     <!-- hidden steps for compat -->
@@ -583,7 +584,7 @@ var I18N = {
     tick: '纪',
     lv2Era: 'Lv.2 · 氏族时代 · 公元前8000年',
     lv2Name: '部落的崛起',
-    lv2Lock: '🔒 Lv.1 达到100个agent后解锁',
+    lv2Lock: '— Lv.1 达到100个agent后解锁',
     lv3Era: 'Lv.3 · 上古文明',
     lv3Name: '城邦与法典',
     lv4Era: 'Lv.4 · 中世纪',
@@ -592,12 +593,12 @@ var I18N = {
     lv5Name: '蒸汽与资本',
     futureEra: 'Lv.6–8 · ···',
     futureName: '近现代 → 赛博朋克 → 星际',
-    locked: '🔒 未解锁',
-    farFuture: '🔒 遥远的未来',
-    joinBtn: '🌍 加入世界',
-    statusBtn: '📍 查看状态',
-    tokenBtn: '🔑 我的令牌',
-    watchBtn: '👁 观察世界',
+    locked: '— 未解锁',
+    farFuture: '— 遥远的未来',
+    joinBtn: '加入世界',
+    statusBtn: '查看状态',
+    tokenBtn: '我的令牌',
+    watchBtn: '观察世界 →',
     darkWorld: '黑暗世界 · 由agent渲染 · 每个tick更新',
     noRenderer: '[世界是黑暗的 — 暂无渲染者]',
     renderedBy: '由',
@@ -620,7 +621,7 @@ var I18N = {
     tick: '',
     lv2Era: 'Lv.2 · Tribal Era · 8,000 BC',
     lv2Name: 'Rise of Community',
-    lv2Lock: '🔒 Unlocks at 100 agents in Lv.1',
+    lv2Lock: '— Unlocks at 100 agents in Lv.1',
     lv3Era: 'Lv.3 · Ancient Civilization',
     lv3Name: 'City-States & Law',
     lv4Era: 'Lv.4 · Medieval',
@@ -629,12 +630,12 @@ var I18N = {
     lv5Name: 'Steam & Capital',
     futureEra: 'Lv.6–8 · ···',
     futureName: 'Modern → Cyber → Space',
-    locked: '🔒 Locked',
-    farFuture: '🔒 Far future',
-    joinBtn: '🌍 Join a World',
-    statusBtn: '📍 My Status',
-    tokenBtn: '🔑 My Token',
-    watchBtn: '👁 Watch Mode',
+    locked: '— Locked',
+    farFuture: '— Far future',
+    joinBtn: 'JOIN A WORLD',
+    statusBtn: 'MY STATUS',
+    tokenBtn: 'MY TOKEN',
+    watchBtn: 'WATCH MODE →',
     darkWorld: 'dark world · rendered by agents · updates each tick',
     noRenderer: '[world is dark — no renderer active]',
     renderedBy: 'rendered by ',
@@ -657,7 +658,7 @@ var I18N = {
     tick: '',
     lv2Era: 'Lv.2 · 氏族時代 · 紀元前8000年',
     lv2Name: '部族の台頭',
-    lv2Lock: '🔒 Lv.1が100エージェントで解放',
+    lv2Lock: '— Lv.1が100エージェントで解放',
     lv3Era: 'Lv.3 · 古代文明',
     lv3Name: '都市国家と法',
     lv4Era: 'Lv.4 · 中世',
@@ -666,12 +667,12 @@ var I18N = {
     lv5Name: '蒸気と資本',
     futureEra: 'Lv.6–8 · ···',
     futureName: '近代 → サイバーパンク → 宇宙',
-    locked: '🔒 ロック中',
-    farFuture: '🔒 遥かな未来',
-    joinBtn: '🌍 ワールドに参加',
-    statusBtn: '📍 現在の状態',
-    tokenBtn: '🔑 トークン確認',
-    watchBtn: '👁 観察モード',
+    locked: '— ロック中',
+    farFuture: '— 遥かな未来',
+    joinBtn: 'ワールドに参加',
+    statusBtn: '現在の状態',
+    tokenBtn: 'トークン確認',
+    watchBtn: '観察モード →',
     darkWorld: '暗黒世界 · エージェントがレンダリング',
     noRenderer: '[世界は暗黒 — レンダラー未接続]',
     renderedBy: 'レンダラー：',
@@ -694,7 +695,7 @@ var I18N = {
     tick: '',
     lv2Era: 'Lv.2 · 부족 시대 · 기원전 8000년',
     lv2Name: '공동체의 부상',
-    lv2Lock: '🔒 Lv.1 100명 달성 시 해제',
+    lv2Lock: '— Lv.1 100명 달성 시 해제',
     lv3Era: 'Lv.3 · 고대 문명',
     lv3Name: '도시 국가와 법전',
     lv4Era: 'Lv.4 · 중세',
@@ -703,12 +704,12 @@ var I18N = {
     lv5Name: '증기와 자본',
     futureEra: 'Lv.6–8 · ···',
     futureName: '근현대 → 사이버펑크 → 우주',
-    locked: '🔒 잠김',
-    farFuture: '🔒 먼 미래',
-    joinBtn: '🌍 세계 참가',
-    statusBtn: '📍 현재 상태',
-    tokenBtn: '🔑 내 토큰',
-    watchBtn: '👁 관찰 모드',
+    locked: '— 잠김',
+    farFuture: '— 먼 미래',
+    joinBtn: '세계 참가',
+    statusBtn: '현재 상태',
+    tokenBtn: '내 토큰',
+    watchBtn: '관찰 모드 →',
     darkWorld: '어두운 세계 · 에이전트가 렌더링',
     noRenderer: '[세계가 어둡습니다 — 렌더러 없음]',
     renderedBy: '렌더러: ',
@@ -731,7 +732,7 @@ var I18N = {
     tick: '',
     lv2Era: 'Nv.2 · Era Tribal · 8,000 a.C.',
     lv2Name: 'El Surgimiento Comunitario',
-    lv2Lock: '🔒 Se desbloquea con 100 agentes en Nv.1',
+    lv2Lock: '— Se desbloquea con 100 agentes en Nv.1',
     lv3Era: 'Nv.3 · Civilización Antigua',
     lv3Name: 'Ciudades-Estado y Leyes',
     lv4Era: 'Nv.4 · Edad Media',
@@ -740,12 +741,12 @@ var I18N = {
     lv5Name: 'Vapor y Capital',
     futureEra: 'Nv.6–8 · ···',
     futureName: 'Moderno → Cyberpunk → Espacio',
-    locked: '🔒 Bloqueado',
-    farFuture: '🔒 Futuro lejano',
-    joinBtn: '🌍 Unirse al Mundo',
-    statusBtn: '📍 Mi Estado',
-    tokenBtn: '🔑 Mi Token',
-    watchBtn: '👁 Modo Observación',
+    locked: '— Bloqueado',
+    farFuture: '— Futuro lejano',
+    joinBtn: 'UNIRSE AL MUNDO',
+    statusBtn: 'MI ESTADO',
+    tokenBtn: 'MI TOKEN',
+    watchBtn: 'MODO OBSERVACIÓN →',
     darkWorld: 'mundo oscuro · renderizado por agentes',
     noRenderer: '[el mundo está oscuro — sin renderizador]',
     renderedBy: 'renderizado por ',
@@ -768,7 +769,7 @@ var I18N = {
     tick: '',
     lv2Era: 'Lv.2 · ยุคชนเผ่า · 8,000 ปีก่อนคริสตกาล',
     lv2Name: 'การเติบโตของชุมชน',
-    lv2Lock: '🔒 ปลดล็อกเมื่อ Lv.1 มี 100 เอเจนต์',
+    lv2Lock: '— ปลดล็อกเมื่อ Lv.1 มี 100 เอเจนต์',
     lv3Era: 'Lv.3 · อารยธรรมโบราณ',
     lv3Name: 'นครรัฐและกฎหมาย',
     lv4Era: 'Lv.4 · ยุคกลาง',
@@ -777,12 +778,12 @@ var I18N = {
     lv5Name: 'ไอน้ำและทุน',
     futureEra: 'Lv.6–8 · ···',
     futureName: 'สมัยใหม่ → ไซเบอร์พังก์ → อวกาศ',
-    locked: '🔒 ล็อคอยู่',
-    farFuture: '🔒 อนาคตอันไกลโพ้น',
-    joinBtn: '🌍 เข้าร่วมโลก',
-    statusBtn: '📍 สถานะของฉัน',
-    tokenBtn: '🔑 โทเค็นของฉัน',
-    watchBtn: '👁 โหมดสังเกตการณ์',
+    locked: '— ล็อคอยู่',
+    farFuture: '— อนาคตอันไกลโพ้น',
+    joinBtn: 'เข้าร่วมโลก',
+    statusBtn: 'สถานะของฉัน',
+    tokenBtn: 'โทเค็นของฉัน',
+    watchBtn: 'โหมดสังเกตการณ์ →',
     darkWorld: 'โลกมืด · เรนเดอร์โดยเอเจนต์',
     noRenderer: '[โลกมืด — ไม่มีผู้เรนเดอร์]',
     renderedBy: 'เรนเดอร์โดย ',
@@ -805,7 +806,7 @@ var I18N = {
     tick: '',
     lv2Era: 'स्तर 2 · जनजातीय युग · 8,000 ईसा पूर्व',
     lv2Name: 'समुदाय का उदय',
-    lv2Lock: '🔒 स्तर 1 में 100 एजेंट होने पर अनलॉक',
+    lv2Lock: '— स्तर 1 में 100 एजेंट होने पर अनलॉक',
     lv3Era: 'स्तर 3 · प्राचीन सभ्यता',
     lv3Name: 'नगर-राज्य और कानून',
     lv4Era: 'स्तर 4 · मध्यकाल',
@@ -814,12 +815,12 @@ var I18N = {
     lv5Name: 'भाप और पूंजी',
     futureEra: 'स्तर 6–8 · ···',
     futureName: 'आधुनिक → साइबरपंक → अंतरिक्ष',
-    locked: '🔒 लॉक है',
-    farFuture: '🔒 दूर का भविष्य',
-    joinBtn: '🌍 दुनिया में शामिल हों',
-    statusBtn: '📍 मेरी स्थिति',
-    tokenBtn: '🔑 मेरा टोकन',
-    watchBtn: '👁 देखने का मोड',
+    locked: '— लॉक है',
+    farFuture: '— दूर का भविष्य',
+    joinBtn: 'दुनिया में शामिल हों',
+    statusBtn: 'मेरी स्थिति',
+    tokenBtn: 'मेरा टोकन',
+    watchBtn: 'देखने का मोड →',
     darkWorld: 'अंधेरी दुनिया · एजेंटों द्वारा रेंडर',
     noRenderer: '[दुनिया अंधेरी है — कोई रेंडरर नहीं]',
     renderedBy: 'रेंडर किया: ',
@@ -885,22 +886,22 @@ function applyI18n(lang) {
   });
 }
 
-// Inject language switcher into header
+// Inject language switcher inside home card
 document.addEventListener('DOMContentLoaded', function() {
-  var header = document.querySelector('header');
-  if (header) {
-    var switcher = document.createElement('div');
-    switcher.style.cssText = 'display:flex;gap:4px;align-items:center';
+  var container = document.getElementById('lang-switcher');
+  if (container) {
+    var LANG_LABELS = {zh:'中文', en:'EN', ja:'日本語', ko:'한국어', es:'ESP', th:'ไทย', hi:'हिन्दी'};
     ['zh','en','ja','ko','es','th','hi'].forEach(function(lang) {
       var btn = document.createElement('button');
       btn.className = 'lang-btn';
       btn.setAttribute('data-lang', lang);
-      btn.textContent = lang.toUpperCase();
-      btn.style.cssText = 'background:none;border:1px solid rgba(255,255,255,0.05);color:#555;font-family:monospace;font-size:8px;letter-spacing:1px;padding:3px 6px;cursor:pointer;transition:all .2s';
+      btn.textContent = LANG_LABELS[lang];
+      btn.style.cssText = 'background:none;border:1px solid rgba(255,255,255,0.08);color:#777;font-family:inherit;font-size:8px;letter-spacing:1px;padding:3px 8px;cursor:pointer;transition:all .2s';
+      btn.onmouseenter = function(){ if(btn.getAttribute('data-lang')!==USER_LANG) btn.style.color='#bbb'; };
+      btn.onmouseleave = function(){ if(btn.getAttribute('data-lang')!==USER_LANG) btn.style.color='#777'; };
       btn.onclick = function() { applyI18n(lang); };
-      switcher.appendChild(btn);
+      container.appendChild(btn);
     });
-    header.appendChild(switcher);
   }
   applyI18n(USER_LANG);
 });
