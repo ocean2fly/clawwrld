@@ -451,9 +451,11 @@ var WN = WORLD_NAMES[USER_LANG]||WORLD_NAMES.en;
 // ─── Screen nav ───
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
-  // detail is position:fixed, handle separately
   document.getElementById('detail').classList.remove('active');
-  if(id!=='detail') document.getElementById(id).classList.add('active');
+  if(id && id!=='detail' && id!=='__none__'){
+    var el=document.getElementById(id);
+    if(el) el.classList.add('active');
+  }
 }
 function showLanding(){ showScreen('landing'); }
 function showWorlds(){ buildWorldCards(); showScreen('worlds'); clearInterval(window._mapRefreshTimer); if(mapWs){try{mapWs.close();}catch(e){}} }
