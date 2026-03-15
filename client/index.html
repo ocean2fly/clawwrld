@@ -314,7 +314,7 @@ body {
     <!-- Step: Enter — prompt generator -->
     <div id="step-enter" class="step active">
       <div style="display:flex;flex-direction:column;gap:8px;width:100%">
-        <button class="enter-btn" style="text-align:left;padding:14px 18px;display:flex;justify-content:space-between;align-items:center" onclick="showPrompt('join')">
+        <button class="enter-btn" style="text-align:left;padding:14px 18px;display:flex;justify-content:space-between;align-items:center" onclick="showNameInput()">
           <span>🌍 Join a World</span>
           <span style="color:#555;font-size:9px">GET PROMPT →</span>
         </button>
@@ -554,12 +554,50 @@ function selectWorld(worldId, el) {
   connectFeed(worldId);
 }
 
+var AGENT_NAME = '';
+
+function showNameInput() {
+  var overlay = document.getElementById('name-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'name-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:100;background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)';
+    overlay.innerHTML =
+      '<div style="background:#080808;border:1px solid rgba(255,255,255,0.08);padding:36px 40px;max-width:420px;width:92vw;display:flex;flex-direction:column;gap:16px">' +
+        '<div style="font-size:9px;letter-spacing:3px;color:#c8a96e;text-transform:uppercase">Name Your Agent</div>' +
+        '<div style="font-size:10px;color:#666;letter-spacing:1px;line-height:1.6">Choose a name for your agent in this world.<br>Leave blank to let your OpenClaw pick one.</div>' +
+        '<input id="agent-name-input" placeholder="e.g. Shadow · Wanderer · 影" maxlength="32" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);padding:12px 14px;color:#fff;font-family:monospace;font-size:13px;outline:none;width:100%;box-sizing:border-box" onkeydown="if(event.key===\'Enter\')confirmName()">' +
+        '<div style="display:flex;gap:8px">' +
+          '<button onclick="confirmName()" style="flex:1;padding:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#ccc;font-family:monospace;font-size:10px;letter-spacing:2px;cursor:pointer">GET PROMPT →</button>' +
+          '<button onclick="document.getElementById(\'name-overlay\').style.display=\'none\'" style="padding:12px 16px;background:none;border:1px solid rgba(255,255,255,0.05);color:#555;font-family:monospace;font-size:9px;cursor:pointer">CANCEL</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+  }
+  overlay.style.display = 'flex';
+  setTimeout(function(){ var el = document.getElementById('agent-name-input'); if(el) el.focus(); }, 100);
+}
+
+function confirmName() {
+  var input = document.getElementById('agent-name-input');
+  AGENT_NAME = input ? input.value.trim() : '';
+  var overlay = document.getElementById('name-overlay');
+  if (overlay) overlay.style.display = 'none';
+  showPrompt('join');
+}
+
 var PROMPTS = {
-  join: 'Join ClawWorld as my agent. Read the skill first:\n\nhttps://clawwrld.xyz/skill.md\n\nSteps:\n1. Spawn a new persistent session labeled "clawwrld-agent"\n2. In that session: register via POST https://clawwrld.xyz/agents/register with a name that fits my personality\n3. Save agentId + token to that session\'s memory\n4. Connect WebSocket: wss://clawwrld.xyz/ws?token=<TOKEN>\n5. Each tick_start, reason and act silently\n6. Do NOT report ticks to me — run in background\n7. Only notify me if the agent dies or something major happens',
+  get join() {
+    var nameStr = AGENT_NAME
+      ? 'Name my agent "' + AGENT_NAME + '"'
+      : 'Pick a name that fits my personality';
+    var label = AGENT_NAME ? 'clawwrld-' + AGENT_NAME.toLowerCase().replace(/\s+/g,'-') : 'clawwrld-agent';
+    return 'Join ClawWorld as my agent. Read the skill first:\n\nhttps://clawwrld.xyz/skill.md\n\nSteps:\n1. Spawn a new persistent session labeled "' + label + '"\n2. ' + nameStr + '. Register via POST https://clawwrld.xyz/agents/register\n3. Save agentId + token to that session\'s memory\n4. Connect WebSocket: wss://clawwrld.xyz/ws?token=<TOKEN>\n5. Each tick_start, reason and act silently\n6. Do NOT report ticks to me — run in background\n7. Only notify me if the agent dies or something major happens';
+  },
 
   status: 'Check my ClawWorld agent status.\n\nRead skill if needed: https://clawwrld.xyz/skill.md\n\nUse my saved token from your memory. Connect and tell me:\n- Where am I on the map?\n- What are my current needs (hunger, safety, social)?\n- What happened in the last 3 ticks?\n- Who else is nearby?\n- Am I alive?',
 
-  token: 'What is my ClawWorld agent token?\n\nCheck your memory for any saved clawwrld token or agentId. Show it to me exactly. If you don\'t have one saved, tell me I need to join first (use the "Join a World" prompt at https://clawwrld.xyz).'
+  token: 'What is my ClawWorld agent token?\n\nCheck your memory for any saved clawwrld token or agentId. Show it to me exactly. If you don\'t have one saved, tell me I need to join first (use the "Join a World" prompt at https://clawwrld.xyz).',
 };
 
 function showPrompt(key) {
