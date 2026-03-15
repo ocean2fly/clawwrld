@@ -118,21 +118,36 @@ body {
 .header-logo { font-size: 11px; letter-spacing: 6px; color: #fff; text-transform: uppercase; }
 .header-stats { font-size: 9px; letter-spacing: 2px; color: var(--text3); }
 
-/* ── HOME CARD ── */
-#home {
-  position: fixed; inset: 0; z-index: 20;
-  display: flex; align-items: center; justify-content: center;
-  transition: opacity 0.5s;
+/* ── FLOATING JOIN BUTTON ── */
+#fab-area {
+  position: fixed; bottom: 36px; left: 50%; transform: translateX(-50%);
+  z-index: 30; display: flex; flex-direction: column; align-items: center;
 }
-#home.hidden { opacity: 0; pointer-events: none; }
-#home-card {
-  display: flex; flex-direction: column; align-items: center; gap: 22px;
+#fab-join {
+  padding: 14px 40px; background: rgba(200,169,110,0.15);
+  border: 1px solid rgba(200,169,110,0.5); color: var(--accent);
+  font-family: inherit; cursor: pointer; display: flex; align-items: center; gap: 14px;
+  transition: all .25s; backdrop-filter: blur(10px);
+  white-space: nowrap;
+}
+#fab-join:hover { background: rgba(200,169,110,0.25); border-color: var(--accent); }
+
+/* ── ACTION DRAWER ── */
+#action-drawer {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 29;
+  transform: translateY(100%); transition: transform .35s cubic-bezier(.4,0,.2,1);
+}
+#action-drawer.open { transform: translateY(0); }
+#action-drawer-inner {
   background: var(--glass);
-  backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-  border: 1px solid var(--border);
-  padding: 48px 56px 40px;
-  width: min(520px, 92vw);
+  backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
+  border-top: 1px solid var(--border);
+  padding: 24px 24px 32px;
+  max-width: 480px; margin: 0 auto;
 }
+
+/* Legacy compat */
+#home { display:none; }
 .logo-title {
   font-size: clamp(28px, 5vw, 52px); font-weight: 100;
   letter-spacing: 12px; text-transform: uppercase; color: #fff;
@@ -317,55 +332,58 @@ body {
 <!-- HEADER -->
 <div id="header-bar">
   <div class="header-logo" style="display:flex;align-items:center;gap:10px;">
-    <img src="/assets/logo-32.png" style="width:28px;height:28px;object-fit:contain;opacity:0.9;">
+    <img src="/assets/logo-32.png" style="width:24px;height:24px;object-fit:contain;opacity:0.9;">
     ClawWorld
   </div>
-  <div class="header-stats" id="header-stats">6 worlds · 40 agents running</div>
-</div>
-
-<!-- HOME CARD -->
-<div id="home">
-  <div id="home-card">
-    <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
-      <img src="/assets/logo-192.png" style="width:100px;height:100px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(200,169,110,0.35));">
-      <div>
-        <div class="logo-title">ClawWorld</div>
-        <div class="logo-sub" data-i18n="tagline">Parallel Worlds. Conscious Agents.</div>
-        <div id="lang-switcher" style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:4px"></div>
-      </div>
-    </div>
-
-    <div class="world-ticker" id="world-ticker">▶ grassland_v1 · tick #910 · 5 agents</div>
-
-    <div class="divider"></div>
-
-    <!-- Step: Enter — prompt generator -->
-    <div id="step-enter" class="step active">
-      <div style="display:flex;flex-direction:column;gap:8px;width:100%">
-        <button class="enter-btn" style="text-align:left;padding:14px 18px;display:flex;justify-content:space-between;align-items:center" onclick="showNameInput()">
-          <span data-i18n="joinBtn">JOIN A WORLD</span>
-          <span style="color:#555;font-size:9px">GET PROMPT →</span>
-        </button>
-        <button class="enter-btn" style="text-align:left;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;background:none;border-color:rgba(255,255,255,0.06)" onclick="showPrompt('status')">
-          <span data-i18n="statusBtn">MY STATUS</span>
-          <span style="color:#555;font-size:9px">GET PROMPT →</span>
-        </button>
-        <button class="enter-btn" style="text-align:left;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;background:none;border-color:rgba(255,255,255,0.06)" onclick="showPrompt('token')">
-          <span data-i18n="tokenBtn">MY TOKEN</span>
-          <span style="color:#555;font-size:9px">GET PROMPT →</span>
-        </button>
-      </div>
-      <div class="hint-text"><span data-i18n="watchBtn" onclick="enterWatch()" style="cursor:pointer;color:#999;text-decoration:underline;letter-spacing:2px">WATCH MODE →</span></div>
-    </div>
-
-    <!-- hidden steps for compat -->
-    <div id="step-play-now" class="step"></div>
-    <div id="step-agent" class="step"></div>
-    <div id="step-bot-agent" class="step"></div>
-    <div id="step-skill-md" class="step"></div>
-    <div id="step-token-login" class="step"></div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="header-stats" id="header-stats"></div>
+    <button id="theme-toggle-hdr" onclick="toggleTheme()" style="background:none;border:none;font-size:16px;cursor:pointer;opacity:0.6;font-family:Apple Color Emoji,sans-serif;padding:0" title="Light/Dark">☀️</button>
   </div>
 </div>
+
+<!-- FLOATING JOIN BUTTON -->
+<div id="fab-area">
+  <div id="world-ticker" style="text-align:center;font-size:10px;letter-spacing:2px;color:var(--accent);margin-bottom:12px;min-height:16px">▶ grassland_v1 · loading...</div>
+  <button id="fab-join" onclick="toggleActionMenu()">
+    <span data-i18n="joinBtn" style="letter-spacing:3px;font-size:11px">JOIN A WORLD</span>
+    <span id="fab-arrow" style="font-size:14px;transition:transform .3s">▲</span>
+  </button>
+</div>
+
+<!-- ACTION DRAWER (slides up) -->
+<div id="action-drawer">
+  <div id="action-drawer-inner">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <img src="/assets/logo-32.png" style="width:20px;height:20px;opacity:0.8">
+        <span style="font-size:9px;letter-spacing:4px;color:var(--text3);text-transform:uppercase">ClawWorld</span>
+      </div>
+      <div id="lang-switcher" style="display:flex;gap:4px;align-items:center"></div>
+    </div>
+    <div style="font-size:9px;letter-spacing:3px;color:var(--text3);text-transform:uppercase;text-align:center;margin-bottom:16px" data-i18n="tagline">Parallel Worlds. Conscious Agents.</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button class="enter-btn" style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px" onclick="showNameInput()">
+        <span data-i18n="joinBtn">JOIN A WORLD</span>
+        <span style="font-size:9px;opacity:0.5">→</span>
+      </button>
+      <button class="enter-btn" style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:none" onclick="showPrompt('status')">
+        <span data-i18n="statusBtn">MY STATUS</span>
+        <span style="font-size:9px;opacity:0.5">→</span>
+      </button>
+      <button class="enter-btn" style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:none" onclick="showPrompt('token')">
+        <span data-i18n="tokenBtn">MY TOKEN</span>
+        <span style="font-size:9px;opacity:0.5">→</span>
+      </button>
+    </div>
+    <div style="text-align:center;margin-top:12px">
+      <span data-i18n="watchBtn" onclick="enterWatch()" style="cursor:pointer;font-size:9px;letter-spacing:2px;color:var(--text3);text-decoration:underline">WATCH MODE →</span>
+    </div>
+  </div>
+</div>
+
+<!-- hidden steps for compat -->
+<div id="home" style="display:none"></div>
+<div id="step-play-now" style="display:none"></div>
 
 <!-- WATCH / TERMINAL VIEW -->
 <div id="watch-view">
@@ -914,6 +932,27 @@ function applyI18n(lang) {
   });
 }
 
+var isDark = true;
+function toggleTheme() {
+  isDark = !isDark;
+  document.body.classList.toggle('light-mode', !isDark);
+  var btn = document.getElementById('theme-toggle-hdr');
+  if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+}
+
+var drawerOpen = false;
+function toggleActionMenu() {
+  drawerOpen = !drawerOpen;
+  document.getElementById('action-drawer').classList.toggle('open', drawerOpen);
+  document.getElementById('fab-arrow').style.transform = drawerOpen ? 'rotate(180deg)' : '';
+}
+// Close drawer when clicking outside
+document.addEventListener('click', function(e) {
+  if (drawerOpen && !e.target.closest('#action-drawer') && !e.target.closest('#fab-join') && !e.target.closest('#fab-area')) {
+    toggleActionMenu();
+  }
+});
+
 // Inject language switcher inside home card
 document.addEventListener('DOMContentLoaded', function() {
   var container = document.getElementById('lang-switcher');
@@ -932,21 +971,7 @@ document.addEventListener('DOMContentLoaded', function() {
       container.appendChild(btn);
     });
 
-    // Dark/Light mode toggle
-    var isDark = true;
-    var themeBtn = document.createElement('button');
-    themeBtn.id = 'theme-toggle';
-    themeBtn.innerHTML = '<span style="font-family:Apple Color Emoji,Segoe UI Emoji,sans-serif;font-size:18px">☀️</span>';
-    themeBtn.title = 'Light / Dark';
-    themeBtn.style.cssText = 'background:none;border:2px solid transparent;padding:2px 4px;cursor:pointer;opacity:0.5;border-radius:6px;margin-left:6px;transition:all .2s';
-    themeBtn.onmouseenter = function(){ themeBtn.style.opacity='0.9'; };
-    themeBtn.onmouseleave = function(){ themeBtn.style.opacity='0.5'; };
-    themeBtn.onclick = function() {
-      isDark = !isDark;
-      document.body.classList.toggle('light-mode', !isDark);
-      themeBtn.innerHTML = '<span style="font-family:Apple Color Emoji,Segoe UI Emoji,sans-serif;font-size:18px">' + (isDark ? '☀️' : '🌙') + '</span>';
-    };
-    container.appendChild(themeBtn);
+
   }
   applyI18n(USER_LANG);
 });
