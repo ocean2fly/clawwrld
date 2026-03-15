@@ -207,6 +207,21 @@ body {
 @keyframes fadein { to { opacity:1; } }
 .feed-empty { padding:48px 24px; text-align:center; font-size:10px; color:var(--text3); letter-spacing:2px; }
 
+/* ─── 3D ASCII overlay ─── */
+#ascii3d {
+  position:absolute; inset:0; z-index:20; background:#050508;
+  display:none; overflow:hidden;
+}
+#ascii3d.open { display:block; }
+#ascii3d table { border-spacing:0; }
+.view-toggle {
+  background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15);
+  color:var(--text3); font-family:inherit; font-size:8px; letter-spacing:2px;
+  padding:4px 10px; cursor:pointer; transition:all .2s;
+}
+.view-toggle.active { color:var(--accent); border-color:rgba(200,169,110,0.5); background:rgba(200,169,110,0.08); }
+.view-toggle:hover { color:var(--text); }
+
 /* ─── JOIN DRAWER ─── */
 #join-drawer {
   position:fixed; bottom:0; left:0; right:0; z-index:60;
@@ -313,16 +328,21 @@ body {
   <div id="detail-bar">
     <button class="detail-back" onclick="showWorlds()">← WORLDS</button>
     <div id="detail-bar-center"></div>
-    <div id="detail-bar-right"></div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <div id="detail-bar-right" style="font-size:9px;letter-spacing:2px;color:var(--text3)"></div>
+      <button class="view-toggle" id="btn-2d" onclick="setView('2d')">2D</button>
+      <button class="view-toggle active" id="btn-3d" onclick="setView('3d')">3D ASCII</button>
+    </div>
   </div>
   <!-- map hero -->
   <div id="map-stage">
+    <!-- 2D grid view -->
     <div id="map-grid"></div>
-    <!-- SVG layer for love lines -->
     <svg id="love-svg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:6" overflow="visible"></svg>
-    <!-- agent pins injected by JS -->
     <div id="map-tick-overlay">LIVE</div>
     <div id="map-overlay"></div>
+    <!-- 3D ASCII view -->
+    <div id="ascii3d" class="open"></div>
   </div>
   <!-- event strip -->
   <div id="event-strip"></div>
@@ -768,6 +788,217 @@ document.addEventListener('DOMContentLoaded',function(){
   applyI18n(USER_LANG);
   setInterval(fetchStats,15000);
 });
+</script>
+<script type="module">
+// ── Three.js ASCII 3D Engine ──────────────────────────────────────
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js';
+import { AsciiEffect } from 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/effects/AsciiEffect.js';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/controls/OrbitControls.js';
+
+let scene, camera, renderer, effect, controls;
+let agentMeshes = {}, agentTargets = {};
+let initialized = false, animId = null;
+
+const TERRAIN_MAP = {
+  '1,1':'tree','1,2':'tree','0,2':'mountain','9,7':'mountain',
+  '4,3':'water','4,4':'water','2,6':'river','3,6':'river','7,6':'river'
+};
+
+function hexColor(species, hunger) {
+  const h = parseFloat(hunger)||50;
+  if(h<=10) return 0xe03030;
+  if(h<=25) return 0xd07030;
+  if(!species) return 0x30c0c0;
+  const s = species.toLowerCase();
+  if(s.includes('human'))    return h<35 ? 0xd08030 : 0x40c8c0;
+  if(s.includes('斑马')||s.includes('zebra')) return 0xd4a060;
+  if(s.includes('象')||s.includes('elephant')) return 0xa080d0;
+  return 0x909090;
+}
+
+function init3D(container) {
+  if(initialized) return;
+  initialized = true;
+
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x050508);
+  scene.fog = new THREE.FogExp2(0x050508, 0.045);
+
+  const W = container.offsetWidth, H = container.offsetHeight;
+  camera = new THREE.PerspectiveCamera(55, W/H, 0.1, 100);
+  camera.position.set(5, 11, 16);
+  camera.lookAt(5, 0, 4);
+
+  renderer = new THREE.WebGLRenderer({ antialias: false });
+  renderer.setSize(W, H);
+
+  effect = new AsciiEffect(renderer, ' .`\':-=+*#%@$', { invert: true, resolution: 0.155 });
+  effect.setSize(W, H);
+  const el = effect.domElement;
+  el.style.cssText = 'position:absolute;inset:0;color:#b8a07a;background:#050508;font-family:"SF Mono","Fira Code",Consolas,monospace;font-size:11px;line-height:1.1;overflow:hidden';
+  container.appendChild(el);
+
+  // Lights
+  scene.add(new THREE.AmbientLight(0x334422, 1.2));
+  const sun = new THREE.DirectionalLight(0xffe8c0, 2.0);
+  sun.position.set(8, 14, 10); scene.add(sun);
+  const fill = new THREE.DirectionalLight(0x2040a0, 0.5);
+  fill.position.set(-5, 6, -8); scene.add(fill);
+
+  controls = new OrbitControls(camera, el);
+  controls.target.set(5, 0, 4);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.autoRotate = true; controls.autoRotateSpeed = 0.35;
+  controls.minPolarAngle = Math.PI/6; controls.maxPolarAngle = Math.PI/2.3;
+  controls.minDistance = 6; controls.maxDistance = 26;
+
+  buildTerrain();
+  animateLoop();
+
+  window.addEventListener('resize', () => {
+    const nw = container.offsetWidth, nh = container.offsetHeight;
+    camera.aspect = nw/nh; camera.updateProjectionMatrix();
+    renderer.setSize(nw,nh); effect.setSize(nw,nh);
+  });
+}
+
+function buildTerrain() {
+  // Ground
+  const gnd = new THREE.Mesh(
+    new THREE.PlaneGeometry(10,8),
+    new THREE.MeshLambertMaterial({color:0x1a2a0c})
+  );
+  gnd.rotation.x=-Math.PI/2; gnd.position.set(5,0,4);
+  scene.add(gnd);
+
+  // Subtle grid lines
+  const grid = new THREE.GridHelper(10,10,0x223316,0x1a2210);
+  grid.position.set(5,0.01,4); scene.add(grid);
+
+  Object.entries(TERRAIN_MAP).forEach(([key,type])=>{
+    const [cx,cz]=key.split(',').map(Number);
+    const wx=cx+0.5, wz=cz+0.5;
+    if(type==='tree'){
+      const trunk=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.11,0.55,7),
+        new THREE.MeshLambertMaterial({color:0x3a1a06}));
+      trunk.position.set(wx,0.28,wz); scene.add(trunk);
+      const top=new THREE.Mesh(new THREE.SphereGeometry(0.38,9,7),
+        new THREE.MeshLambertMaterial({color:0x1a5010}));
+      top.position.set(wx,0.85,wz); scene.add(top);
+    } else if(type==='mountain'){
+      const cone=new THREE.Mesh(new THREE.ConeGeometry(0.55,1.4,8),
+        new THREE.MeshLambertMaterial({color:0x303040}));
+      cone.position.set(wx,0.7,wz); scene.add(cone);
+      // snow cap
+      const snow=new THREE.Mesh(new THREE.ConeGeometry(0.2,0.4,8),
+        new THREE.MeshLambertMaterial({color:0xd8e8f0}));
+      snow.position.set(wx,1.5,wz); scene.add(snow);
+    } else if(type==='water'||type==='river'){
+      const col=type==='water'?0x0a3060:0x082030;
+      const wr=new THREE.Mesh(new THREE.PlaneGeometry(0.88,0.88),
+        new THREE.MeshLambertMaterial({color:col,transparent:true,opacity:0.75}));
+      wr.rotation.x=-Math.PI/2; wr.position.set(wx,0.03,wz); scene.add(wr);
+    }
+  });
+}
+
+function updateAgents3D(agents) {
+  const seen=new Set();
+  (agents||[]).forEach(a=>{
+    const ax=parseFloat(a.position_x!=null?a.position_x:a.x);
+    const az=parseFloat(a.position_y!=null?a.position_y:a.y);
+    if(isNaN(ax)) return;
+    seen.add(a.id);
+    const wx=ax+0.5, wz=az+0.5;
+    const col=hexColor(a.species,a.hunger);
+    if(!agentMeshes[a.id]){
+      const mat=new THREE.MeshLambertMaterial({color:col,emissive:col,emissiveIntensity:0.5});
+      const mesh=new THREE.Mesh(new THREE.SphereGeometry(0.28,14,10),mat);
+      mesh.position.set(wx,0.35,wz);
+      scene.add(mesh);
+      // name label (billboard CSS)
+      agentMeshes[a.id]={mesh,name:a.name,labelEl:null};
+    }
+    agentTargets[a.id]={x:wx,z:wz,col};
+    agentMeshes[a.id].mesh.material.color.setHex(col);
+    agentMeshes[a.id].mesh.material.emissive.setHex(col);
+  });
+  Object.keys(agentMeshes).forEach(id=>{
+    if(!seen.has(id)){scene.remove(agentMeshes[id].mesh);delete agentMeshes[id];delete agentTargets[id];}
+  });
+}
+
+let _prev=0;
+function animateLoop(now=0){
+  animId=requestAnimationFrame(animateLoop);
+  const dt=Math.min((now-_prev)/1000,0.08); _prev=now;
+  // Smooth agent movement
+  Object.keys(agentTargets).forEach(id=>{
+    const m=agentMeshes[id]; if(!m) return;
+    const t=agentTargets[id];
+    const p=m.mesh.position;
+    p.x+=(t.x-p.x)*dt*1.8;
+    p.z+=(t.z-p.z)*dt*1.8;
+    p.y=0.32+Math.sin(Date.now()*0.0018+id.charCodeAt(0)*0.7)*0.07;
+  });
+  controls.update();
+  effect.render(scene,camera);
+}
+
+function stopAnim(){ if(animId){cancelAnimationFrame(animId);animId=null;} }
+
+// Expose to main script
+window._3D={
+  init: init3D,
+  update: updateAgents3D,
+  stop: stopAnim,
+  get running(){ return !!animId; }
+};
+</script>
+
+<script>
+// ── View toggle (2D / 3D ASCII) ─────────────────────────────────
+var currentView = '3d';
+
+function setView(v) {
+  currentView = v;
+  document.getElementById('btn-2d').classList.toggle('active', v==='2d');
+  document.getElementById('btn-3d').classList.toggle('active', v==='3d');
+  var asc=document.getElementById('ascii3d');
+  if(v==='3d'){
+    asc.classList.add('open');
+    // Init if first time
+    if(window._3D && !window._3D.running){
+      setTimeout(function(){ window._3D.init(asc); },50);
+    }
+  } else {
+    asc.classList.remove('open');
+  }
+}
+
+// Hook into refreshMap to also update 3D
+var _orig_refreshMap = refreshMap;
+async function refreshMap(worldId){
+  await _orig_refreshMap(worldId);
+}
+
+// Override updateMapAgents to also push to 3D
+var _orig_updateMapAgents = updateMapAgents;
+function updateMapAgents(agents){
+  _orig_updateMapAgents(agents);
+  if(window._3D) window._3D.update(agents);
+}
+
+// Auto-init 3D on detail open
+var _orig_loadDetail = loadDetail;
+async function loadDetail(worldId, name, era){
+  await _orig_loadDetail(worldId, name, era);
+  if(currentView==='3d'){
+    var asc=document.getElementById('ascii3d');
+    if(window._3D && !window._3D.running) setTimeout(function(){ window._3D.init(asc); },100);
+  }
+}
 </script>
 </body>
 </html>
