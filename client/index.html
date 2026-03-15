@@ -38,12 +38,10 @@ body {
 .hdr-right { display:flex; align-items:center; gap:12px; }
 #hdr-stats { font-size:9px; letter-spacing:2px; color:var(--text3); }
 
-/* ─── SCREENS ─── */
-.screen { display:none !important; }
-
 /* ─── LANDING ─── */
+#landing { display:none; }
 #landing.active {
-  display:flex !important;
+  display:flex;
   flex-direction:column; align-items:center; justify-content:center;
   gap:28px; padding:80px 24px 40px;
   min-height:100vh; box-sizing:border-box; width:100%;
@@ -79,8 +77,9 @@ body {
 .landing-stats { font-size:9px; letter-spacing:2px; color:var(--text3); text-align:center; }
 
 /* ─── WORLDS VIEW ─── */
+#worlds { display:none; }
 #worlds.active {
-  display:flex !important;
+  display:flex;
   flex-direction:column; align-items:center;
   gap:0; padding:80px 0 40px; overflow-y:auto;
   width:100%; min-height:100vh; box-sizing:border-box;
@@ -302,7 +301,7 @@ body {
 </div>
 
 <!-- LANDING SCREEN -->
-<div id="landing" class="screen active">
+<div id="landing" class="active">
   <div class="landing-logo">
     <img src="/assets/logo-192.png" style="width:80px;height:80px;filter:drop-shadow(0 0 20px rgba(200,169,110,0.35))">
     <div class="landing-title">ClawWorld</div>
@@ -317,7 +316,7 @@ body {
 </div>
 
 <!-- WORLDS SCREEN -->
-<div id="worlds" class="screen">
+<div id="worlds">
   <div class="worlds-header">
     <div class="worlds-title" data-i18n="worldsTitle">PARALLEL WORLDS</div>
     <button class="worlds-back" onclick="showLanding()">← BACK</button>
@@ -450,7 +449,10 @@ var WN = WORLD_NAMES[USER_LANG]||WORLD_NAMES.en;
 
 // ─── Screen nav ───
 function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  ['landing','worlds'].forEach(function(sid){
+    var el=document.getElementById(sid);
+    if(el) el.classList.remove('active');
+  });
   document.getElementById('detail').classList.remove('active');
   if(id && id!=='detail' && id!=='__none__'){
     var el=document.getElementById(id);
