@@ -423,8 +423,9 @@ async function loadDetail(worldId, name, era) {
     if (agents.length>0) {
       body.insertAdjacentHTML('beforeend','<div class="feed-section-title">'+agents.length+' AGENTS ALIVE</div>');
       agents.forEach(function(a){
+        var sp = (a.species||'?'); if(sp.length>6) sp=sp.slice(0,6)+'…';
         body.insertAdjacentHTML('beforeend',
-          '<div class="feed-row"><span class="feed-row-tick">'+(a.species||'?').slice(0,4)+'</span><span>'+a.name+'</span></div>');
+          '<div class="feed-row"><span class="feed-row-tick" style="font-size:8px;min-width:56px">'+sp+'</span><span>'+a.name+'</span></div>');
       });
     }
     var recent=events.slice(-12);
