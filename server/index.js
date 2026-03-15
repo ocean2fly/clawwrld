@@ -73,7 +73,12 @@ app.get('/worlds', async (req, res) => {
   try {
     const db = require('./db');
     const { rows } = await db.query(
-      'SELECT id, name, era, status, tick, created_at FROM worlds WHERE status = $1',
+      `SELECT w.id, w.name, w.era, w.status, w.tick, w.level, w.created_at,
+              COUNT(a.id) FILTER (WHERE a.status='alive') AS "agentCount"
+       FROM worlds w
+       LEFT JOIN agents a ON a.world_id = w.id
+       WHERE w.status = $1
+       GROUP BY w.id`,
       ['active']
     );
     res.json(rows);
