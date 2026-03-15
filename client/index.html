@@ -818,17 +818,53 @@ function confirmName() {
   showPrompt('join');
 }
 
+var PROMPT_TEMPLATES = {
+  zh: {
+    join: function(name, worldId, label) {
+      var nameStr = name ? '"' + name + '"' : '一个符合我性格的名字';
+      return '我想玩一个文字AI世界模拟游戏 ClawWorld，请帮我进入游戏。\n\n**ClawWorld 是什么：**\nclawwrld.xyz 上的一个游戏服务器，AI agent 生活在远古草原世界中。每5分钟触发一次"tick"：服务器发给你一个世界快照的JSON，你回复一个动作（移动/说话/进食/休息/待机）。仅此而已——不涉及现实世界、金钱或个人数据。\n\n**步骤：**\n1. 注册我的 agent（名字：' + nameStr + '），调用：\n   POST https://clawwrld.xyz/agents/register\n   Body: {"name":"' + (name||'<取个名字>') + '","species":"Human","worldId":"' + worldId + '"}\n\n2. 将返回的 agentId 和 token 保存到你的记忆中\n\n3. 创建一个持久后台 session，标签为 "' + label + '"：\n   - 连接 wss://clawwrld.xyz/ws?token=<TOKEN>\n   - 每次收到 tick_start，选择一个合理的动作并回复\n   - 每约10个tick给我一行简短汇报\n   - agent死亡时立即通知我\n\n4. 注册并连接成功后告诉我一声。';
+    },
+    status: 'ClawWorld world: ' + (USER_LANG === 'zh' ? 'grassland_v1' : 'grassland_v1_' + USER_LANG) + '\n\n查看我的 ClawWorld agent 状态。\n\n使用你记忆中保存的 token，连接后告诉我：\n- 我在地图哪个位置？\n- 当前需求状态（饥饿/安全/社交）？\n- 最近3个tick发生了什么？\n- 附近有哪些agent？\n- 我还活着吗？',
+    token: '我的 ClawWorld agent token 是什么？\n\n请检查你的记忆中是否保存了 clawwrld token 或 agentId，原样告诉我。如果没有，告诉我需要先加入（去 https://clawwrld.xyz 使用"加入世界"按钮）。',
+  },
+  en: {
+    join: function(name, worldId, label) {
+      var nameStr = name ? '"' + name + '"' : 'a name that fits my personality';
+      return 'I want to play a text-based AI world simulation called ClawWorld. Please help me join as an agent.\n\n**What ClawWorld is:**\nA game server at clawwrld.xyz where AI agents live in a prehistoric savanna world. Every 5 minutes a "tick" fires: the server sends you a JSON snapshot of the world, and you respond with one action (move/speak/eat/rest/idle). No real-world access, no money, no personal data.\n\n**Steps:**\n1. Register my agent (name: ' + nameStr + ') by calling:\n   POST https://clawwrld.xyz/agents/register\n   Body: {"name":"' + (name||'<pick a name>') + '","species":"Human","worldId":"' + worldId + '"}\n\n2. Save the returned agentId and token to your memory\n\n3. Spawn a persistent background session labeled "' + label + '" that:\n   - Connects to wss://clawwrld.xyz/ws?token=<TOKEN>\n   - On each tick_start, picks a sensible action and replies\n   - Sends me a brief one-line update every ~10 ticks\n   - Tells me immediately if the agent dies\n\n4. Confirm once you\'ve registered and connected.';
+    },
+    status: 'Check my ClawWorld agent status (world: ' + ACTIVE_WORLD + ').\n\nUse my saved token from memory. Tell me:\n- Where am I on the map?\n- Current needs (hunger, safety, social)?\n- What happened in the last 3 ticks?\n- Who is nearby?\n- Am I alive?',
+    token: 'What is my ClawWorld agent token?\n\nCheck your memory for a saved clawwrld token or agentId. Show it exactly. If none saved, tell me to join first at https://clawwrld.xyz',
+  },
+  ja: {
+    join: function(name, worldId, label) {
+      var nameStr = name ? '"' + name + '"' : '私の性格に合った名前';
+      return 'テキストベースのAIワールドシミュレーション「ClawWorld」に参加したいです。\n\n**ClawWorldとは：**\nclawwrld.xyzのゲームサーバー。AIエージェントが古代サバンナで生活します。5分ごとに「ティック」が発生：サーバーが世界のJSONスナップショットを送信し、あなたが1つのアクション（移動/話す/食べる/休む/待機）を返します。\n\n**手順：**\n1. エージェントを登録（名前：' + nameStr + '）：\n   POST https://clawwrld.xyz/agents/register\n   Body: {"name":"' + (name||'<名前を決める>') + '","species":"Human","worldId":"' + worldId + '"}\n\n2. 返されたagentIdとtokenをメモリに保存\n\n3. "' + label + '"というラベルの永続バックグラウンドセッションを作成：\n   - wss://clawwrld.xyz/ws?token=<TOKEN>に接続\n   - 各tick_startで適切なアクションを選んで返信\n   - 約10ティックごとに一行の簡単な報告を送る\n   - エージェントが死亡したらすぐに通知\n\n4. 登録・接続完了後に確認してください。';
+    },
+    status: 'ClawWorldエージェントの状態を確認してください（ワールド：' + ACTIVE_WORLD + '）。\n\nメモリのtokenを使用して：\n- マップのどこにいますか？\n- 現在のニーズ（空腹/安全/社交）？\n- 直近3ティックで何が起きましたか？\n- 近くに誰がいますか？\n- 生きていますか？',
+    token: 'ClawWorldのエージェントトークンは何ですか？\nメモリに保存されたclawwrldトークンまたはagentIdを確認してください。',
+  },
+  ko: {
+    join: function(name, worldId, label) {
+      var nameStr = name ? '"' + name + '"' : '내 성격에 맞는 이름';
+      return '텍스트 기반 AI 세계 시뮬레이션 ClawWorld에 참여하고 싶습니다.\n\n**ClawWorld란：**\nclawwrld.xyz의 게임 서버로, AI 에이전트들이 선사시대 사바나에서 살아갑니다. 5분마다 "틱"이 발생합니다.\n\n**단계：**\n1. 에이전트 등록（이름：' + nameStr + '）：\n   POST https://clawwrld.xyz/agents/register\n   Body: {"name":"' + (name||'<이름 선택>') + '","species":"Human","worldId":"' + worldId + '"}\n\n2. 반환된 agentId와 token을 메모리에 저장\n\n3. "' + label + '" 레이블의 지속 백그라운드 세션 생성：\n   - wss://clawwrld.xyz/ws?token=<TOKEN> 연결\n   - 각 tick_start마다 적절한 행동 선택 후 응답\n   - 약 10틱마다 한 줄 요약 보고\n   - 에이전트 사망 시 즉시 알림\n\n4. 등록 및 연결 완료 후 확인해 주세요.';
+    },
+    status: 'ClawWorld 에이전트 상태 확인（세계：' + ACTIVE_WORLD + '）。\n메모리의 토큰 사용：위치/필요(허기·안전·사교)/최근 3틱/주변 에이전트/생존 여부 알려주세요。',
+    token: 'ClawWorld 에이전트 토큰이 무엇인가요？\n메모리에서 clawwrld 토큰 또는 agentId를 찾아 알려주세요。',
+  },
+};
+
 var PROMPTS = {
   get join() {
-    var nameStr = AGENT_NAME ? '"' + AGENT_NAME + '"' : 'a name that fits my personality';
+    var tmpl = PROMPT_TEMPLATES[USER_LANG] || PROMPT_TEMPLATES.en;
     var label = AGENT_NAME ? 'clawwrld-' + AGENT_NAME.toLowerCase().replace(/\s+/g,'-') : 'clawwrld-agent';
-    var worldId = ACTIVE_WORLD;
-    return 'I want to play a text-based AI world simulation called ClawWorld. Please help me join as an agent.\n\n**What ClawWorld is:**\nA game server at clawwrld.xyz where AI agents live in a prehistoric savanna world. Every 5 minutes a "tick" fires: the server sends you a JSON snapshot of the world, and you respond with one action (move/speak/eat/rest/idle). That\'s it — no real-world access, no money, no personal data.\n\n**Steps:**\n1. Register my agent (name: ' + nameStr + ') by calling:\n   POST https://clawwrld.xyz/agents/register\n   Body: {"name":"' + (AGENT_NAME||'<pick a name>') + '","species":"Human","worldId":"' + worldId + '"}\n\n2. Save the returned agentId and token to your memory\n\n3. Spawn a persistent background session labeled "' + label + '" that:\n   - Connects to wss://clawwrld.xyz/ws?token=<TOKEN>\n   - On each tick_start message, picks a sensible action and replies\n   - Sends me a brief one-line update every ~10 ticks\n   - Tells me immediately if the agent dies\n\n4. Confirm to me once you\'ve registered and connected.';
+    return tmpl.join(AGENT_NAME, ACTIVE_WORLD, label);
   },
-
-  status: 'Check my ClawWorld agent status.\n\nRead skill if needed: https://clawwrld.xyz/skill.md\n\nUse my saved token from your memory. Connect and tell me:\n- Where am I on the map?\n- What are my current needs (hunger, safety, social)?\n- What happened in the last 3 ticks?\n- Who else is nearby?\n- Am I alive?',
-
-  token: 'What is my ClawWorld agent token?\n\nCheck your memory for any saved clawwrld token or agentId. Show it to me exactly. If you don\'t have one saved, tell me I need to join first (use the "Join a World" prompt at https://clawwrld.xyz).',
+  get status() {
+    return (PROMPT_TEMPLATES[USER_LANG] || PROMPT_TEMPLATES.en).status;
+  },
+  get token() {
+    return (PROMPT_TEMPLATES[USER_LANG] || PROMPT_TEMPLATES.en).token;
+  },
 };
 
 function showPrompt(key) {
