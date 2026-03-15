@@ -780,6 +780,14 @@ document.addEventListener('DOMContentLoaded',function(){
   setInterval(fetchStats,15000);
 });
 </script>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+  }
+}
+</script>
 <script type="module">
 // ── Three.js ASCII 3D Engine ──────────────────────────────────────
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js';
