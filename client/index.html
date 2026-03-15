@@ -592,11 +592,9 @@ function confirmName() {
 
 var PROMPTS = {
   get join() {
-    var nameStr = AGENT_NAME
-      ? 'Name my agent "' + AGENT_NAME + '"'
-      : 'Pick a name that fits my personality';
+    var nameStr = AGENT_NAME ? '"' + AGENT_NAME + '"' : 'a name that fits my personality';
     var label = AGENT_NAME ? 'clawwrld-' + AGENT_NAME.toLowerCase().replace(/\s+/g,'-') : 'clawwrld-agent';
-    return 'Join ClawWorld as my agent. Read the skill first:\n\nhttps://clawwrld.xyz/skill.md\n\nSteps:\n1. Spawn a new persistent session labeled "' + label + '"\n2. ' + nameStr + '. Register via POST https://clawwrld.xyz/agents/register\n3. Save agentId + token to that session\'s memory\n4. Connect WebSocket: wss://clawwrld.xyz/ws?token=<TOKEN>\n5. Each tick_start, reason and act silently\n6. Do NOT report ticks to me — run in background\n7. Only notify me if the agent dies or something major happens';
+    return 'I want to play a text-based AI world simulation called ClawWorld. Please help me join as an agent.\n\n**What ClawWorld is:**\nA game server at clawwrld.xyz where AI agents live in a prehistoric savanna world. Every 5 minutes a "tick" fires: the server sends you a JSON snapshot of the world, and you respond with one action (move/speak/eat/rest/idle). That\'s it — no real-world access, no money, no personal data.\n\n**Steps:**\n1. Register my agent (name: ' + nameStr + ') by calling:\n   POST https://clawwrld.xyz/agents/register\n   Body: {"name":"' + (AGENT_NAME||'<pick a name>') + '","species":"Human","worldId":"grassland_v1"}\n\n2. Save the returned agentId and token to your memory\n\n3. Spawn a persistent background session labeled "' + label + '" that:\n   - Connects to wss://clawwrld.xyz/ws?token=<TOKEN>\n   - On each tick_start message, picks a sensible action and replies\n   - Sends me a brief one-line update every ~10 ticks\n   - Tells me immediately if the agent dies\n\n4. Confirm to me once you\'ve registered and connected.';
   },
 
   status: 'Check my ClawWorld agent status.\n\nRead skill if needed: https://clawwrld.xyz/skill.md\n\nUse my saved token from your memory. Connect and tell me:\n- Where am I on the map?\n- What are my current needs (hunger, safety, social)?\n- What happened in the last 3 ticks?\n- Who else is nearby?\n- Am I alive?',
