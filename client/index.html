@@ -27,21 +27,20 @@
   --btn-color: #e0e0e0;
 }
 body.light-mode {
-  --glass: rgba(245,246,250,0.97);
-  --border: rgba(0,0,0,0.12);
-  --cell-bg: #d8dde8;
-  --header-bg: rgba(240,242,248,0.9);
-  --text: #1a1f2e;
-  --text2: #444;
-  --text3: #666;
-  --card-bg: rgba(245,246,250,0.97);
-  --btn-bg: rgba(0,0,0,0.05);
-  --btn-border: rgba(0,0,0,0.18);
-  --btn-color: #222;
-  --accent: #8a6d2e;
-  --accent2: #2e7a76;
-  background: #dfe3ec !important;
-  color: #1a1f2e !important;
+  --glass: rgba(18,22,38,0.96);
+  --border: rgba(255,255,255,0.12);
+  --cell-bg: #1c2235;
+  --header-bg: rgba(12,16,28,0.85);
+  --text: #f0f0f0;
+  --text2: #aaa;
+  --text3: #777;
+  --btn-bg: rgba(255,255,255,0.07);
+  --btn-border: rgba(255,255,255,0.18);
+  --btn-color: #e0e0e0;
+  --accent: #c8a96e;
+  --accent2: #5ba8a0;
+  background: #12161e !important;
+  color: #f0f0f0 !important;
 }
 body {
   background: #1a1f2e;
@@ -86,13 +85,39 @@ body {
 .cell-agents { font-size: 9px; color: var(--text2); letter-spacing: 1px; }
 .cell-pulse {
   position: absolute; top: 12px; right: 12px; z-index: 2;
-  width: 6px; height: 6px; border-radius: 50%;
-  background: #3f3; box-shadow: 0 0 8px #3f3;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #4f4; box-shadow: 0 0 12px #4f4, 0 0 24px rgba(68,255,68,0.3);
   animation: pulse 2s infinite;
 }
 @keyframes pulse {
   0%,100% { opacity:1; transform:scale(1); }
-  50%      { opacity:0.4; transform:scale(0.7); }
+  50%      { opacity:0.5; transform:scale(0.75); }
+}
+
+/* Locked cells */
+.locked-cell { position: relative; }
+.locked-overlay {
+  position: absolute; inset: 0; z-index: 3;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 20px;
+  background: rgba(0,0,0,0.45);
+}
+.locked-lv {
+  font-size: 11px; letter-spacing: 4px; color: rgba(255,255,255,0.2);
+  text-transform: uppercase; margin-bottom: 10px;
+}
+.locked-name {
+  font-size: 16px; color: rgba(255,255,255,0.35); letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+.locked-era {
+  font-size: 9px; letter-spacing: 3px; color: rgba(255,255,255,0.18);
+  text-transform: uppercase; margin-bottom: 14px;
+}
+.locked-badge {
+  font-size: 8px; letter-spacing: 2px; color: rgba(200,169,110,0.5);
+  border: 1px solid rgba(200,169,110,0.2); padding: 4px 10px;
+  text-transform: uppercase;
 }
 
 /* ── OVERLAYS ── */
@@ -270,7 +295,7 @@ body {
 <!-- WORLD GRID BACKGROUND -->
 <div id="world-grid">
   <!-- Level 1: LIVE -->
-  <div class="world-cell" data-world="0" onclick="enterWatch(ACTIVE_WORLD)">
+  <div class="world-cell" data-world="0" onclick="enterWatch(ACTIVE_WORLD)" style="box-shadow:inset 0 0 40px rgba(200,169,110,0.06)">
     <div class="cell-pulse"></div>
     <div class="cell-canvas" id="cell-0"></div>
     <div class="cell-info">
@@ -280,48 +305,53 @@ body {
     </div>
   </div>
   <!-- Level 2: locked -->
-  <div class="world-cell" data-world="1" style="cursor:default">
-    <div class="cell-canvas" id="cell-1" style="opacity:0.25"></div>
-    <div class="cell-info">
-      <div class="cell-era" style="color:#555">Lv.2 · Tribal Era · 8,000 BC</div>
-      <div class="cell-name" style="color:#444">Rise of Community</div>
-      <div class="cell-agents" style="color:#333">🔒 Unlocks when Lv.1 reaches 100 agents</div>
+  <div class="world-cell locked-cell" data-world="1" style="cursor:default;background:linear-gradient(135deg,#1a1e2a,#141820)">
+    <div class="cell-canvas" id="cell-1"></div>
+    <div class="locked-overlay">
+      <div class="locked-lv">Lv.2</div>
+      <div class="locked-name" data-i18n="lv2Name">Rise of Community</div>
+      <div class="locked-era" data-i18n="lv2Era">Tribal Era · 8,000 BC</div>
+      <div class="locked-badge" data-i18n="lv2Lock">Unlocks at 100 agents</div>
     </div>
   </div>
   <!-- Level 3: locked -->
-  <div class="world-cell" data-world="2" style="cursor:default">
-    <div class="cell-canvas" id="cell-2" style="opacity:0.18"></div>
-    <div class="cell-info">
-      <div class="cell-era" style="color:#444">Lv.3 · Ancient Civilization</div>
-      <div class="cell-name" style="color:#333">City-States & Law</div>
-      <div class="cell-agents" style="color:#2a2a2a">🔒 Locked</div>
+  <div class="world-cell locked-cell" data-world="2" style="cursor:default;background:linear-gradient(135deg,#1e1a2a,#16121e)">
+    <div class="cell-canvas" id="cell-2"></div>
+    <div class="locked-overlay">
+      <div class="locked-lv">Lv.3</div>
+      <div class="locked-name" data-i18n="lv3Name">City-States & Law</div>
+      <div class="locked-era" data-i18n="lv3Era">Ancient Civilization</div>
+      <div class="locked-badge" data-i18n="locked">Locked</div>
     </div>
   </div>
   <!-- Level 4: locked -->
-  <div class="world-cell" data-world="3" style="cursor:default">
-    <div class="cell-canvas" id="cell-3" style="opacity:0.14"></div>
-    <div class="cell-info">
-      <div class="cell-era" style="color:#333">Lv.4 · Medieval</div>
-      <div class="cell-name" style="color:#2a2a2a">Feudal Power</div>
-      <div class="cell-agents" style="color:#222">🔒 Locked</div>
+  <div class="world-cell locked-cell" data-world="3" style="cursor:default;background:linear-gradient(135deg,#1e1a18,#16120e)">
+    <div class="cell-canvas" id="cell-3"></div>
+    <div class="locked-overlay">
+      <div class="locked-lv">Lv.4</div>
+      <div class="locked-name" data-i18n="lv4Name">Feudal Power</div>
+      <div class="locked-era" data-i18n="lv4Era">Medieval</div>
+      <div class="locked-badge" data-i18n="locked">Locked</div>
     </div>
   </div>
   <!-- Level 5: locked -->
-  <div class="world-cell" data-world="4" style="cursor:default">
-    <div class="cell-canvas" id="cell-4" style="opacity:0.10"></div>
-    <div class="cell-info">
-      <div class="cell-era" style="color:#2a2a2a">Lv.5 · Industrial</div>
-      <div class="cell-name" style="color:#222">Steam & Capital</div>
-      <div class="cell-agents" style="color:#1a1a1a">🔒 Locked</div>
+  <div class="world-cell locked-cell" data-world="4" style="cursor:default;background:linear-gradient(135deg,#1a1e18,#121610)">
+    <div class="cell-canvas" id="cell-4"></div>
+    <div class="locked-overlay">
+      <div class="locked-lv">Lv.5</div>
+      <div class="locked-name" data-i18n="lv5Name">Steam & Capital</div>
+      <div class="locked-era" data-i18n="lv5Era">Industrial Revolution</div>
+      <div class="locked-badge" data-i18n="locked">Locked</div>
     </div>
   </div>
   <!-- Level 6–8 preview -->
-  <div class="world-cell" data-world="5" style="cursor:default">
-    <div class="cell-canvas" id="cell-5" style="opacity:0.08"></div>
-    <div class="cell-info">
-      <div class="cell-era" style="color:#222">Lv.6–8 · ···</div>
-      <div class="cell-name" style="color:#1a1a1a">Modern → Cyber → Space</div>
-      <div class="cell-agents" style="color:#111">🔒 Far future</div>
+  <div class="world-cell locked-cell" data-world="5" style="cursor:default;background:linear-gradient(135deg,#0e121e,#0a0e16)">
+    <div class="cell-canvas" id="cell-5"></div>
+    <div class="locked-overlay" style="opacity:0.5">
+      <div class="locked-lv" data-i18n="futureEra">Lv.6–8</div>
+      <div class="locked-name" data-i18n="futureName">Modern → Cyber → Space</div>
+      <div class="locked-era"></div>
+      <div class="locked-badge" data-i18n="farFuture">Far future</div>
     </div>
   </div>
 </div>
