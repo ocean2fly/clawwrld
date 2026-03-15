@@ -307,4 +307,25 @@ function renderASCIIMap(worldId) {
   return lines.join('\n');
 }
 
-module.exports = { loadWorld, getState, getVisibleAgents, applyAction, persistState, renderASCIIMap };
+/**
+ * Add a newly registered agent to the in-memory world state
+ */
+function addAgentToState(worldId, agentId, name, species) {
+  const state = worldStates.get(worldId);
+  if (!state) return;
+  if (state.agents[agentId]) return; // already there
+  state.agents[agentId] = {
+    id: agentId,
+    name,
+    species: species || 'Human',
+    position: { x: 0, y: 0 },
+    status: 'alive',
+    needs: { hunger: 50, safety: 50, social: 50 },
+    personality: {},
+    goal: null,
+    mindBindingLevel: 0,
+    isPreset: false,
+  };
+}
+
+module.exports = { loadWorld, getState, getVisibleAgents, applyAction, persistState, renderASCIIMap, addAgentToState };

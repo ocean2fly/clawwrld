@@ -7,6 +7,7 @@ const { WebSocketServer } = require('ws');
 const { loadWorld } = require('./world');
 const { registerAgent: registerAgentDB, requireAuth, extractWSToken } = require('./auth');
 const { registerAgent: registerWSAgent, unregisterAgent, submitAction, startTickScheduler } = require('./tick');
+const { addAgentToState } = require('./world');
 const library = require('./library');
 const gov = require('./governance');
 const community = require('./community');
@@ -29,6 +30,8 @@ app.post('/agents/register', async (req, res) => {
   }
   try {
     const result = await registerAgentDB({ name, species, ownerPublicKey, worldId });
+    // Also add to in-memory world state so agent appears on map immediately
+    addAgentToState(worldId, result.agentId, name, species);
     res.json(result);
   } catch (err) {
     console.error('[Register]', err);
