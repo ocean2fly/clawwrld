@@ -142,7 +142,7 @@ body {
   padding:10px 24px; font-size:8px; letter-spacing:3px; color:var(--text3);
   display:flex; justify-content:space-between; align-items:center;
 }
-#terminal-wrap { height:280px; background:#000; }
+#terminal-wrap { height:320px; background:#000; }
 
 /* ─── JOIN DRAWER ─── */
 #join-drawer {
@@ -404,6 +404,8 @@ function buildWorldCards() {
 // ─── Detail view ───
 var detailWorldId = null;
 async function loadDetail(worldId, name, era) {
+  // disconnect old WS
+  if (termWs) { try{termWs.close();}catch(e){} termWs=null; }
   detailWorldId = worldId;
   document.getElementById('detail-title').textContent = name;
   document.getElementById('detail-era').textContent = era;
@@ -439,32 +441,53 @@ async function loadDetail(worldId, name, era) {
     if (agents.length===0 && events.length===0) {
       body.innerHTML='<div class="feed-empty">No agents yet</div>';
     }
+    // auto-connect terminal
+    setTimeout(connectTerminal, 300);
   } catch(e){
     body.innerHTML='<div class="feed-empty">Failed to load</div>';
+    setTimeout(connectTerminal, 300);
   }
 }
 
 // ─── Terminal ───
-var term, termWs;
+var term, termWs, termFit;
+function ensureTerm() {
+  if (term) return;
+  term = new Terminal({theme:{background:'#000',foreground:'#ccc'},fontFamily:"'SF Mono','Fira Code',monospace",fontSize:12,lineHeight:1.5,cursorBlink:false});
+  termFit = new FitAddon.FitAddon(); term.loadAddon(termFit);
+  term.open(document.getElementById('terminal-wrap')); termFit.fit();
+}
 function connectTerminal() {
-  if (!term) {
-    term = new Terminal({theme:{background:'#000',foreground:'#ccc'},fontFamily:"'SF Mono',monospace",fontSize:12,lineHeight:1.4,cursorBlink:true});
-    var fit = new FitAddon.FitAddon(); term.loadAddon(fit);
-    term.open(document.getElementById('terminal-wrap')); fit.fit();
-  }
+  ensureTerm(); term.clear();
+  // 1. Try to load world render (ASCII map + narrative)
+  fetch(API+'/worlds/'+detailWorldId+'/render')
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if (d.ascii_map) {
+        term.writeln('\x1b[90m── rendered by '+(d.renderer_name||'system')+' · tick #'+(d.tick||'?')+' ──\x1b[0m');
+        term.writeln('');
+        d.ascii_map.split('\n').forEach(function(line){ term.writeln(line); });
+        if (d.narrative) { term.writeln(''); term.writeln('\x1b[36m'+d.narrative+'\x1b[0m'); }
+      } else {
+        term.writeln('\x1b[90m[no map render available — world is dark]\x1b[0m');
+      }
+      term.writeln('');
+      connectWs();
+    }).catch(function(){ connectWs(); });
+}
+function connectWs() {
   if (termWs) { try{termWs.close();}catch(e){} }
-  term.clear();
-  term.writeln('\x1b[90m connecting to '+detailWorldId+' ...\x1b[0m');
   var proto = location.protocol==='https:'?'wss:':'ws:';
   termWs = new WebSocket(proto+'//'+location.host+'/ws');
-  termWs.onopen = function(){ term.writeln('\x1b[90m[live · '+detailWorldId+']\x1b[0m'); };
+  termWs.onopen = function(){ term.writeln('\x1b[90m── live feed connected ──\x1b[0m'); };
   termWs.onmessage = function(e){
     try {
       var m=JSON.parse(e.data);
-      if (m.type==='tick_end') term.writeln('\x1b[90m━ tick #'+m.tick+' ━\x1b[0m');
-      else if (m.events) m.events.forEach(function(ev){ if(ev.description) term.writeln('\x1b[33m'+ev.description+'\x1b[0m'); });
+      if (m.type==='tick_end') term.writeln('\x1b[90m\r\n━ tick #'+m.tick+' ━\x1b[0m');
+      else if (m.events) m.events.forEach(function(ev){ if(ev.description) term.writeln('\x1b[33m· '+ev.description+'\x1b[0m'); });
     } catch(e){}
   };
+  termWs.onerror = function(){ term.writeln('\x1b[90m[live feed unavailable]\x1b[0m'); };
 }
 
 // ─── Join ───
