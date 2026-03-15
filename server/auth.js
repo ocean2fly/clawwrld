@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const db = require('./db');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'moltworld-dev-secret-change-in-prod';
-const JWT_EXPIRES = '24h';
+// No expiry — tokens last forever (agent identity is permanent)
 
 /**
  * Register a new agent
@@ -25,7 +25,7 @@ async function registerAgent({ name, species, ownerPublicKey, worldId, isPreset 
  * Issue a JWT for an agent
  */
 function issueToken(agentId, worldId) {
-  return jwt.sign({ agentId, worldId }, JWT_SECRET, { expiresIn: JWT_EXPIRES });
+  return jwt.sign({ agentId, worldId }, JWT_SECRET);
 }
 
 /**
