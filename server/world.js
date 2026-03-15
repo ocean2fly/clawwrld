@@ -145,6 +145,29 @@ function getDirection(from, to) {
  * Apply an action to world state (pure logic, no LLM)
  * Returns: { success, events, updatedAgents }
  */
+// ── Relationship system ─────────────────────────────────────────────
+// relationships: worldId → Map(key → { score, level, confessed, partnered })
+const relationships = new Map();
+
+function relKey(a, b) { return [a,b].sort().join('::'); }
+
+function getRelationships(worldId) {
+  if (!relationships.has(worldId)) relationships.set(worldId, new Map());
+  return relationships.get(worldId);
+}
+
+function getRelLevel(score) {
+  if (score >= 90) return 'lovers';
+  if (score >= 70) return 'close';
+  if (score >= 45) return 'friends';
+  if (score >= 20) return 'acquaintance';
+  return 'stranger';
+}
+
+function relLabel(level) {
+  return { stranger:'陌生人', acquaintance:'相识', friends:'朋友', close:'挚友', lovers:'恋人' }[level] || '陌生人';
+}
+
 // ── Narrative description helpers ──────────────────────────────────
 function terrainAt(state, x, y) {
   const t = state.terrain || {};
@@ -224,23 +247,111 @@ function restDesc(agent, state) {
 function checkEncounters(worldId, state, movedAgentId) {
   const me = state.agents[movedAgentId];
   if (!me || me.status !== 'alive') return;
-  const same = Object.values(state.agents).filter(a =>
-    a.id !== movedAgentId && a.status === 'alive' &&
-    a.position.x === me.position.x && a.position.y === me.position.y
-  );
-  for (const other of same) {
-    const key = [movedAgentId, other.id].sort().join(':');
-    const lastEnc = state._lastEncounter || {};
-    if (lastEnc[key] === state.tick) continue; // already fired this tick
-    if (!state._lastEncounter) state._lastEncounter = {};
-    state._lastEncounter[key] = state.tick;
+  const rels = getRelationships(worldId);
 
-    const desc = pick([
-      `${me.name}与${other.name}在此处相遇，彼此对视`,
-      `${me.name}走近${other.name}，两者在草原上短暂驻足`,
-      `${me.name}和${other.name}不期而遇，沉默地站在一起`,
-    ]);
-    state.events.push({ type: 'encounter', participants: [movedAgentId, other.id], description: desc });
+  const nearby = Object.values(state.agents).filter(a =>
+    a.id !== movedAgentId && a.status === 'alive' &&
+    Math.abs(a.position.x - me.position.x) <= 1 &&
+    Math.abs(a.position.y - me.position.y) <= 1
+  );
+
+  for (const other of nearby) {
+    const key = relKey(movedAgentId, other.id);
+    const encKey = `enc:${key}`;
+    if (!state._lastEncounter) state._lastEncounter = {};
+    if (state._lastEncounter[encKey] === state.tick) continue;
+    state._lastEncounter[encKey] = state.tick;
+
+    // Get / init relationship
+    if (!rels.has(key)) rels.set(key, { score: 0, confessed: false, partnered: false });
+    const rel = rels.get(key);
+    const prevLevel = getRelLevel(rel.score);
+
+    // Score increases more when both have social need
+    const meS = me.needs.social || 50, otS = other.needs.social || 50;
+    const gain = 4 + (meS < 40 ? 3 : 0) + (otS < 40 ? 3 : 0) + Math.floor(Math.random()*4);
+    rel.score = Math.min(100, rel.score + gain);
+    const newLevel = getRelLevel(rel.score);
+
+    let desc = '';
+
+    // Level-up moment
+    if (prevLevel !== newLevel) {
+      const upgrades = {
+        acquaintance: `${me.name}和${other.name}的关系悄悄发生了变化——他们已不再是陌生人`,
+        friends: `${me.name}拍了拍${other.name}的肩膀，两人相视而笑，友谊在此刻悄然生根`,
+        close: `${me.name}与${other.name}并肩坐在草原上，倾吐心声，彼此深深信任`,
+        lovers: `${me.name}看着${other.name}，心跳不由自主地加速。这片草原上，有什么东西永远改变了`,
+      };
+      desc = upgrades[newLevel] || `${me.name}与${other.name}的关系更近了一步`;
+      state.events.push({ type: 'relationship_upgrade', participants: [movedAgentId, other.id], relLevel: newLevel, description: desc });
+    }
+
+    // Confession: close/lovers + not yet confessed + random
+    if ((newLevel === 'close' || newLevel === 'lovers') && !rel.confessed && Math.random() < 0.18) {
+      rel.confessed = true;
+      const accepted = Math.random() < 0.65; // 65% chance accepted
+      if (accepted) {
+        rel.partnered = true;
+        desc = pick([
+          `${me.name}鼓起勇气，轻声说："我一直想告诉你……我喜欢你。" ${other.name}沉默片刻，缓缓转过身，露出了一个温柔的笑`,
+          `草原的风吹过，${me.name}握住了${other.name}的手。那一刻，两人都明白了什么`,
+          `${me.name}说："如果世界有尽头，我希望和你一起站在那里。" ${other.name}没有说话，只是靠近了一点`,
+        ]);
+      } else {
+        desc = pick([
+          `${me.name}说出了心里的话，${other.name}沉默良久，轻声说："我……需要一些时间"`,
+          `${me.name}鼓起勇气表白，${other.name}低下头，轻声道："对不起……"`,
+        ]);
+      }
+      state.events.push({ type: 'confession', participants: [movedAgentId, other.id], accepted, description: desc });
+      continue;
+    }
+
+    // Partners: special moments
+    if (rel.partnered && Math.random() < 0.35) {
+      desc = pick([
+        `${me.name}与${other.name}肩并肩站在夕阳下，没有说话，却什么都说了`,
+        `${me.name}轻轻碰了碰${other.name}的手，对方回以一个微笑`,
+        `${me.name}低声对${other.name}说："有你在，这片草原没那么孤独了"`,
+        `${other.name}朝${me.name}走来，两人在草原中央相遇，如同一个秘密`,
+      ]);
+      state.events.push({ type: 'romance_moment', participants: [movedAgentId, other.id], description: desc });
+      continue;
+    }
+
+    // Regular encounters by relationship level
+    if (!desc) {
+      const byLevel = {
+        stranger: [
+          `${me.name}与${other.name}对视一眼，互相打量`,
+          `${me.name}第一次见到${other.name}，谨慎地停下脚步`,
+          `${me.name}注意到附近有个陌生人——${other.name}`,
+        ],
+        acquaintance: [
+          `${me.name}见到${other.name}，点了点头`,
+          `"${other.name}，你也在这里。" ${me.name}说`,
+          `${me.name}和${other.name}相遇，简短地交换了眼神`,
+        ],
+        friends: [
+          `${me.name}看见${other.name}，快步走近："最近怎么样？"`,
+          `${me.name}与${other.name}分享了一段安静的时光`,
+          `${me.name}笑着对${other.name}说："找到你了"`,
+        ],
+        close: [
+          `${me.name}靠近${other.name}，低声说："我昨晚做了个奇怪的梦"`,
+          `${me.name}与${other.name}席地而坐，倾谈了很久`,
+          `${me.name}把最近的心事告诉了${other.name}，只有他们之间才有这样的默契`,
+        ],
+        lovers: [
+          `${me.name}与${other.name}相遇，周围的一切都安静下来`,
+          `${me.name}轻轻地叫了${other.name}的名字`,
+          `${me.name}与${other.name}站在一起，草原的风把他们的发吹向同一个方向`,
+        ],
+      };
+      desc = pick(byLevel[newLevel] || byLevel.stranger);
+      state.events.push({ type: 'encounter', participants: [movedAgentId, other.id], relLevel: newLevel, relScore: rel.score, description: desc });
+    }
   }
 }
 
