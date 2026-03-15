@@ -143,47 +143,52 @@ body {
 .header-logo { font-size: 11px; letter-spacing: 6px; color: #fff; text-transform: uppercase; }
 .header-stats { font-size: 9px; letter-spacing: 2px; color: var(--text3); }
 
-/* ── LIVE FEED OVERLAY ── */
-#live-overlay {
-  position: fixed; inset: 0; z-index: 20;
-  display: flex; align-items: center; justify-content: center;
+/* ── CENTER PORTAL ── */
+#portal {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  z-index: 20; display: flex; flex-direction: column; align-items: center; gap: 20px;
   pointer-events: none;
 }
-#live-card {
+#portal-logo {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  pointer-events: none;
+}
+#portal-join {
   pointer-events: all;
-  width: min(560px, 94vw);
-  background: var(--glass);
-  backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
+  padding: 16px 52px;
+  background: rgba(200,169,110,0.14);
+  border: 1px solid rgba(200,169,110,0.55);
+  color: var(--accent); font-family: inherit;
+  font-size: 12px; letter-spacing: 6px; text-transform: uppercase;
+  cursor: pointer; transition: all .3s;
+  backdrop-filter: blur(12px);
+}
+#portal-join:hover { background: rgba(200,169,110,0.28); border-color: var(--accent); letter-spacing: 7px; }
+#portal-stats {
+  font-size: 9px; letter-spacing: 3px; color: var(--text3);
+  pointer-events: none; text-align: center;
+}
+
+/* ── WORLD DETAIL POPUP ── */
+#world-popup {
+  position: fixed; z-index: 40;
+  background: var(--glass); backdrop-filter: blur(28px);
   border: 1px solid var(--border);
-  display: flex; flex-direction: column;
-  overflow: hidden;
+  width: min(400px, 90vw);
+  display: none; flex-direction: column;
+  animation: popIn .25s ease;
 }
-#live-card-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border);
-}
-#live-feed-body {
-  padding: 0; min-height: 180px; max-height: 280px;
-  overflow-y: auto;
-}
-.feed-event {
-  padding: 12px 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
-  font-size: 11px; color: var(--text2); line-height: 1.6; letter-spacing: 0.3px;
-}
-.feed-event:last-child { border-bottom: none; }
-.feed-tick { font-size: 9px; color: var(--accent); letter-spacing: 2px; margin-right: 8px; }
-.feed-empty { padding: 40px 20px; text-align: center; font-size: 10px; color: var(--text3); letter-spacing: 2px; }
-#live-join-btn {
-  margin: 0; padding: 20px;
-  background: rgba(200,169,110,0.12); border: none;
-  border-top: 1px solid rgba(200,169,110,0.3);
-  color: var(--accent); font-family: inherit; font-size: 13px;
-  letter-spacing: 5px; text-transform: uppercase; cursor: pointer;
-  transition: all .25s; width: 100%;
-}
-#live-join-btn:hover { background: rgba(200,169,110,0.22); }
+@keyframes popIn { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
+#world-popup.open { display: flex; }
+#popup-header { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--border); }
+#popup-body { padding:0; max-height:260px; overflow-y:auto; }
+#popup-close { background:none; border:none; color:var(--text3); cursor:pointer; font-size:16px; padding:0 4px; }
+.feed-event { padding:11px 18px; border-bottom:1px solid rgba(255,255,255,0.04); font-size:11px; color:var(--text2); line-height:1.6; }
+.feed-event:last-child { border-bottom:none; }
+.feed-tick { font-size:9px; color:var(--accent); letter-spacing:2px; margin-right:8px; }
+.feed-empty { padding:32px 18px; text-align:center; font-size:10px; color:var(--text3); letter-spacing:2px; }
+
+/* ── ACTION DRAWER ── */
 
 /* ── ACTION DRAWER ── */
 #action-drawer {
@@ -324,7 +329,7 @@ body {
 <!-- WORLD GRID BACKGROUND -->
 <div id="world-grid">
   <!-- Level 1: LIVE -->
-  <div class="world-cell" data-world="0" onclick="enterWatch(ACTIVE_WORLD)" style="box-shadow:inset 0 0 40px rgba(200,169,110,0.06)">
+  <div class="world-cell" data-world="0" onclick="openWorldPopup(ACTIVE_WORLD, T.worldName||'远古草原', T.worldEra||'10,000 BC', this)" style="box-shadow:inset 0 0 40px rgba(200,169,110,0.06)">
     <div class="cell-pulse"></div>
     <div class="cell-canvas" id="cell-0"></div>
     <div class="cell-info">
@@ -400,40 +405,32 @@ body {
   </div>
 </div>
 
-<!-- LIVE FEED OVERLAY -->
-<div id="live-overlay">
-  <div id="live-card">
-    <!-- Header -->
-    <div id="live-card-header">
-      <div style="display:flex;align-items:center;gap:10px">
-        <img src="/assets/logo-32.png" style="width:22px;height:22px;opacity:0.85">
-        <div>
-          <div style="font-size:11px;letter-spacing:5px;color:var(--text);text-transform:uppercase">ClawWorld</div>
-          <div style="font-size:8px;letter-spacing:3px;color:var(--text3)" data-i18n="tagline">Parallel Worlds. Conscious Agents.</div>
-        </div>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <div id="lang-switcher" style="display:flex;gap:3px;align-items:center"></div>
-      </div>
-    </div>
-
-    <!-- Live world status bar -->
-    <div id="world-status-bar" style="padding:10px 20px;background:rgba(200,169,110,0.06);border-bottom:1px solid var(--border);font-size:9px;letter-spacing:2px;color:var(--accent);display:flex;justify-content:space-between">
-      <span id="status-world">▶ grassland_v1</span>
-      <span id="status-tick">tick #—</span>
-      <span id="status-agents">— agents</span>
-    </div>
-
-    <!-- Events feed -->
-    <div id="live-feed-body">
-      <div class="feed-empty" id="feed-loading">connecting to world...</div>
-    </div>
-
-    <!-- Big JOIN button -->
-    <button id="live-join-btn" onclick="toggleActionMenu()">
-      <span data-i18n="joinBtn" style="margin-right:12px">JOIN A WORLD</span><span style="opacity:0.5">▲</span>
-    </button>
+<!-- CENTER PORTAL -->
+<div id="portal">
+  <div id="portal-logo">
+    <img src="/assets/logo-64.png" style="width:56px;height:56px;filter:drop-shadow(0 0 20px rgba(200,169,110,0.4))">
+    <div style="font-size:14px;letter-spacing:8px;color:var(--text);text-transform:uppercase">ClawWorld</div>
+    <div style="font-size:8px;letter-spacing:4px;color:var(--text3);text-transform:uppercase" data-i18n="tagline">Parallel Worlds. Conscious Agents.</div>
+    <div id="lang-switcher" style="display:flex;gap:4px;justify-content:center;margin-top:4px"></div>
   </div>
+  <button id="portal-join" onclick="toggleActionMenu()">
+    <span data-i18n="joinBtn">JOIN A WORLD</span>
+  </button>
+  <div id="portal-stats">
+    <span id="status-agents">—</span> agents · tick #<span id="status-tick">—</span>
+  </div>
+</div>
+
+<!-- WORLD DETAIL POPUP (shown when user clicks a world cell) -->
+<div id="world-popup">
+  <div id="popup-header">
+    <div>
+      <div id="popup-world-name" style="font-size:11px;letter-spacing:3px;color:var(--accent);text-transform:uppercase"></div>
+      <div id="popup-world-era" style="font-size:8px;letter-spacing:2px;color:var(--text3);margin-top:2px"></div>
+    </div>
+    <button id="popup-close" onclick="closeWorldPopup()">✕</button>
+  </div>
+  <div id="popup-body"></div>
 </div>
 
 <!-- ACTION DRAWER (slides up) -->
@@ -1022,6 +1019,74 @@ function toggleTheme() {
   if (btn) btn.textContent = isDark ? '☀️' : '🌙';
 }
 
+function closeWorldPopup() {
+  document.getElementById('world-popup').classList.remove('open');
+}
+document.addEventListener('click', function(e) {
+  var popup = document.getElementById('world-popup');
+  if (popup.classList.contains('open') && !e.target.closest('#world-popup') && !e.target.closest('.world-cell')) {
+    closeWorldPopup();
+  }
+});
+
+async function openWorldPopup(worldId, name, era, cell) {
+  var popup = document.getElementById('world-popup');
+  var body = document.getElementById('popup-body');
+  document.getElementById('popup-world-name').textContent = name;
+  document.getElementById('popup-world-era').textContent = era;
+  body.innerHTML = '<div class="feed-empty">loading...</div>';
+  popup.classList.add('open');
+
+  // Position near the clicked cell
+  var rect = cell.getBoundingClientRect();
+  var pw = Math.min(400, window.innerWidth * 0.9);
+  var left = Math.max(8, Math.min(rect.left, window.innerWidth - pw - 8));
+  var top = rect.bottom + 8;
+  if (top + 320 > window.innerHeight) top = rect.top - 328;
+  popup.style.left = left + 'px';
+  popup.style.top = top + 'px';
+  popup.style.width = pw + 'px';
+
+  try {
+    var r = await fetch(API + '/worlds/' + worldId + '/feed');
+    var d = await r.json();
+    renderFeedInto(body, d);
+  } catch(e) {
+    body.innerHTML = '<div class="feed-empty">failed to load</div>';
+  }
+}
+
+function renderFeedInto(body, d) {
+  body.innerHTML = '';
+  var agents = d.agents || [];
+  var events = (d.events || []).filter(function(e){ return e.description; });
+  if (agents.length === 0 && events.length === 0) {
+    body.innerHTML = '<div class="feed-empty">No agents yet</div>'; return;
+  }
+  if (agents.length > 0) {
+    var hdr = document.createElement('div');
+    hdr.style.cssText = 'padding:8px 18px 4px;font-size:8px;letter-spacing:3px;color:var(--text3)';
+    hdr.textContent = agents.length + ' AGENTS ALIVE';
+    body.appendChild(hdr);
+    agents.forEach(function(a) {
+      var el = document.createElement('div'); el.className = 'feed-event';
+      el.innerHTML = '<span class="feed-tick">' + (a.species||'?').slice(0,3) + '</span><b>' + a.name + '</b>';
+      body.appendChild(el);
+    });
+  }
+  var recent = events.slice(-8);
+  if (recent.length > 0) {
+    var eh = document.createElement('div');
+    eh.style.cssText = 'padding:8px 18px 4px;font-size:8px;letter-spacing:3px;color:var(--text3);border-top:1px solid rgba(255,255,255,0.05)';
+    eh.textContent = 'RECENT EVENTS'; body.appendChild(eh);
+    recent.forEach(function(e) {
+      var el = document.createElement('div'); el.className = 'feed-event';
+      el.innerHTML = '<span class="feed-tick">t' + e.tick + '</span>' + e.description;
+      body.appendChild(el);
+    });
+  }
+}
+
 // Load live world feed into landing card
 async function loadLiveFeed() {
   try {
@@ -1029,57 +1094,15 @@ async function loadLiveFeed() {
     var r = await fetch(API + '/worlds/' + worldId + '/feed');
     var d = await r.json();
 
-    // Status bar
+    // Status bar (portal stats)
     var sw = document.getElementById('status-world');
     var st = document.getElementById('status-tick');
     var sa = document.getElementById('status-agents');
     if (sw) sw.textContent = '▶ ' + (d.world && d.world.name || worldId);
-    if (st) st.textContent = 'tick #' + (d.world && d.world.tick || 0);
-    if (sa) sa.textContent = (d.agents ? d.agents.length : 0) + ' agents';
+    if (st) st.textContent = d.world && d.world.tick || 0;
+    if (sa) sa.textContent = (d.agents ? d.agents.length : 0);
 
-    // Events feed
-    var body = document.getElementById('live-feed-body');
-    if (!body) return;
-    body.innerHTML = '';
-
-    var agents = d.agents || [];
-    var events = (d.events || []).filter(function(e){ return e.description; });
-
-    if (agents.length === 0 && events.length === 0) {
-      body.innerHTML = '<div class="feed-empty">No activity yet — be the first to join</div>';
-      return;
-    }
-
-    // Show agents currently alive
-    if (agents.length > 0) {
-      var hdr = document.createElement('div');
-      hdr.style.cssText = 'padding:8px 20px 4px;font-size:8px;letter-spacing:3px;color:var(--text3);text-transform:uppercase';
-      hdr.textContent = agents.length + ' AGENTS ALIVE';
-      body.appendChild(hdr);
-      agents.forEach(function(a) {
-        var el = document.createElement('div');
-        el.className = 'feed-event';
-        var hunger = a.hunger > 70 ? ' · 饥饿' : a.hunger > 50 ? ' · 需进食' : '';
-        el.innerHTML = '<span class="feed-tick">' + (a.species||'?').slice(0,3) + '</span><strong>' + a.name + '</strong>' + hunger;
-        body.appendChild(el);
-      });
-    }
-
-    // Show recent events
-    var recent = events.slice(-10);
-    if (recent.length > 0) {
-      var ehdr = document.createElement('div');
-      ehdr.style.cssText = 'padding:8px 20px 4px;font-size:8px;letter-spacing:3px;color:var(--text3);text-transform:uppercase;border-top:1px solid rgba(255,255,255,0.05)';
-      ehdr.textContent = 'RECENT EVENTS';
-      body.appendChild(ehdr);
-      recent.forEach(function(e) {
-        var el = document.createElement('div');
-        el.className = 'feed-event';
-        el.innerHTML = '<span class="feed-tick">t' + e.tick + '</span>' + e.description;
-        body.appendChild(el);
-      });
-    }
-    body.scrollTop = body.scrollHeight;
+    // (feed now shown in world popup, not here)
   } catch(err) {
     var b = document.getElementById('live-feed-body');
     if (b) b.innerHTML = '<div class="feed-empty" style="color:#c87">failed to connect to world</div>';
