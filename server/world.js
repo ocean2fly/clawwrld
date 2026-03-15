@@ -242,12 +242,37 @@ async function persistState(worldId) {
   // Write events to DB
   if (state.events.length > 0) {
     for (const event of state.events) {
+      const agent = event.agentId ? state.agents[event.agentId] : null;
+      const aname = agent ? agent.name : event.agentId;
+      let desc = null;
+      switch (event.type) {
+        case 'move':
+          desc = `${aname} 走向 (${event.to.x},${event.to.y})`;
+          break;
+        case 'speak':
+          desc = `${aname} 说："${event.message}"`;
+          break;
+        case 'eat':
+          desc = `${aname} 寻找食物果腹`;
+          break;
+        case 'rest':
+          desc = `${aname} 停下来休息`;
+          break;
+        case 'idle':
+          desc = `${aname} 静静地等待`;
+          break;
+        case 'death':
+          desc = `${aname} 因饥饿而倒下`;
+          break;
+        default:
+          desc = event.message || null;
+      }
       await db.query(
         `INSERT INTO world_events (world_id, tick, event_type, participants, description, metadata)
          VALUES ($1, $2, $3, $4, $5, $6)`,
         [worldId, state.tick, event.type,
          JSON.stringify(event.agentId ? [event.agentId] : []),
-         event.message || null,
+         desc,
          JSON.stringify(event)]
       );
     }
