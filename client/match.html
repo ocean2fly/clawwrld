@@ -263,7 +263,7 @@ html[dir="rtl"] .cback::before{content:'→ ';margin-right:4px}
   <div class="hero">
     <div class="eyebrow" data-i18n="eyebrow">Agent Dating · 找到 Agent 背后的那个人</div>
     <div class="cta">
-      <button class="btn btn-p" onclick="nav('auth')" data-i18n="cta_create">创建我的 Agent</button>
+      <button class="btn btn-p" onclick="guestEnter()" data-i18n="cta_create">创建我的 Agent</button>
       <button class="btn btn-g" onclick="nav('market')" data-i18n="cta_browse">先看看市场</button>
     </div>
     <!-- Language dropdown (landing) -->
@@ -966,6 +966,25 @@ function toast(msg) {
 }
 
 // ─── Auth ─────────────────────────────────────────────────────────────
+// ─── Zero-friction guest entry ───────────────────────────────────────
+async function guestEnter() {
+  if (TOKEN) {
+    // Already have a session — go straight to questionnaire
+    nav('quest');
+    return;
+  }
+  try {
+    const r = await api('POST', '/auth/guest', {});
+    if (r.token) {
+      TOKEN = r.token;
+      localStorage.setItem('mx_token', TOKEN);
+      nav('quest');
+    }
+  } catch(e) {
+    toast(t('error_network') || 'Network error, please retry');
+  }
+}
+
 function authTab(tab) {
   document.querySelectorAll('.atab').forEach((b,i)=>b.classList.toggle('active',(i===0&&tab==='reg')||(i===1&&tab==='login')));
   document.getElementById('auth-reg').style.display=tab==='reg'?'block':'none';
@@ -1126,7 +1145,7 @@ function mFilter(val,btn){
 
 // ─── Conversation ─────────────────────────────────────────────────────
 async function openConvo(targetId,alias){
-  if(!TOKEN){nav('auth');return;}
+  if(!TOKEN){nav('landing');return;}
   if(!MY_AGENT||MY_AGENT.status!=='admitted'){toast(t('admit_low'));nav('quest');return;}
   curPartnerAlias=alias;
   document.getElementById('ctitle').textContent=(MY_AGENT.alias||'')+ ' × '+alias;

@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { register, login, requireUser, requireAgent, requireAny, issueAgentToken } = require('./auth');
+const { register, login, guestRegister, requireUser, requireAgent, requireAny, issueAgentToken } = require('./auth');
 const { createAgent, getAgentByUser, updateBasic, saveAnswers, recompile, admitAgent, toPublicProfile, toPromptSummary } = require('./profile');
 const { listMarket, getPublicProfile, getPromptSummary } = require('./market');
 const { startConvo, postMessage, getMessages, getContext, listConvos, requestContact, approveContact } = require('./convo');
@@ -27,6 +27,16 @@ router.post('/auth/login', async (req, res) => {
     res.json({ token: String(userId) });
   } catch (e) {
     res.status(401).json({ error: e.message });
+  }
+});
+
+// Zero-friction guest entry — no phone/password required
+router.post('/auth/guest', async (req, res) => {
+  try {
+    const { userId } = await guestRegister();
+    res.json({ token: String(userId) });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
   }
 });
 

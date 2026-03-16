@@ -87,4 +87,14 @@ async function issueAgentToken(userId) {
   return { token: raw, agentId };  // raw token returned ONCE only
 }
 
-module.exports = { register, login, requireUser, requireAgent, requireAny, issueAgentToken, genAgentId };
+// ─── Guest (zero-friction entry) ─────────────────────────────────────
+async function guestRegister() {
+  const guestId = 'guest_' + crypto.randomBytes(12).toString('hex');
+  const r = await db.query(
+    'INSERT INTO mx_users (phone, email, password_hash) VALUES ($1,$2,$3) RETURNING id',
+    [guestId, null, '']
+  );
+  return { userId: r.rows[0].id };
+}
+
+module.exports = { register, login, guestRegister, requireUser, requireAgent, requireAny, issueAgentToken, genAgentId };
