@@ -125,6 +125,66 @@ html[dir="rtl"] .opt.sel::after{right:auto;left:14px}
 html[dir="rtl"] .cback::before{content:'→ ';margin-right:4px}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:480px){.agrid{grid-template-columns:1fr}#lang-switcher{gap:2px}}
+
+/* ── LANDING DECORATIONS ── */
+#s-landing{position:relative;overflow:hidden}
+
+/* Orb glows */
+.orb{position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none;animation:orbDrift 12s ease-in-out infinite}
+.orb1{width:500px;height:500px;background:radial-gradient(circle,rgba(200,169,110,.12) 0%,transparent 70%);top:-100px;left:-100px;animation-delay:0s}
+.orb2{width:400px;height:400px;background:radial-gradient(circle,rgba(126,184,196,.10) 0%,transparent 70%);bottom:-80px;right:-80px;animation-delay:-4s}
+.orb3{width:300px;height:300px;background:radial-gradient(circle,rgba(200,169,110,.08) 0%,transparent 70%);top:40%;left:60%;animation-delay:-8s}
+@keyframes orbDrift{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-20px) scale(1.05)}66%{transform:translate(-20px,30px) scale(0.97)}}
+
+/* Floating agent cards */
+.float-cards{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.fc-card{position:absolute;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.10);padding:12px 16px;display:flex;align-items:center;gap:10px;backdrop-filter:blur(8px);animation:floatCard 8s ease-in-out infinite}
+.fc-card:nth-child(even){animation-direction:alternate-reverse}
+.fc1{top:18%;left:6%;animation-delay:0s;animation-duration:9s}
+.fc2{top:28%;right:7%;animation-delay:-2s;animation-duration:11s}
+.fc3{bottom:30%;left:4%;animation-delay:-4s;animation-duration:8s}
+.fc4{bottom:22%;right:6%;animation-delay:-1s;animation-duration:10s}
+.fc5{top:12%;left:28%;animation-delay:-3s;animation-duration:12s}
+.fc6{bottom:15%;right:22%;animation-delay:-6s;animation-duration:9s}
+@keyframes floatCard{0%,100%{transform:translateY(0px) rotate(0deg)}50%{transform:translateY(-12px) rotate(.4deg)}}
+.fc-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,rgba(200,169,110,.4),rgba(126,184,196,.3));display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--text);flex-shrink:0;font-weight:300}
+.fc-av2{background:linear-gradient(135deg,rgba(126,184,196,.4),rgba(200,169,110,.3))}
+.fc-av3{background:linear-gradient(135deg,rgba(212,122,122,.3),rgba(200,169,110,.3))}
+.fc-av4{background:linear-gradient(135deg,rgba(122,196,122,.3),rgba(126,184,196,.3))}
+.fc-av5{background:linear-gradient(135deg,rgba(200,169,110,.5),rgba(212,122,122,.2))}
+.fc-av6{background:linear-gradient(135deg,rgba(126,184,196,.5),rgba(122,196,122,.2))}
+.fc-info{flex:1}
+.fc-alias{font-size:13px;font-weight:300;color:var(--text);margin-bottom:2px}
+.fc-meta{font-size:10px;color:var(--text3)}
+.fc-tag{font-size:9px;color:var(--accent);border:1px solid rgba(200,169,110,.3);padding:2px 7px;letter-spacing:1px;white-space:nowrap}
+
+/* SVG connection lines */
+.conn-lines{position:absolute;inset:0;width:100%;height:100%;opacity:.25}
+
+/* Hero center */
+.hero{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 24px 160px;text-align:center}
+.eyebrow{font-size:11px;letter-spacing:6px;color:var(--accent);text-transform:uppercase;margin-bottom:36px;position:relative}
+.eyebrow::before,.eyebrow::after{content:'';position:absolute;top:50%;width:40px;height:1px;background:rgba(200,169,110,.4)}
+.eyebrow::before{right:calc(100% + 16px)}
+.eyebrow::after{left:calc(100% + 16px)}
+.cta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+
+/* Stats bar */
+.stats-bar{position:absolute;bottom:60px;left:50%;transform:translateX(-50%);z-index:10;display:flex;align-items:center;gap:0;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(12px);padding:14px 32px;gap:32px;white-space:nowrap}
+.stat-item{display:flex;flex-direction:column;align-items:center;gap:4px}
+.stat-num{font-size:22px;font-weight:200;color:var(--accent);letter-spacing:2px;font-variant-numeric:tabular-nums}
+.stat-label{font-size:10px;color:var(--text3);letter-spacing:2px;text-transform:uppercase}
+.stat-sep{width:1px;height:36px;background:rgba(255,255,255,.08)}
+
+/* Ticker */
+.ticker-wrap{position:absolute;bottom:0;left:0;right:0;z-index:10;overflow:hidden;height:36px;border-top:1px solid rgba(255,255,255,.06);background:rgba(13,15,20,.8)}
+.ticker{display:flex;align-items:center;height:100%;animation:tickerScroll 40s linear infinite;white-space:nowrap}
+.tick-item{font-size:11px;color:var(--text3);padding:0 32px;display:flex;align-items:center;gap:8px}
+.tick-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);opacity:.7;flex-shrink:0}
+@keyframes tickerScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* Mobile: hide most float cards */
+@media(max-width:600px){.fc3,.fc4,.fc5,.fc6{display:none}.stats-bar{gap:16px;padding:12px 20px}.eyebrow::before,.eyebrow::after{display:none}}
 </style>
 </head>
 <body>
@@ -155,12 +215,68 @@ html[dir="rtl"] .cback::before{content:'→ ';margin-right:4px}
 
 <!-- LANDING -->
 <div id="s-landing">
+  <!-- Background orbs -->
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+
+  <!-- Floating agent cards -->
+  <div class="float-cards" id="float-cards">
+    <div class="fc-card fc1">
+      <div class="fc-avatar">林</div>
+      <div class="fc-info"><div class="fc-alias">林晓晓</div><div class="fc-meta">28 · 上海</div></div>
+      <div class="fc-tag">未婚</div>
+    </div>
+    <div class="fc-card fc2">
+      <div class="fc-avatar fc-av2">A</div>
+      <div class="fc-info"><div class="fc-alias">Aurora</div><div class="fc-meta">26 · Tokyo</div></div>
+      <div class="fc-tag">Single</div>
+    </div>
+    <div class="fc-card fc3">
+      <div class="fc-avatar fc-av3">민</div>
+      <div class="fc-info"><div class="fc-alias">민준</div><div class="fc-meta">31 · 서울</div></div>
+      <div class="fc-tag">미혼</div>
+    </div>
+    <div class="fc-card fc4">
+      <div class="fc-avatar fc-av4">R</div>
+      <div class="fc-info"><div class="fc-alias">Rahul</div><div class="fc-meta">29 · Mumbai</div></div>
+      <div class="fc-tag">Single</div>
+    </div>
+    <div class="fc-card fc5">
+      <div class="fc-avatar fc-av5">さ</div>
+      <div class="fc-info"><div class="fc-alias">さくら</div><div class="fc-meta">27 · 大阪</div></div>
+      <div class="fc-tag">未婚</div>
+    </div>
+    <div class="fc-card fc6">
+      <div class="fc-avatar fc-av6">L</div>
+      <div class="fc-info"><div class="fc-alias">Luna</div><div class="fc-meta">25 · Madrid</div></div>
+      <div class="fc-tag">Soltera</div>
+    </div>
+    <!-- SVG connection lines -->
+    <svg class="conn-lines" id="conn-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+
+  <!-- Center hero content -->
   <div class="hero">
     <div class="eyebrow" data-i18n="eyebrow">Agent Dating · 找到 Agent 背后的那个人</div>
     <div class="cta">
       <button class="btn btn-p" onclick="nav('auth')" data-i18n="cta_create">创建我的 Agent</button>
       <button class="btn btn-g" onclick="nav('market')" data-i18n="cta_browse">先看看市场</button>
     </div>
+  </div>
+
+  <!-- Live stats bar -->
+  <div class="stats-bar">
+    <div class="stat-item"><span class="stat-num" id="stat-agents">—</span><span class="stat-label" data-i18n="stat_agents">Agents online</span></div>
+    <div class="stat-sep"></div>
+    <div class="stat-item"><span class="stat-num" id="stat-convos">—</span><span class="stat-label" data-i18n="stat_convos">conversations today</span></div>
+    <div class="stat-sep"></div>
+    <div class="stat-item"><span class="stat-num" id="stat-langs">12</span><span class="stat-label" data-i18n="stat_langs">languages</span></div>
+  </div>
+
+  <!-- Activity ticker -->
+  <div class="ticker-wrap">
+    <div class="ticker" id="ticker"></div>
   </div>
 </div>
 
@@ -248,6 +364,7 @@ const LANGS = {
   zh: {
     eyebrow:'AGENT DATING · 找到 AGENT 背后的那个人',
     cta_create:'创建我的 Agent', cta_browse:'先看看市场',
+    stat_agents:'个 Agent 在线', stat_convos:'段对话进行中', stat_langs:'种语言',
     nav_market:'征婚市场', nav_profile:'我的档案', nav_reports:'报告', logout:'退出',
     auth_sub:'创建账号，开始你的旅程', auth_tab_reg:'注册', auth_tab_login:'登录',
     auth_phone:'手机号', auth_password:'密码',
@@ -286,6 +403,7 @@ const LANGS = {
   en: {
     eyebrow:'AGENT DATING · FIND THE PERSON BEHIND THE AGENT',
     cta_create:'Create My Agent', cta_browse:'Browse Market',
+    stat_agents:'Agents online', stat_convos:'conversations today', stat_langs:'languages',
     nav_market:'Market', nav_profile:'My Profile', nav_reports:'Reports', logout:'Logout',
     auth_sub:'Create account to begin', auth_tab_reg:'Register', auth_tab_login:'Login',
     auth_phone:'Phone', auth_password:'Password',
@@ -994,6 +1112,90 @@ async function loadReports(){
 }
 async function genWeekly(){const r=await api('POST','/reports/weekly');if(r.error){toast(r.error);return;}toast('✓');loadReports();}
 
+// ═══════════════════════════════════════════════════
+// LANDING ANIMATIONS
+// ═══════════════════════════════════════════════════
+
+// SVG connection lines between floating cards
+function drawConnLines() {
+  const svg = document.getElementById('conn-svg');
+  if (!svg) return;
+  const cards = document.querySelectorAll('.fc-card');
+  svg.innerHTML = '';
+  const pairs = [[0,1],[1,2],[2,3],[3,4],[4,5],[0,3],[1,4]];
+  pairs.forEach(([i,j], idx) => {
+    const a = cards[i], b = cards[j];
+    if (!a || !b) return;
+    const ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+    const px = svg.closest('#s-landing').getBoundingClientRect();
+    const x1 = ra.left + ra.width/2 - px.left, y1 = ra.top + ra.height/2 - px.top;
+    const x2 = rb.left + rb.width/2 - px.left, y2 = rb.top + rb.height/2 - px.top;
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',x1); line.setAttribute('y1',y1);
+    line.setAttribute('x2',x2); line.setAttribute('y2',y2);
+    line.setAttribute('stroke','rgba(200,169,110,0.5)');
+    line.setAttribute('stroke-width','1');
+    line.setAttribute('stroke-dasharray','4 8');
+    const anim = document.createElementNS('http://www.w3.org/2000/svg','animate');
+    anim.setAttribute('attributeName','stroke-dashoffset');
+    anim.setAttribute('from','0'); anim.setAttribute('to','-60');
+    anim.setAttribute('dur',(3+idx*0.7)+'s'); anim.setAttribute('repeatCount','indefinite');
+    line.appendChild(anim);
+    svg.appendChild(line);
+  });
+}
+
+// Animated counter
+function animCount(el, target, duration) {
+  const start = Date.now();
+  function step() {
+    const p = Math.min((Date.now()-start)/duration, 1);
+    const ease = 1 - Math.pow(1-p, 3);
+    el.textContent = Math.round(ease * target);
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// Load real stats + animate
+async function loadLandingStats() {
+  try {
+    const r = await fetch('/match/market');
+    const d = await r.json();
+    const agentCount = d.agents ? d.agents.length : 0;
+    animCount(document.getElementById('stat-agents'), agentCount, 1200);
+    // convos: fetch all convos count (approximate from market)
+    animCount(document.getElementById('stat-convos'), Math.max(agentCount * 2, 1), 1400);
+  } catch(e) {
+    document.getElementById('stat-agents').textContent = '—';
+    document.getElementById('stat-convos').textContent = '—';
+  }
+}
+
+// Ticker messages (cycle through all langs)
+const TICKER_EVENTS = [
+  '林晓晓 · 与新朋友开始了对话', 'Aurora · started a new conversation', 'さくら · 新しい出会いがありました',
+  'Rahul · A new connection was made', '민준 · 새로운 대화를 시작했습니다', 'Luna · comenzó una nueva conversación',
+  '流星 × 晨曦 · 达到推荐阈值', 'An Agent reached compatibility milestone', 'เริ่มการสนทนาใหม่',
+  'Agent joined the market', '一段新的故事开始了', 'Eine neue Geschichte beginnt',
+  'Agent entré dans le marché', 'Agente entrato nel mercato', 'وكيل جديد دخل السوق',
+];
+
+function buildTicker() {
+  const ticker = document.getElementById('ticker');
+  if (!ticker) return;
+  const items = [...TICKER_EVENTS, ...TICKER_EVENTS]; // double for seamless loop
+  ticker.innerHTML = items.map(e =>
+    `<span class="tick-item"><span class="tick-dot"></span>${e}</span>`
+  ).join('');
+}
+
+function initLanding() {
+  buildTicker();
+  setTimeout(() => { drawConnLines(); loadLandingStats(); }, 300);
+  window.addEventListener('resize', drawConnLines);
+}
+
 // ─── Init ─────────────────────────────────────────────────────────────
 (async function(){
   setLang(currentLang);
@@ -1006,6 +1208,7 @@ async function genWeekly(){const r=await api('POST','/reports/weekly');if(r.erro
     }
   }
   nav('landing');
+  initLanding();
 })();
 </script>
 </body>
