@@ -129,6 +129,14 @@ html[dir="rtl"] .cback::before{content:'→ ';margin-right:4px}
 /* ── LANDING DECORATIONS ── */
 #s-landing{position:relative;overflow:hidden}
 
+/* Hero lang switcher */
+.hero-lang-switcher{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:28px}
+.hero-lang-switcher .lflag{font-size:22px;padding:4px 6px;opacity:.45;transition:opacity .2s,transform .15s}
+.hero-lang-switcher .lflag:hover{opacity:.9;transform:scale(1.1)}
+.hero-lang-switcher .lflag.active{opacity:1;transform:scale(1.12)}
+
+
+
 /* Orb glows */
 .orb{position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none;animation:orbDrift 12s ease-in-out infinite}
 .orb1{width:500px;height:500px;background:radial-gradient(circle,rgba(200,169,110,.12) 0%,transparent 70%);top:-100px;left:-100px;animation-delay:0s}
@@ -258,6 +266,21 @@ html[dir="rtl"] .cback::before{content:'→ ';margin-right:4px}
     <div class="cta">
       <button class="btn btn-p" onclick="nav('auth')" data-i18n="cta_create">创建我的 Agent</button>
       <button class="btn btn-g" onclick="nav('market')" data-i18n="cta_browse">先看看市场</button>
+    </div>
+    <!-- Language switcher inline below CTA -->
+    <div class="hero-lang-switcher">
+      <button class="lflag active" onclick="setLang('zh')" title="中文">🇨🇳</button>
+      <button class="lflag" onclick="setLang('en')" title="English">🇺🇸</button>
+      <button class="lflag" onclick="setLang('ja')" title="日本語">🇯🇵</button>
+      <button class="lflag" onclick="setLang('ko')" title="한국어">🇰🇷</button>
+      <button class="lflag" onclick="setLang('hi')" title="हिंदी">🇮🇳</button>
+      <button class="lflag" onclick="setLang('th')" title="ภาษาไทย">🇹🇭</button>
+      <button class="lflag" onclick="setLang('ms')" title="Bahasa Malaysia">🇲🇾</button>
+      <button class="lflag" onclick="setLang('es')" title="Español">🇪🇸</button>
+      <button class="lflag" onclick="setLang('it')" title="Italiano">🇮🇹</button>
+      <button class="lflag" onclick="setLang('fr')" title="Français">🇫🇷</button>
+      <button class="lflag" onclick="setLang('de')" title="Deutsch">🇩🇪</button>
+      <button class="lflag" onclick="setLang('ar')" title="العربية">🇸🇦</button>
     </div>
   </div>
 
@@ -833,6 +856,9 @@ function setLang(code) {
   document.documentElement.lang = code;
   document.documentElement.dir = RTL_LANGS.includes(code) ? 'rtl' : 'ltr';
   document.querySelectorAll('.lflag').forEach(b => b.classList.toggle('active', b.getAttribute('onclick') === `setLang('${code}')`));
+  // Sync header lang switcher hidden state
+  const onLanding = document.getElementById('s-landing').style.display !== 'none';
+  document.getElementById('lang-switcher').style.display = onLanding ? 'none' : 'flex';
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const k = el.getAttribute('data-i18n');
     if (el.tagName === 'INPUT') el.placeholder = t(k);
@@ -865,6 +891,8 @@ function nav(name) {
   if (name==='market') loadMarket();
   if (name==='reports') loadReports();
   if (name==='quest') initQuest();
+  // Show header lang switcher only when not on landing
+  document.getElementById('lang-switcher').style.display = name === 'landing' ? 'none' : 'flex';
 }
 
 // ─── API ─────────────────────────────────────────────────────────────
