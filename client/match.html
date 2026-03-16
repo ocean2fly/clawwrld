@@ -129,11 +129,16 @@ html[dir="rtl"] .cback::before{content:'→ ';margin-right:4px}
 /* ── LANDING DECORATIONS ── */
 #s-landing{position:relative;overflow:hidden}
 
-/* Hero lang switcher */
-.hero-lang-switcher{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:28px}
-.hero-lang-switcher .lflag{font-size:22px;padding:4px 6px;opacity:.45;transition:opacity .2s,transform .15s}
-.hero-lang-switcher .lflag:hover{opacity:.9;transform:scale(1.1)}
-.hero-lang-switcher .lflag.active{opacity:1;transform:scale(1.12)}
+/* Language dropdown */
+.lang-drop-wrap{position:relative;margin-top:28px}
+.lang-drop-btn{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:var(--text2);padding:9px 20px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .2s;letter-spacing:1px}
+.lang-drop-btn:hover{border-color:var(--accent);color:var(--accent)}
+.lang-drop-arrow{font-size:10px;color:var(--text3);transition:transform .2s}
+.lang-drop-wrap.open .lang-drop-arrow{transform:rotate(180deg)}
+.lang-drop-menu{position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);background:rgba(20,24,38,.97);border:1px solid rgba(255,255,255,.12);min-width:200px;z-index:200;display:none;flex-direction:column;backdrop-filter:blur(16px);box-shadow:0 16px 48px rgba(0,0,0,.6)}
+.lang-drop-wrap.open .lang-drop-menu{display:flex}
+.lang-drop-menu button{background:none;border:none;color:var(--text2);padding:11px 20px;text-align:left;cursor:pointer;font-size:13px;transition:all .15s;font-family:inherit;letter-spacing:.5px}
+.lang-drop-menu button:hover{background:rgba(200,169,110,.1);color:var(--accent)}
 
 
 
@@ -267,20 +272,27 @@ html[dir="rtl"] .cback::before{content:'→ ';margin-right:4px}
       <button class="btn btn-p" onclick="nav('auth')" data-i18n="cta_create">创建我的 Agent</button>
       <button class="btn btn-g" onclick="nav('market')" data-i18n="cta_browse">先看看市场</button>
     </div>
-    <!-- Language switcher inline below CTA -->
-    <div class="hero-lang-switcher">
-      <button class="lflag active" onclick="setLang('zh')" title="中文">🇨🇳</button>
-      <button class="lflag" onclick="setLang('en')" title="English">🇺🇸</button>
-      <button class="lflag" onclick="setLang('ja')" title="日本語">🇯🇵</button>
-      <button class="lflag" onclick="setLang('ko')" title="한국어">🇰🇷</button>
-      <button class="lflag" onclick="setLang('hi')" title="हिंदी">🇮🇳</button>
-      <button class="lflag" onclick="setLang('th')" title="ภาษาไทย">🇹🇭</button>
-      <button class="lflag" onclick="setLang('ms')" title="Bahasa Malaysia">🇲🇾</button>
-      <button class="lflag" onclick="setLang('es')" title="Español">🇪🇸</button>
-      <button class="lflag" onclick="setLang('it')" title="Italiano">🇮🇹</button>
-      <button class="lflag" onclick="setLang('fr')" title="Français">🇫🇷</button>
-      <button class="lflag" onclick="setLang('de')" title="Deutsch">🇩🇪</button>
-      <button class="lflag" onclick="setLang('ar')" title="العربية">🇸🇦</button>
+    <!-- Language dropdown -->
+    <div class="lang-drop-wrap" id="lang-drop-wrap">
+      <button class="lang-drop-btn" id="lang-drop-btn" onclick="toggleLangDrop()">
+        <span id="lang-drop-flag">🌐</span>
+        <span id="lang-drop-label">Language</span>
+        <span class="lang-drop-arrow">▾</span>
+      </button>
+      <div class="lang-drop-menu" id="lang-drop-menu">
+        <button onclick="pickLang('zh','🇨🇳','中文')">🇨🇳 中文</button>
+        <button onclick="pickLang('en','🇺🇸','English')">🇺🇸 English</button>
+        <button onclick="pickLang('ja','🇯🇵','日本語')">🇯🇵 日本語</button>
+        <button onclick="pickLang('ko','🇰🇷','한국어')">🇰🇷 한국어</button>
+        <button onclick="pickLang('hi','🇮🇳','हिंदी')">🇮🇳 हिंदी</button>
+        <button onclick="pickLang('th','🇹🇭','ภาษาไทย')">🇹🇭 ภาษาไทย</button>
+        <button onclick="pickLang('ms','🇲🇾','Bahasa Malaysia')">🇲🇾 Bahasa Malaysia</button>
+        <button onclick="pickLang('es','🇪🇸','Español')">🇪🇸 Español</button>
+        <button onclick="pickLang('it','🇮🇹','Italiano')">🇮🇹 Italiano</button>
+        <button onclick="pickLang('fr','🇫🇷','Français')">🇫🇷 Français</button>
+        <button onclick="pickLang('de','🇩🇪','Deutsch')">🇩🇪 Deutsch</button>
+        <button onclick="pickLang('ar','🇸🇦','العربية')">🇸🇦 العربية</button>
+      </div>
     </div>
   </div>
 
@@ -849,6 +861,21 @@ if (!LANGS[currentLang]) currentLang = 'zh';
 
 function t(key) { return (LANGS[currentLang] || LANGS.zh)[key] || LANGS.zh[key] || key; }
 
+function toggleLangDrop() {
+  document.getElementById('lang-drop-wrap').classList.toggle('open');
+}
+function pickLang(code, flag, label) {
+  document.getElementById('lang-drop-flag').textContent = flag;
+  document.getElementById('lang-drop-label').textContent = label;
+  document.getElementById('lang-drop-wrap').classList.remove('open');
+  setLang(code);
+}
+// Close dropdown on outside click
+document.addEventListener('click', e => {
+  const w = document.getElementById('lang-drop-wrap');
+  if (w && !w.contains(e.target)) w.classList.remove('open');
+});
+
 function setLang(code) {
   if (!LANGS[code]) return;
   currentLang = code;
@@ -1224,6 +1251,12 @@ function initLanding() {
 
 // ─── Init ─────────────────────────────────────────────────────────────
 (async function(){
+  const LANG_META = {zh:['🇨🇳','中文'],en:['🇺🇸','English'],ja:['🇯🇵','日本語'],ko:['🇰🇷','한국어'],hi:['🇮🇳','हिंदी'],th:['🇹🇭','ภาษาไทย'],ms:['🇲🇾','Bahasa Malaysia'],es:['🇪🇸','Español'],it:['🇮🇹','Italiano'],fr:['🇫🇷','Français'],de:['🇩🇪','Deutsch'],ar:['🇸🇦','العربية']};
+  const lm = LANG_META[currentLang] || LANG_META.zh;
+  const flagEl = document.getElementById('lang-drop-flag');
+  const labelEl = document.getElementById('lang-drop-label');
+  if (flagEl) flagEl.textContent = lm[0];
+  if (labelEl) labelEl.textContent = lm[1];
   setLang(currentLang);
   if(TOKEN){
     await refreshAgent();
