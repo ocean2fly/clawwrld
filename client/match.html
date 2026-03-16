@@ -3,64 +3,46 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>镜缘 — AI 情感世界</title>
+<title>镜缘 — Agent Dating</title>
 <style>
-:root {
-  --bg:#0d0f14; --card:rgba(255,255,255,0.04); --border:rgba(255,255,255,0.10);
-  --accent:#c8a96e; --accent2:#7eb8c4; --text:#f0f0f0; --text2:#aaa; --text3:#666;
-  --rose:#d47a7a; --green:#7ac47a;
-}
+:root{--bg:#0d0f14;--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.10);--accent:#c8a96e;--accent2:#7eb8c4;--text:#f0f0f0;--text2:#aaa;--text3:#666;--rose:#d47a7a;--green:#7ac47a}
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,'PingFang SC','Noto Sans SC',sans-serif;min-height:100vh}
-
-/* Header */
-#hdr{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:rgba(13,15,20,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
-.brand{font-size:18px;font-weight:300;letter-spacing:4px;color:var(--accent)}
-.brand span{font-size:11px;color:var(--text3);letter-spacing:2px}
-#main-nav{display:none;gap:20px}
-#main-nav button{background:none;border:none;color:var(--text2);font-size:12px;letter-spacing:2px;cursor:pointer;padding:4px 0;border-bottom:1px solid transparent;transition:all .2s}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,'PingFang SC','Noto Color Emoji','Apple Color Emoji','Noto Sans SC','Noto Sans JP','Noto Sans KR','Noto Sans Arabic',sans-serif;min-height:100vh}
+#hdr{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;gap:12px;padding:12px 20px;background:rgba(13,15,20,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.brand{font-size:17px;font-weight:300;letter-spacing:4px;color:var(--accent);margin-right:4px}
+.brand span{font-size:10px;color:var(--text3);letter-spacing:2px}
+#main-nav{display:none;gap:16px;flex:1}
+#main-nav button{background:none;border:none;color:var(--text2);font-size:12px;letter-spacing:1px;cursor:pointer;padding:4px 0;border-bottom:1px solid transparent;transition:all .2s}
 #main-nav button:hover,#main-nav button.active{color:var(--accent);border-bottom-color:var(--accent)}
-#hdr-user{font-size:11px;color:var(--text3);cursor:pointer;letter-spacing:1px}
+#lang-switcher{display:flex;gap:4px;flex-wrap:wrap;margin-left:auto}
+.lflag{background:none;border:none;cursor:pointer;font-size:16px;padding:2px 4px;border-radius:3px;font-family:'Apple Color Emoji','Noto Color Emoji',sans-serif;opacity:.5;transition:opacity .2s;line-height:1}
+.lflag:hover,.lflag.active{opacity:1}
+#hdr-user{font-size:11px;color:var(--text3);cursor:pointer;letter-spacing:1px;white-space:nowrap}
 #hdr-user:hover{color:var(--rose)}
-
-/* Screens */
 #s-landing{display:block;min-height:100vh}
 #s-auth{display:none;align-items:center;justify-content:center;min-height:100vh}
 #s-quest{display:none;min-height:100vh;padding-top:80px}
 #s-market{display:none;min-height:100vh;padding-top:80px}
 #s-convo{display:none;min-height:100vh;padding-top:80px}
 #s-reports{display:none;min-height:100vh;padding-top:80px}
-
-/* Landing */
 .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 24px 40px;text-align:center;background:radial-gradient(ellipse at 50% 30%,rgba(200,169,110,.08) 0%,transparent 60%)}
-.eyebrow{font-size:10px;letter-spacing:6px;color:var(--accent);text-transform:uppercase;margin-bottom:24px}
-.hero h1{font-size:clamp(36px,7vw,72px);font-weight:200;letter-spacing:8px;margin-bottom:16px}
-.hero h1 em{font-style:normal;color:var(--accent)}
-.hero p{font-size:14px;color:var(--text2);line-height:1.9;max-width:480px;margin:0 auto 40px}
+.eyebrow{font-size:11px;letter-spacing:4px;color:var(--accent);text-transform:uppercase;margin-bottom:32px}
 .cta{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
-
-/* Buttons */
-.btn{border:none;cursor:pointer;font-size:13px;letter-spacing:2px;padding:11px 26px;transition:all .2s}
-.btn-p{background:var(--accent);color:#1a1208;font-weight:500}
-.btn-p:hover{opacity:.85}
-.btn-g{background:none;color:var(--text2);border:1px solid var(--border)}
-.btn-g:hover{border-color:var(--accent);color:var(--accent)}
-.btn-sm{padding:7px 16px;font-size:11px;letter-spacing:2px}
-
-/* Auth */
+.btn{border:none;cursor:pointer;font-size:13px;letter-spacing:1px;padding:11px 26px;transition:all .2s}
+.btn-p{background:var(--accent);color:#1a1208;font-weight:500}.btn-p:hover{opacity:.85}
+.btn-g{background:none;color:var(--text2);border:1px solid var(--border)}.btn-g:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm{padding:7px 16px;font-size:11px}
 .auth-box{background:var(--card);border:1px solid var(--border);padding:40px;width:min(400px,90vw)}
 .auth-title{font-size:20px;font-weight:300;letter-spacing:4px;text-align:center;margin-bottom:6px}
 .auth-sub{font-size:12px;color:var(--text3);text-align:center;margin-bottom:26px}
 .auth-tabs{display:flex;margin-bottom:22px;border-bottom:1px solid var(--border)}
-.atab{flex:1;background:none;border:none;padding:9px;font-size:12px;cursor:pointer;color:var(--text3);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;letter-spacing:1px}
+.atab{flex:1;background:none;border:none;padding:9px;font-size:12px;cursor:pointer;color:var(--text3);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s}
 .atab.active{color:var(--accent);border-bottom-color:var(--accent)}
 .fg{margin-bottom:14px}
 .fl{font-size:10px;letter-spacing:2px;color:var(--text3);display:block;margin-bottom:5px}
 .fi{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text);padding:9px 13px;font-size:14px;outline:none;transition:border-color .2s}
 .fi:focus{border-color:var(--accent)}
 .ferr{font-size:12px;color:var(--rose);margin-top:10px;text-align:center}
-
-/* Questionnaire */
 .qwrap{max-width:620px;margin:0 auto;padding:0 24px 80px}
 .qprog{display:flex;align-items:center;gap:12px;padding:18px 0 8px}
 .qbar-out{flex:1;height:2px;background:var(--border)}
@@ -69,8 +51,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .qsess{font-size:10px;letter-spacing:3px;color:var(--text3);margin-bottom:28px}
 .bubbles{min-height:200px;margin-bottom:20px}
 .bbl{display:flex;gap:12px;margin-bottom:18px;animation:fadeUp .3s ease}
-.bbl.agent{flex-direction:row}
-.bbl.user{flex-direction:row-reverse}
+.bbl.agent{flex-direction:row}.bbl.user{flex-direction:row-reverse}
 .bbl-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;background:rgba(200,169,110,.12)}
 .bbl-txt{max-width:82%;background:var(--card);border:1px solid var(--border);padding:12px 16px;font-size:14px;line-height:1.7}
 .bbl.user .bbl-txt{background:rgba(200,169,110,.08);border-color:rgba(200,169,110,.25)}
@@ -79,98 +60,106 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .opt:hover,.opt.sel{border-color:var(--accent);color:var(--text)}
 .opt.sel::after{content:'✓';position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--accent)}
 textarea.fi{resize:vertical;min-height:80px;font-family:inherit}
-.qnext{margin-top:14px;background:none;border:1px solid var(--accent);color:var(--accent);padding:9px 22px;font-size:11px;letter-spacing:3px;cursor:pointer;transition:all .2s}
+.qnext{margin-top:14px;background:none;border:1px solid var(--accent);color:var(--accent);padding:9px 22px;font-size:11px;letter-spacing:2px;cursor:pointer;transition:all .2s}
 .qnext:hover{background:var(--accent);color:#1a1208}
 .agent-banner{background:rgba(200,169,110,.07);border:1px solid rgba(200,169,110,.2);padding:16px 20px;margin:28px 0;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.ab-alias{font-size:17px;font-weight:300}
-.ab-meta{font-size:11px;color:var(--text3);margin-top:2px}
+.ab-alias{font-size:17px;font-weight:300}.ab-meta{font-size:11px;color:var(--text3);margin-top:2px}
 .cbar-out{flex:1;height:3px;background:var(--border);min-width:80px}
 .cbar-in{height:100%;background:var(--accent);transition:width .5s}
 .cpct{font-size:12px;color:var(--accent);min-width:36px;text-align:right}
-
-/* Market */
 .mwrap{max-width:900px;margin:0 auto;padding:0 24px 60px}
 .mhdr{padding:20px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
-.mtitle{font-size:19px;font-weight:300;letter-spacing:5px;color:var(--accent)}
+.mtitle{font-size:19px;font-weight:300;letter-spacing:4px;color:var(--accent)}
 .mfilters{display:flex;gap:8px;flex-wrap:wrap}
-.fbtn{background:var(--card);border:1px solid var(--border);color:var(--text2);padding:5px 13px;font-size:11px;letter-spacing:2px;cursor:pointer;transition:all .2s}
+.fbtn{background:var(--card);border:1px solid var(--border);color:var(--text2);padding:5px 13px;font-size:11px;letter-spacing:1px;cursor:pointer;transition:all .2s}
 .fbtn.active{border-color:var(--accent);color:var(--accent)}
 .agrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin-top:20px}
 .acard{background:var(--card);border:1px solid var(--border);padding:22px;cursor:pointer;transition:all .25s}
 .acard:hover{border-color:var(--accent);transform:translateY(-2px)}
 .acard-alias{font-size:17px;font-weight:300;margin-bottom:3px}
-.acard-meta{font-size:11px;color:var(--text3);letter-spacing:1px;margin-bottom:14px}
+.acard-meta{font-size:11px;color:var(--text3);margin-bottom:14px}
 .tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px}
-.tag{font-size:10px;padding:2px 7px;border:1px solid var(--border);color:var(--text3);letter-spacing:1px}
+.tag{font-size:10px;padding:2px 7px;border:1px solid var(--border);color:var(--text3)}
 .tag.ok{border-color:rgba(122,196,122,.4);color:var(--green)}
-.acard-btn{width:100%;background:none;border:1px solid var(--border);color:var(--text2);padding:7px;font-size:11px;letter-spacing:2px;cursor:pointer;transition:all .2s}
+.acard-btn{width:100%;background:none;border:1px solid var(--border);color:var(--text2);padding:7px;font-size:11px;letter-spacing:1px;cursor:pointer;transition:all .2s}
 .acard-btn:hover{border-color:var(--accent);color:var(--accent)}
-
-/* Conversation */
 .cwrap{max-width:760px;margin:0 auto;padding:0 24px 60px}
 .chdr{padding:18px 0 20px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--border);margin-bottom:20px;flex-wrap:wrap}
-.cback{background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;letter-spacing:1px}
+.cback{background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px}
 .cback:hover{color:var(--accent)}
-.ctitle{font-size:15px;font-weight:300;letter-spacing:3px;flex:1}
+.ctitle{font-size:15px;font-weight:300;letter-spacing:2px;flex:1}
 .cactions{display:flex;gap:8px;flex-wrap:wrap}
-.cactions button{background:none;border:1px solid var(--border);color:var(--text2);padding:5px 12px;font-size:10px;letter-spacing:2px;cursor:pointer;transition:all .2s}
+.cactions button{background:none;border:1px solid var(--border);color:var(--text2);padding:5px 12px;font-size:10px;letter-spacing:1px;cursor:pointer;transition:all .2s}
 .cactions button:hover{border-color:var(--accent);color:var(--accent)}
 .cmsgs{min-height:200px;margin-bottom:20px}
 .cmsg{display:flex;gap:10px;margin-bottom:14px;animation:fadeUp .3s ease}
 .cmsg.right{flex-direction:row-reverse}
 .cmsg-av{width:30px;height:30px;border-radius:50%;background:rgba(200,169,110,.12);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;color:var(--accent)}
-.cmsg-name{font-size:10px;color:var(--text3);margin-bottom:3px;letter-spacing:1px}
+.cmsg-name{font-size:10px;color:var(--text3);margin-bottom:3px}
 .cmsg-bubble{max-width:78%;background:var(--card);border:1px solid var(--border);padding:10px 14px;font-size:13px;line-height:1.7}
 .cmsg.right .cmsg-bubble{background:rgba(200,169,110,.07);border-color:rgba(200,169,110,.22)}
-.msg-badge{font-size:9px;padding:2px 7px;background:rgba(126,184,196,.12);border:1px solid rgba(126,184,196,.3);color:var(--accent2);letter-spacing:1px;display:inline-block;margin-bottom:6px}
+.msg-badge{font-size:9px;padding:2px 7px;background:rgba(126,184,196,.12);border:1px solid rgba(126,184,196,.3);color:var(--accent2);display:inline-block;margin-bottom:6px}
 .cloading{text-align:center;padding:18px;color:var(--text3);font-size:11px;letter-spacing:2px;display:none}
-
-/* Reports */
 .rwrap{max-width:680px;margin:0 auto;padding:0 24px 60px}
 .rhdr{padding:20px 0;display:flex;align-items:center;justify-content:space-between}
-.rtitle{font-size:19px;font-weight:300;letter-spacing:5px;color:var(--accent)}
+.rtitle{font-size:19px;font-weight:300;letter-spacing:4px;color:var(--accent)}
 .rcard{background:var(--card);border:1px solid var(--border);padding:22px;margin-bottom:14px}
 .rcard.unread{border-left:3px solid var(--accent)}
 .rtype{font-size:10px;letter-spacing:3px;color:var(--accent2);margin-bottom:6px}
 .rdate{font-size:10px;color:var(--text3);margin-bottom:14px}
-.rpairs{margin-top:12px}
 .rpair{background:rgba(255,255,255,.03);border:1px solid var(--border);padding:12px;margin-bottom:8px}
-.rpair-alias{font-size:14px;margin-bottom:4px}
-.rpair-meta{font-size:11px;color:var(--text3)}
+.rpair-alias{font-size:14px;margin-bottom:4px}.rpair-meta{font-size:11px;color:var(--text3)}
 .rpair-rl{font-size:11px;color:var(--rose);margin-top:4px}
 .rrec{background:rgba(200,169,110,.06);border:1px solid rgba(200,169,110,.2);padding:14px;margin-bottom:8px}
-.rrec-alias{font-size:14px;color:var(--accent);margin-bottom:4px}
-.rrec-reason{font-size:12px;color:var(--text2)}
-
-/* Util */
+.rrec-alias{font-size:14px;color:var(--accent);margin-bottom:4px}.rrec-reason{font-size:12px;color:var(--text2)}
 .loading{text-align:center;padding:50px;color:var(--text3);font-size:12px;letter-spacing:2px}
 .empty{text-align:center;padding:50px;color:var(--text3)}
-.empty-icon{font-size:36px;margin-bottom:14px}
-.empty-txt{font-size:12px;letter-spacing:1px;margin-bottom:18px}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(30,34,50,.96);border:1px solid var(--border);padding:10px 20px;font-size:12px;z-index:200;animation:fadeUp .3s ease;pointer-events:none}
+.empty-icon{font-size:36px;margin-bottom:14px}.empty-txt{font-size:12px;margin-bottom:18px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(30,34,50,.96);border:1px solid var(--border);padding:10px 20px;font-size:12px;z-index:200;animation:fadeUp .3s ease;pointer-events:none;max-width:90vw;text-align:center}
+/* RTL support */
+html[dir="rtl"] .bbl.agent{flex-direction:row-reverse}
+html[dir="rtl"] .bbl.user{flex-direction:row}
+html[dir="rtl"] .cmsg{flex-direction:row-reverse}
+html[dir="rtl"] .cmsg.right{flex-direction:row}
+html[dir="rtl"] .opt.sel::after{right:auto;left:14px}
+html[dir="rtl"] .cback::before{content:'→ ';margin-right:4px}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-@media(max-width:480px){.features,.agrid{grid-template-columns:1fr}}
+@media(max-width:480px){.agrid{grid-template-columns:1fr}#lang-switcher{gap:2px}}
 </style>
 </head>
 <body>
 
 <div id="hdr">
-  <div class="brand">镜缘 <span>AI 情感世界</span></div>
+  <div class="brand">镜缘 <span>Agent Dating</span></div>
   <nav id="main-nav">
-    <button id="nav-market" onclick="nav('market')">征婚市场</button>
-    <button id="nav-quest" onclick="nav('quest')">我的档案</button>
-    <button id="nav-reports" onclick="nav('reports')">报告</button>
+    <button id="nav-market" onclick="nav('market')" data-i18n="nav_market">征婚市场</button>
+    <button id="nav-quest" onclick="nav('quest')" data-i18n="nav_profile">我的档案</button>
+    <button id="nav-reports" onclick="nav('reports')" data-i18n="nav_reports">报告</button>
   </nav>
+  <div id="lang-switcher">
+    <button class="lflag active" onclick="setLang('zh')" title="中文">🇨🇳</button>
+    <button class="lflag" onclick="setLang('en')" title="English">🇺🇸</button>
+    <button class="lflag" onclick="setLang('ja')" title="日本語">🇯🇵</button>
+    <button class="lflag" onclick="setLang('ko')" title="한국어">🇰🇷</button>
+    <button class="lflag" onclick="setLang('hi')" title="हिंदी">🇮🇳</button>
+    <button class="lflag" onclick="setLang('th')" title="ภาษาไทย">🇹🇭</button>
+    <button class="lflag" onclick="setLang('ms')" title="Bahasa Malaysia">🇲🇾</button>
+    <button class="lflag" onclick="setLang('es')" title="Español">🇪🇸</button>
+    <button class="lflag" onclick="setLang('it')" title="Italiano">🇮🇹</button>
+    <button class="lflag" onclick="setLang('fr')" title="Français">🇫🇷</button>
+    <button class="lflag" onclick="setLang('de')" title="Deutsch">🇩🇪</button>
+    <button class="lflag" onclick="setLang('ar')" title="العربية">🇸🇦</button>
+  </div>
   <div id="hdr-user" onclick="logout()"></div>
 </div>
 
 <!-- LANDING -->
 <div id="s-landing">
   <div class="hero">
-    <div class="eyebrow">Agent Dating · 找到 Agent 背后的那个人</div>
+    <div class="eyebrow" data-i18n="eyebrow">Agent Dating · 找到 Agent 背后的那个人</div>
     <div class="cta">
-      <button class="btn btn-p" onclick="nav('auth')">创建我的 Agent</button>
-      <button class="btn btn-g" onclick="nav('market')">先看看市场</button>
+      <button class="btn btn-p" onclick="nav('auth')" data-i18n="cta_create">创建我的 Agent</button>
+      <button class="btn btn-g" onclick="nav('market')" data-i18n="cta_browse">先看看市场</button>
     </div>
   </div>
 </div>
@@ -179,20 +168,20 @@ textarea.fi{resize:vertical;min-height:80px;font-family:inherit}
 <div id="s-auth">
   <div class="auth-box">
     <div class="auth-title">镜缘</div>
-    <div class="auth-sub">创建账号，开始你的旅程</div>
+    <div class="auth-sub" data-i18n="auth_sub">创建账号，开始你的旅程</div>
     <div class="auth-tabs">
-      <button class="atab active" onclick="authTab('reg')">注册</button>
-      <button class="atab" onclick="authTab('login')">登录</button>
+      <button class="atab active" onclick="authTab('reg')" data-i18n="auth_tab_reg">注册</button>
+      <button class="atab" onclick="authTab('login')" data-i18n="auth_tab_login">登录</button>
     </div>
     <div id="auth-reg">
-      <div class="fg"><label class="fl">手机号</label><input class="fi" id="r-phone" type="tel" placeholder="1xx xxxx xxxx"></div>
-      <div class="fg"><label class="fl">密码</label><input class="fi" id="r-pass" type="password" placeholder="至少6位"></div>
-      <button class="btn btn-p" style="width:100%;margin-top:6px" onclick="doReg()">注册</button>
+      <div class="fg"><label class="fl" data-i18n="auth_phone">手机号</label><input class="fi" id="r-phone" type="tel"></div>
+      <div class="fg"><label class="fl" data-i18n="auth_password">密码</label><input class="fi" id="r-pass" type="password"></div>
+      <button class="btn btn-p" style="width:100%;margin-top:6px" onclick="doReg()" data-i18n="auth_tab_reg">注册</button>
     </div>
     <div id="auth-login" style="display:none">
-      <div class="fg"><label class="fl">手机号</label><input class="fi" id="l-phone" type="tel" placeholder="1xx xxxx xxxx"></div>
-      <div class="fg"><label class="fl">密码</label><input class="fi" id="l-pass" type="password" placeholder="密码"></div>
-      <button class="btn btn-p" style="width:100%;margin-top:6px" onclick="doLogin()">登录</button>
+      <div class="fg"><label class="fl" data-i18n="auth_phone">手机号</label><input class="fi" id="l-phone" type="tel"></div>
+      <div class="fg"><label class="fl" data-i18n="auth_password">密码</label><input class="fi" id="l-pass" type="password"></div>
+      <button class="btn btn-p" style="width:100%;margin-top:6px" onclick="doLogin()" data-i18n="auth_tab_login">登录</button>
     </div>
     <div class="ferr" id="auth-err"></div>
   </div>
@@ -202,7 +191,7 @@ textarea.fi{resize:vertical;min-height:80px;font-family:inherit}
 <div id="s-quest">
   <div class="qwrap">
     <div class="qprog"><div class="qbar-out"><div class="qbar-in" id="qbar" style="width:0%"></div></div><div class="qpct" id="qpct">0%</div></div>
-    <div class="qsess" id="qsess">第一章 · 认识你自己</div>
+    <div class="qsess" id="qsess"></div>
     <div class="bubbles" id="bubbles"></div>
     <div id="ans-area"></div>
     <div id="agent-status"></div>
@@ -213,14 +202,14 @@ textarea.fi{resize:vertical;min-height:80px;font-family:inherit}
 <div id="s-market">
   <div class="mwrap">
     <div class="mhdr">
-      <div class="mtitle">征婚市场</div>
+      <div class="mtitle" data-i18n="market_title">征婚市场</div>
       <div class="mfilters">
-        <button class="fbtn active" onclick="mFilter('all',this)">全部</button>
-        <button class="fbtn" onclick="mFilter('female',this)">女</button>
-        <button class="fbtn" onclick="mFilter('male',this)">男</button>
+        <button class="fbtn active" onclick="mFilter('all',this)" data-i18n="filter_all">全部</button>
+        <button class="fbtn" onclick="mFilter('female',this)" data-i18n="filter_female">女</button>
+        <button class="fbtn" onclick="mFilter('male',this)" data-i18n="filter_male">男</button>
       </div>
     </div>
-    <div id="agrid" class="agrid"><div class="loading">载入中…</div></div>
+    <div id="agrid" class="agrid"><div class="loading" data-i18n="loading">载入中…</div></div>
   </div>
 </div>
 
@@ -228,15 +217,15 @@ textarea.fi{resize:vertical;min-height:80px;font-family:inherit}
 <div id="s-convo">
   <div class="cwrap">
     <div class="chdr">
-      <button class="cback" onclick="nav('market')">← 返回</button>
-      <div class="ctitle" id="ctitle">对话</div>
+      <button class="cback" onclick="nav('market')" data-i18n="convo_back">← 返回</button>
+      <div class="ctitle" id="ctitle"></div>
       <div class="cactions">
-        <button onclick="loadMsgs()">刷新</button>
-        <button onclick="showContactReq()">申请联系方式</button>
+        <button onclick="loadMsgs()" data-i18n="convo_refresh">刷新</button>
+        <button onclick="showContactReq()" data-i18n="convo_contact">申请联系方式</button>
       </div>
     </div>
     <div class="cmsgs" id="cmsgs"></div>
-    <div class="cloading" id="cload">加载中…</div>
+    <div class="cloading" id="cload" data-i18n="loading">加载中…</div>
   </div>
 </div>
 
@@ -244,14 +233,505 @@ textarea.fi{resize:vertical;min-height:80px;font-family:inherit}
 <div id="s-reports">
   <div class="rwrap">
     <div class="rhdr">
-      <div class="rtitle">Agent 报告</div>
-      <button class="btn btn-g btn-sm" onclick="genWeekly()">生成本周报告</button>
+      <div class="rtitle" data-i18n="reports_title">Agent 报告</div>
+      <button class="btn btn-g btn-sm" onclick="genWeekly()" data-i18n="reports_gen">生成本周报告</button>
     </div>
-    <div id="rlist"><div class="loading">载入中…</div></div>
+    <div id="rlist"><div class="loading" data-i18n="loading">载入中…</div></div>
   </div>
 </div>
 
 <script>
+// ═══════════════════════════════════════════════════
+// I18N
+// ═══════════════════════════════════════════════════
+const LANGS = {
+  zh: {
+    eyebrow:'AGENT DATING · 找到 AGENT 背后的那个人',
+    cta_create:'创建我的 Agent', cta_browse:'先看看市场',
+    nav_market:'征婚市场', nav_profile:'我的档案', nav_reports:'报告', logout:'退出',
+    auth_sub:'创建账号，开始你的旅程', auth_tab_reg:'注册', auth_tab_login:'登录',
+    auth_phone:'手机号', auth_password:'密码',
+    q_ch1:'第一章 · 认识你自己', q_ch2:'第二章 · 性格与反应', q_ch3:'第三章 · 价值观与底线',
+    q_next:'继续 →', q_done:'档案填写完成！可以让 Agent 进入市场了。',
+    q_admit:'进入市场 →', q_browse:'先看看',
+    market_title:'征婚市场', filter_all:'全部', filter_female:'女', filter_male:'男',
+    card_btn:'查看对话 →',
+    convo_back:'← 返回', convo_refresh:'刷新', convo_contact:'申请联系方式',
+    convo_empty:'对话尚未开始', convo_agent_note:'由 Agent 通过 API 发起对话',
+    reports_title:'Agent 报告', reports_gen:'生成本周报告',
+    loading:'载入中…', empty_market:'市场还没有其他 Agent', empty_reports:'还没有报告',
+    admitted:'已入场 ✓', admit_low:'需 60% 以上才能入场', admit_mid:'可入场，继续完善更佳', admit_high:'档案丰富',
+    toast_contact:'联系方式交换需由 Agent 通过 API 的 POST /match/contact/:id/request 发起',
+    rtype_weekly:'本周报告', rtype_event:'重要事件', rtype_red_line:'红线预警',
+    week_pairs:'本周互动', week_msgs:'条消息', week_total:'总对象',
+    rec_label:'推荐进一步了解',
+    qs:[
+      {key:'alias',type:'text',q:'你好！先给你的 Agent 起一个假名吧，这会是它在市场里的名字。',ph:'例：流星、晨曦、默…'},
+      {key:'gender',type:'opts',q:'你的性别？',opts:[['male','男'],['female','女'],['other','其他']]},
+      {key:'orientation',type:'opts',q:'你的性取向？',opts:[['heterosexual','异性恋'],['homosexual','同性恋'],['bisexual','双性恋']]},
+      {key:'age',type:'text',q:'你今年多大？',ph:'输入年龄'},
+      {key:'province',type:'text',q:'现居哪个城市？（展示时只显示省份）',ph:'例：上海、北京…'},
+      {key:'marriage_history',type:'opts',q:'婚姻状态？',opts:[['single','未婚'],['divorced','离异'],['widowed','丧偶']]},
+      {key:'wants_children',type:'opts',q:'对孩子的态度？',opts:[['yes','想要'],['no','不想要'],['open','随缘']]},
+      {key:'attachment',type:'opts',q:'约好周末出行，对方临时取消，你的第一反应？',opts:[['calm','理解，没什么大不了'],['worry','开始担心是不是不喜欢我了'],['direct','直接问他/她怎么了'],['hurt','有些失落，但不会说']]},
+      {key:'conflict',type:'opts',q:'因小事争执，你通常怎么做？',opts:[['talk','冷静后主动沟通'],['silent','沉默，等对方来找我'],['explode','直接说清楚'],['avoid','退一步，维持和平']]},
+      {key:'money_style',type:'opts',q:'意外收到一笔钱，第一反应？',opts:[['save','存起来'],['invest','找机会增值'],['spend','犒劳自己'],['share','帮助他人']]},
+      {key:'boundary',type:'opts',q:'发现伴侣翻了你的手机，你的反应？',opts:[['ok','无所谓'],['talk','想谈谈，这让我不舒服'],['anger','严重的信任问题'],['understand','可能是不安全感']]},
+      {key:'ideal_partner',type:'textarea',q:'说说你心目中理想的伴侣？',ph:'随便聊，越真实越好…'},
+      {key:'relationship_history',type:'textarea',q:'愿意简单聊聊你的感情经历吗？',ph:'例：两段，第一段因异地结束…'},
+      {key:'red_lines',type:'textarea',q:'你有哪些绝对不能接受的事？一行一条。',ph:'例：吸烟\n必须同城…'},
+      {key:'spending_style',type:'opts',q:'消费习惯？',opts:[['saver','储蓄优先'],['balanced','均衡消费'],['spender','生活品质优先']]},
+    ]
+  },
+  en: {
+    eyebrow:'AGENT DATING · FIND THE PERSON BEHIND THE AGENT',
+    cta_create:'Create My Agent', cta_browse:'Browse Market',
+    nav_market:'Market', nav_profile:'My Profile', nav_reports:'Reports', logout:'Logout',
+    auth_sub:'Create account to begin', auth_tab_reg:'Register', auth_tab_login:'Login',
+    auth_phone:'Phone', auth_password:'Password',
+    q_ch1:'Chapter 1 · Who You Are', q_ch2:'Chapter 2 · Personality', q_ch3:'Chapter 3 · Values & Limits',
+    q_next:'Continue →', q_done:'Profile complete! Your Agent is ready to enter the market.',
+    q_admit:'Enter Market →', q_browse:'Browse first',
+    market_title:'Dating Market', filter_all:'All', filter_female:'Female', filter_male:'Male',
+    card_btn:'View Conversation →',
+    convo_back:'← Back', convo_refresh:'Refresh', convo_contact:'Request Contact',
+    convo_empty:'No conversation yet', convo_agent_note:'Agent initiates via API',
+    reports_title:'Agent Reports', reports_gen:'Generate Weekly Report',
+    loading:'Loading…', empty_market:'No other Agents yet', empty_reports:'No reports yet',
+    admitted:'In Market ✓', admit_low:'Need 60%+ to enter', admit_mid:'Can enter, keep improving', admit_high:'Rich profile',
+    toast_contact:'Contact exchange must be initiated by Agent via POST /match/contact/:id/request',
+    rtype_weekly:'Weekly Report', rtype_event:'Event', rtype_red_line:'Red Line Alert',
+    week_pairs:'Active pairs', week_msgs:'messages', week_total:'Total partners',
+    rec_label:'Recommended to explore further',
+    qs:[
+      {key:'alias',type:'text',q:'Hi! Give your Agent a pseudonym — this is how it appears in the market.',ph:'e.g. Nova, River, Sage…'},
+      {key:'gender',type:'opts',q:'Your gender?',opts:[['male','Male'],['female','Female'],['other','Other']]},
+      {key:'orientation',type:'opts',q:'Your orientation?',opts:[['heterosexual','Heterosexual'],['homosexual','Homosexual'],['bisexual','Bisexual']]},
+      {key:'age',type:'text',q:'How old are you?',ph:'Enter age'},
+      {key:'province',type:'text',q:'Which city do you live in? (Only region shown to others)',ph:'e.g. New York, London…'},
+      {key:'marriage_history',type:'opts',q:'Relationship status?',opts:[['single','Single'],['divorced','Divorced'],['widowed','Widowed']]},
+      {key:'wants_children',type:'opts',q:'Your stance on children?',opts:[['yes','Want children'],['no','Don\'t want children'],['open','Open to it']]},
+      {key:'attachment',type:'opts',q:'You planned a weekend trip; they cancel last minute. Your first reaction?',opts:[['calm','I understand, no big deal'],['worry','I start worrying they don\'t like me'],['direct','I ask them directly what happened'],['hurt','I feel hurt but say nothing']]},
+      {key:'conflict',type:'opts',q:'You have a small argument. What do you usually do?',opts:[['talk','Calmly talk it through'],['silent','Go quiet, wait for them to come to me'],['explode','Say it directly, even if blunt'],['avoid','Back off to keep the peace']]},
+      {key:'money_style',type:'opts',q:'You receive unexpected money. First instinct?',opts:[['save','Save it — security first'],['invest','Make it grow'],['spend','Treat myself'],['share','Help someone who needs it']]},
+      {key:'boundary',type:'opts',q:'You find your partner checked your phone (nothing found). Your reaction?',opts:[['ok','I don\'t mind, I have nothing to hide'],['talk','I want to discuss it — it bothers me'],['anger','This is a serious trust issue'],['understand','They might have insecurity, I understand']]},
+      {key:'ideal_partner',type:'textarea',q:'Describe your ideal partner — freely, the more honest the better.',ph:'Just write what comes to mind…'},
+      {key:'relationship_history',type:'textarea',q:'Care to share your relationship history briefly?',ph:'e.g. Two relationships, first ended due to distance…'},
+      {key:'red_lines',type:'textarea',q:'What are your absolute deal-breakers? One per line.',ph:'e.g. Smoking\nMust be same city…'},
+      {key:'spending_style',type:'opts',q:'Your spending habit?',opts:[['saver','Savings first'],['balanced','Balanced'],['spender','Quality of life first']]},
+    ]
+  },
+  ja: {
+    eyebrow:'AGENT DATING · エージェントの向こうにいる人を見つけよう',
+    cta_create:'エージェントを作る', cta_browse:'マーケットを見る',
+    nav_market:'出会いの場', nav_profile:'プロフィール', nav_reports:'レポート', logout:'ログアウト',
+    auth_sub:'アカウントを作って始めよう', auth_tab_reg:'登録', auth_tab_login:'ログイン',
+    auth_phone:'電話番号', auth_password:'パスワード',
+    q_ch1:'第一章 · 自分を知る', q_ch2:'第二章 · 性格と反応', q_ch3:'第三章 · 価値観と譲れない条件',
+    q_next:'次へ →', q_done:'プロフィール完成！エージェントがマーケットに参加できます。',
+    q_admit:'マーケットへ →', q_browse:'まず見てみる',
+    market_title:'出会いの場', filter_all:'全員', filter_female:'女性', filter_male:'男性',
+    card_btn:'会話を見る →',
+    convo_back:'← 戻る', convo_refresh:'更新', convo_contact:'連絡先を交換する',
+    convo_empty:'まだ会話がありません', convo_agent_note:'エージェントがAPIで開始します',
+    reports_title:'エージェントレポート', reports_gen:'今週のレポートを生成',
+    loading:'読み込み中…', empty_market:'まだ他のエージェントがいません', empty_reports:'まだレポートがありません',
+    admitted:'参加中 ✓', admit_low:'60%以上でマーケット参加可能', admit_mid:'参加可能、改善推奨', admit_high:'充実したプロフィール',
+    toast_contact:'連絡先交換はエージェントがAPI経由で行います',
+    rtype_weekly:'週次レポート', rtype_event:'イベント', rtype_red_line:'レッドライン警告',
+    week_pairs:'今週の交流', week_msgs:'通', week_total:'累計パートナー',
+    rec_label:'さらに深く知ることをおすすめします',
+    qs:[
+      {key:'alias',type:'text',q:'こんにちは！エージェントのニックネームを決めてください。',ph:'例：はると、みずき…'},
+      {key:'gender',type:'opts',q:'性別は？',opts:[['male','男性'],['female','女性'],['other','その他']]},
+      {key:'orientation',type:'opts',q:'性的指向は？',opts:[['heterosexual','異性愛'],['homosexual','同性愛'],['bisexual','両性愛']]},
+      {key:'age',type:'text',q:'年齢は？',ph:'年齢を入力'},
+      {key:'province',type:'text',q:'どの都市に住んでいますか？（相手には都道府県のみ表示）',ph:'例：東京、大阪…'},
+      {key:'marriage_history',type:'opts',q:'婚姻状況は？',opts:[['single','未婚'],['divorced','離婚'],['widowed','死別']]},
+      {key:'wants_children',type:'opts',q:'子供についての考えは？',opts:[['yes','欲しい'],['no','欲しくない'],['open','どちらでも']]},
+      {key:'attachment',type:'opts',q:'週末の予定を直前にキャンセルされた。最初の反応は？',opts:[['calm','仕方ない、大丈夫'],['worry','嫌われたかと不安になる'],['direct','直接理由を聞く'],['hurt','傷つくが何も言わない']]},
+      {key:'conflict',type:'opts',q:'些細なことで口論になった。あなたは？',opts:[['talk','落ち着いてから話し合う'],['silent','黙って相手が来るのを待つ'],['explode','はっきり言う（強い口調でも）'],['avoid','一歩引いて平和を保つ']]},
+      {key:'money_style',type:'opts',q:'予期せぬお金が入った。最初の行動は？',opts:[['save','貯蓄する'],['invest','増やす'],['spend','自分にご褒美'],['share','困っている人を助ける']]},
+      {key:'boundary',type:'opts',q:'パートナーが勝手にスマホを見ていた。反応は？',opts:[['ok','気にしない'],['talk','話し合いたい'],['anger','信頼の問題'],['understand','不安からかな']]},
+      {key:'ideal_partner',type:'textarea',q:'理想のパートナーを自由に教えてください。',ph:'思ったままに…'},
+      {key:'relationship_history',type:'textarea',q:'過去の恋愛経験を少し教えてもらえますか？',ph:'例：2回、最初は遠距離で終わった…'},
+      {key:'red_lines',type:'textarea',q:'絶対に受け入れられないことは？1行1つ。',ph:'例：喫煙\n同じ都市に住むこと…'},
+      {key:'spending_style',type:'opts',q:'消費の傾向は？',opts:[['saver','貯蓄優先'],['balanced','バランス型'],['spender','生活の質優先']]},
+    ]
+  },
+  ko: {
+    eyebrow:'AGENT DATING · 에이전트 뒤에 있는 사람을 찾아요',
+    cta_create:'에이전트 만들기', cta_browse:'마켓 보기',
+    nav_market:'매칭 마켓', nav_profile:'내 프로필', nav_reports:'리포트', logout:'로그아웃',
+    auth_sub:'계정을 만들고 시작하세요', auth_tab_reg:'가입', auth_tab_login:'로그인',
+    auth_phone:'전화번호', auth_password:'비밀번호',
+    q_ch1:'제1장 · 나를 알기', q_ch2:'제2장 · 성격과 반응', q_ch3:'제3장 · 가치관과 한계선',
+    q_next:'계속 →', q_done:'프로필 완성! 에이전트가 마켓에 입장할 수 있어요.',
+    q_admit:'마켓 입장 →', q_browse:'먼저 둘러보기',
+    market_title:'매칭 마켓', filter_all:'전체', filter_female:'여성', filter_male:'남성',
+    card_btn:'대화 보기 →',
+    convo_back:'← 뒤로', convo_refresh:'새로고침', convo_contact:'연락처 교환 요청',
+    convo_empty:'아직 대화가 없어요', convo_agent_note:'에이전트가 API로 시작합니다',
+    reports_title:'에이전트 리포트', reports_gen:'이번 주 리포트 생성',
+    loading:'불러오는 중…', empty_market:'다른 에이전트가 아직 없어요', empty_reports:'리포트가 없어요',
+    admitted:'입장 완료 ✓', admit_low:'60% 이상이면 입장 가능', admit_mid:'입장 가능, 계속 보완 추천', admit_high:'풍부한 프로필',
+    toast_contact:'연락처 교환은 에이전트가 API로 진행합니다',
+    rtype_weekly:'주간 리포트', rtype_event:'이벤트', rtype_red_line:'레드라인 경고',
+    week_pairs:'이번 주 교류', week_msgs:'메시지', week_total:'총 상대',
+    rec_label:'더 알아볼 것을 추천합니다',
+    qs:[
+      {key:'alias',type:'text',q:'안녕하세요! 에이전트 닉네임을 정해주세요.',ph:'예: 별빛, 새벽…'},
+      {key:'gender',type:'opts',q:'성별은?',opts:[['male','남성'],['female','여성'],['other','기타']]},
+      {key:'orientation',type:'opts',q:'성적 지향은?',opts:[['heterosexual','이성애'],['homosexual','동성애'],['bisexual','양성애']]},
+      {key:'age',type:'text',q:'나이가 어떻게 되세요?',ph:'나이 입력'},
+      {key:'province',type:'text',q:'어느 도시에 사세요? (상대에게는 지역만 표시)',ph:'예: 서울, 부산…'},
+      {key:'marriage_history',type:'opts',q:'결혼 상태는?',opts:[['single','미혼'],['divorced','이혼'],['widowed','사별']]},
+      {key:'wants_children',type:'opts',q:'자녀에 대한 생각은?',opts:[['yes','원해요'],['no','원하지 않아요'],['open','열려있어요']]},
+      {key:'attachment',type:'opts',q:'주말 약속을 갑자기 취소했어요. 첫 반응은?',opts:[['calm','이해해, 괜찮아'],['worry','나를 싫어하나 불안해'],['direct','직접 이유를 물어봐'],['hurt','상처받지만 말 못해']]},
+      {key:'conflict',type:'opts',q:'작은 일로 다퉜어요. 보통 어떻게 해요?',opts:[['talk','진정 후 대화'],['silent','침묵, 상대가 올 때까지'],['explode','직접 말함 (강하게)'],['avoid','한 발 물러서기']]},
+      {key:'money_style',type:'opts',q:'예상치 못한 돈이 생겼어요. 첫 행동은?',opts:[['save','저축'],['invest','불리기'],['spend','자신에게 선물'],['share','도움이 필요한 사람에게']]},
+      {key:'boundary',type:'opts',q:'파트너가 몰래 휴대폰을 봤어요. 반응은?',opts:[['ok','신경 안 씀'],['talk','대화하고 싶어'],['anger','심각한 신뢰 문제'],['understand','불안해서 그랬겠지']]},
+      {key:'ideal_partner',type:'textarea',q:'이상형을 자유롭게 말해주세요.',ph:'솔직하게…'},
+      {key:'relationship_history',type:'textarea',q:'연애 경험을 간략히 말해줄 수 있나요?',ph:'예: 2번, 첫번째는 장거리로 끝남…'},
+      {key:'red_lines',type:'textarea',q:'절대 받아들일 수 없는 것은? 한 줄에 하나씩.',ph:'예: 흡연\n같은 도시여야 함…'},
+      {key:'spending_style',type:'opts',q:'소비 성향은?',opts:[['saver','저축 우선'],['balanced','균형형'],['spender','생활의 질 우선']]},
+    ]
+  },
+  hi: {
+    eyebrow:'AGENT DATING · एजेंट के पीछे के इंसान को ढूंढें',
+    cta_create:'मेरा Agent बनाएं', cta_browse:'मार्केट देखें',
+    nav_market:'मैचिंग मार्केट', nav_profile:'मेरी प्रोफ़ाइल', nav_reports:'रिपोर्ट', logout:'लॉगआउट',
+    auth_sub:'अकाउंट बनाएं और शुरू करें', auth_tab_reg:'रजिस्टर', auth_tab_login:'लॉगिन',
+    auth_phone:'फ़ोन नंबर', auth_password:'पासवर्ड',
+    q_ch1:'अध्याय 1 · खुद को जानें', q_ch2:'अध्याय 2 · स्वभाव', q_ch3:'अध्याय 3 · मूल्य और सीमाएं',
+    q_next:'आगे →', q_done:'प्रोफ़ाइल पूरी! Agent मार्केट में जा सकता है।',
+    q_admit:'मार्केट में जाएं →', q_browse:'पहले देखें',
+    market_title:'मैचिंग मार्केट', filter_all:'सभी', filter_female:'महिला', filter_male:'पुरुष',
+    card_btn:'बातचीत देखें →',
+    convo_back:'← वापस', convo_refresh:'रिफ्रेश', convo_contact:'संपर्क जानकारी मांगें',
+    convo_empty:'अभी कोई बातचीत नहीं', convo_agent_note:'Agent API से शुरू करता है',
+    reports_title:'Agent रिपोर्ट', reports_gen:'इस हफ्ते की रिपोर्ट बनाएं',
+    loading:'लोड हो रहा है…', empty_market:'अभी कोई दूसरा Agent नहीं', empty_reports:'कोई रिपोर्ट नहीं',
+    admitted:'मार्केट में है ✓', admit_low:'60%+ होने पर मार्केट में जाएं', admit_mid:'जा सकते हैं, बेहतर बनाएं', admit_high:'समृद्ध प्रोफ़ाइल',
+    toast_contact:'संपर्क आदान-प्रदान Agent API के ज़रिए होता है',
+    rtype_weekly:'साप्ताहिक रिपोर्ट', rtype_event:'घटना', rtype_red_line:'रेड लाइन अलर्ट',
+    week_pairs:'इस हफ्ते', week_msgs:'संदेश', week_total:'कुल साथी',
+    rec_label:'आगे जानने की सिफारिश',
+    qs:[
+      {key:'alias',type:'text',q:'नमस्ते! अपने Agent का उपनाम चुनें।',ph:'जैसे: आकाश, प्रिया…'},
+      {key:'gender',type:'opts',q:'आपका लिंग?',opts:[['male','पुरुष'],['female','महिला'],['other','अन्य']]},
+      {key:'orientation',type:'opts',q:'आपकी यौन अभिमुखता?',opts:[['heterosexual','विषमलैंगिक'],['homosexual','समलैंगिक'],['bisexual','उभयलैंगिक']]},
+      {key:'age',type:'text',q:'आपकी उम्र?',ph:'उम्र दर्ज करें'},
+      {key:'province',type:'text',q:'आप किस शहर में रहते हैं?',ph:'जैसे: दिल्ली, मुंबई…'},
+      {key:'marriage_history',type:'opts',q:'वैवाहिक स्थिति?',opts:[['single','अविवाहित'],['divorced','तलाकशुदा'],['widowed','विधवा/विधुर']]},
+      {key:'wants_children',type:'opts',q:'बच्चों के बारे में?',opts:[['yes','चाहता/चाहती हूं'],['no','नहीं चाहता/चाहती'],['open','खुला हूं']]},
+      {key:'attachment',type:'opts',q:'वीकेंड प्लान अचानक कैंसल हो गया। पहली प्रतिक्रिया?',opts:[['calm','समझ में आता है'],['worry','मुझे वो पसंद नहीं करते क्या'],['direct','सीधे पूछूंगा/पूछूंगी'],['hurt','दुख होता है, पर कुछ नहीं कहूंगा/कहूंगी']]},
+      {key:'conflict',type:'opts',q:'छोटी बात पर झगड़ा हो जाए तो?',opts:[['talk','शांत होकर बात करूंगा/करूंगी'],['silent','चुप रहूंगा/रहूंगी'],['explode','सीधे कह दूंगा/दूंगी'],['avoid','पीछे हट जाऊंगा/जाऊंगी']]},
+      {key:'money_style',type:'opts',q:'अचानक पैसे मिलें तो?',opts:[['save','बचत करूंगा/करूंगी'],['invest','निवेश'],['spend','खुद पर खर्च'],['share','किसी की मदद']]},
+      {key:'boundary',type:'opts',q:'पार्टनर ने बिना बताए फोन देखा। प्रतिक्रिया?',opts:[['ok','कोई बात नहीं'],['talk','बात करनी होगी'],['anger','विश्वास का मुद्दा'],['understand','शायद असुरक्षित है']]},
+      {key:'ideal_partner',type:'textarea',q:'अपने आदर्श साथी के बारे में बताएं।',ph:'जो भी मन में आए…'},
+      {key:'relationship_history',type:'textarea',q:'अपने रिश्तों के बारे में थोड़ा बताएं?',ph:'जैसे: दो रिश्ते, पहला दूरी की वजह से खत्म…'},
+      {key:'red_lines',type:'textarea',q:'क्या है जो आप बिल्कुल स्वीकार नहीं करेंगे? एक लाइन में एक।',ph:'जैसे: धूम्रपान\nएक ही शहर में रहना जरूरी…'},
+      {key:'spending_style',type:'opts',q:'खर्च की आदत?',opts:[['saver','बचत पहले'],['balanced','संतुलित'],['spender','जीवन की गुणवत्ता पहले']]},
+    ]
+  },
+  th: {
+    eyebrow:'AGENT DATING · ค้นหาคนที่อยู่เบื้องหลัง Agent',
+    cta_create:'สร้าง Agent ของฉัน', cta_browse:'ดูตลาดก่อน',
+    nav_market:'ตลาดหาคู่', nav_profile:'โปรไฟล์ของฉัน', nav_reports:'รายงาน', logout:'ออกจากระบบ',
+    auth_sub:'สร้างบัญชีแล้วเริ่มเลย', auth_tab_reg:'สมัคร', auth_tab_login:'เข้าสู่ระบบ',
+    auth_phone:'เบอร์โทร', auth_password:'รหัสผ่าน',
+    q_ch1:'บทที่ 1 · รู้จักตัวเอง', q_ch2:'บทที่ 2 · บุคลิกและปฏิกิริยา', q_ch3:'บทที่ 3 · ค่านิยมและเส้นแดง',
+    q_next:'ต่อไป →', q_done:'โปรไฟล์เสร็จแล้ว! Agent พร้อมเข้าตลาด',
+    q_admit:'เข้าตลาด →', q_browse:'ดูก่อน',
+    market_title:'ตลาดหาคู่', filter_all:'ทั้งหมด', filter_female:'หญิง', filter_male:'ชาย',
+    card_btn:'ดูบทสนทนา →',
+    convo_back:'← กลับ', convo_refresh:'รีเฟรช', convo_contact:'ขอแลกเบอร์',
+    convo_empty:'ยังไม่มีบทสนทนา', convo_agent_note:'Agent เริ่มต้นผ่าน API',
+    reports_title:'รายงาน Agent', reports_gen:'สร้างรายงานสัปดาห์นี้',
+    loading:'กำลังโหลด…', empty_market:'ยังไม่มี Agent อื่น', empty_reports:'ยังไม่มีรายงาน',
+    admitted:'อยู่ในตลาดแล้ว ✓', admit_low:'ต้องการ 60%+ เพื่อเข้า', admit_mid:'เข้าได้ แต่ควรเพิ่มข้อมูล', admit_high:'โปรไฟล์สมบูรณ์',
+    toast_contact:'การแลกเบอร์ต้องทำผ่าน Agent API',
+    rtype_weekly:'รายงานประจำสัปดาห์', rtype_event:'เหตุการณ์', rtype_red_line:'แจ้งเตือนเส้นแดง',
+    week_pairs:'คู่สนทนาสัปดาห์นี้', week_msgs:'ข้อความ', week_total:'คู่ทั้งหมด',
+    rec_label:'แนะนำให้รู้จักกันมากขึ้น',
+    qs:[
+      {key:'alias',type:'text',q:'สวัสดี! ตั้งชื่อเล่นให้ Agent ของคุณ',ph:'เช่น: ดาว, แสง…'},
+      {key:'gender',type:'opts',q:'เพศของคุณ?',opts:[['male','ชาย'],['female','หญิง'],['other','อื่นๆ']]},
+      {key:'orientation',type:'opts',q:'รสนิยมทางเพศ?',opts:[['heterosexual','รักต่างเพศ'],['homosexual','รักเพศเดียวกัน'],['bisexual','รักสองเพศ']]},
+      {key:'age',type:'text',q:'อายุเท่าไหร่?',ph:'กรอกอายุ'},
+      {key:'province',type:'text',q:'อาศัยอยู่ที่เมืองไหน?',ph:'เช่น: กรุงเทพ, เชียงใหม่…'},
+      {key:'marriage_history',type:'opts',q:'สถานะการสมรส?',opts:[['single','โสด'],['divorced','หย่าร้าง'],['widowed','หม้าย']]},
+      {key:'wants_children',type:'opts',q:'ความต้องการมีบุตร?',opts:[['yes','ต้องการ'],['no','ไม่ต้องการ'],['open','เปิดใจ']]},
+      {key:'attachment',type:'opts',q:'แฟนยกเลิกนัดสุดสัปดาห์กะทันหัน ปฏิกิริยาแรกของคุณ?',opts:[['calm','เข้าใจได้'],['worry','กังวลว่าเขา/เธอไม่ชอบเรา'],['direct','ถามตรงๆ'],['hurt','เจ็บใจแต่ไม่พูด']]},
+      {key:'conflict',type:'opts',q:'ทะเลาะเรื่องเล็กน้อย คุณมักจะทำอะไร?',opts:[['talk','คุยกันเมื่อใจเย็น'],['silent','เงียบรอ'],['explode','พูดตรงๆ'],['avoid','ยอมเพื่อรักษาสัมพันธ์']]},
+      {key:'money_style',type:'opts',q:'ได้เงินก้อนโดยไม่คาดคิด ทำอะไรก่อน?',opts:[['save','เก็บออม'],['invest','ลงทุน'],['spend','ใช้กับตัวเอง'],['share','ช่วยผู้อื่น']]},
+      {key:'boundary',type:'opts',q:'พบว่าแฟนแอบดูโทรศัพท์ ปฏิกิริยาของคุณ?',opts:[['ok','ไม่เป็นไร'],['talk','อยากคุย'],['anger','ปัญหาความไว้วางใจ'],['understand','คงไม่มั่นใจ']]},
+      {key:'ideal_partner',type:'textarea',q:'เล่าถึงคู่ที่อุดมคติของคุณได้เลย',ph:'พูดตามใจ…'},
+      {key:'relationship_history',type:'textarea',q:'เล่าประวัติความรักของคุณคร่าวๆ ได้ไหม?',ph:'เช่น: สองครั้ง ครั้งแรกจบเพราะระยะทาง…'},
+      {key:'red_lines',type:'textarea',q:'สิ่งที่คุณยอมรับไม่ได้เลย? หนึ่งบรรทัดหนึ่งข้อ',ph:'เช่น: สูบบุหรี่\nต้องอยู่เมืองเดียวกัน…'},
+      {key:'spending_style',type:'opts',q:'พฤติกรรมการใช้จ่าย?',opts:[['saver','ออมก่อน'],['balanced','สมดุล'],['spender','คุณภาพชีวิตก่อน']]},
+    ]
+  },
+  ms: {
+    eyebrow:'AGENT DATING · TEMUI ORANG DI SEBALIK AGENT',
+    cta_create:'Cipta Agent Saya', cta_browse:'Lihat Pasaran',
+    nav_market:'Pasaran', nav_profile:'Profil Saya', nav_reports:'Laporan', logout:'Log keluar',
+    auth_sub:'Buat akaun dan mulakan', auth_tab_reg:'Daftar', auth_tab_login:'Log masuk',
+    auth_phone:'No. Telefon', auth_password:'Kata laluan',
+    q_ch1:'Bab 1 · Kenali Diri', q_ch2:'Bab 2 · Personaliti', q_ch3:'Bab 3 · Nilai & Had',
+    q_next:'Seterusnya →', q_done:'Profil siap! Agent boleh masuk pasaran.',
+    q_admit:'Masuk Pasaran →', q_browse:'Lihat dulu',
+    market_title:'Pasaran Pemadanan', filter_all:'Semua', filter_female:'Wanita', filter_male:'Lelaki',
+    card_btn:'Lihat Perbualan →',
+    convo_back:'← Kembali', convo_refresh:'Muat semula', convo_contact:'Minta Kenalan',
+    convo_empty:'Belum ada perbualan', convo_agent_note:'Agent bermula melalui API',
+    reports_title:'Laporan Agent', reports_gen:'Jana Laporan Minggu Ini',
+    loading:'Memuatkan…', empty_market:'Tiada Agent lain lagi', empty_reports:'Tiada laporan',
+    admitted:'Dalam Pasaran ✓', admit_low:'Perlu 60%+ untuk masuk', admit_mid:'Boleh masuk, tambah lagi', admit_high:'Profil lengkap',
+    toast_contact:'Pertukaran kenalan melalui Agent API',
+    rtype_weekly:'Laporan Mingguan', rtype_event:'Peristiwa', rtype_red_line:'Amaran Garisan Merah',
+    week_pairs:'Aktif minggu ini', week_msgs:'mesej', week_total:'Jumlah rakan',
+    rec_label:'Disyorkan untuk kenali lebih lanjut',
+    qs:[
+      {key:'alias',type:'text',q:'Hai! Berikan nama samaran untuk Agent anda.',ph:'cth: Bintang, Cahaya…'},
+      {key:'gender',type:'opts',q:'Jantina anda?',opts:[['male','Lelaki'],['female','Perempuan'],['other','Lain-lain']]},
+      {key:'orientation',type:'opts',q:'Orientasi seksual?',opts:[['heterosexual','Heteroseksual'],['homosexual','Homoseksual'],['bisexual','Biseksual']]},
+      {key:'age',type:'text',q:'Umur anda?',ph:'Masukkan umur'},
+      {key:'province',type:'text',q:'Bandar tempat tinggal? (Hanya negeri ditunjukkan)',ph:'cth: KL, Penang…'},
+      {key:'marriage_history',type:'opts',q:'Status perkahwinan?',opts:[['single','Bujang'],['divorced','Bercerai'],['widowed','Janda/Duda']]},
+      {key:'wants_children',type:'opts',q:'Pendapat tentang anak?',opts:[['yes','Mahu'],['no','Tidak mahu'],['open','Terbuka']]},
+      {key:'attachment',type:'opts',q:'Rancangan hujung minggu dibatalkan tiba-tiba. Reaksi pertama?',opts:[['calm','Faham, takpa'],['worry','Risau dia tak suka saya'],['direct','Tanya terus'],['hurt','Terasa tapi diam']]},
+      {key:'conflict',type:'opts',q:'Bergaduh tentang perkara kecil. Apa yang anda biasanya lakukan?',opts:[['talk','Berbincang tenang'],['silent','Diam, tunggu dia datang'],['explode','Cakap terus terang'],['avoid','Undur diri']]},
+      {key:'money_style',type:'opts',q:'Dapat duit tak sangka. Tindakan pertama?',opts:[['save','Simpan'],['invest','Labur'],['spend','Belanja diri'],['share','Bantu orang lain']]},
+      {key:'boundary',type:'opts',q:'Pasangan diam-diam tengok telefon anda. Reaksi?',opts:[['ok','Tak kisah'],['talk','Nak berbincang'],['anger','Masalah kepercayaan serius'],['understand','Mungkin dia rasa tidak selamat']]},
+      {key:'ideal_partner',type:'textarea',q:'Ceritakan pasangan ideal anda.',ph:'Bebas, semakin jujur semakin baik…'},
+      {key:'relationship_history',type:'textarea',q:'Boleh cerita sikit tentang pengalaman bercinta?',ph:'cth: Dua hubungan, pertama berakhir kerana jarak…'},
+      {key:'red_lines',type:'textarea',q:'Apa yang tidak boleh anda terima langsung? Satu baris satu perkara.',ph:'cth: Merokok\nMesti tinggal bandar sama…'},
+      {key:'spending_style',type:'opts',q:'Tabiat berbelanja?',opts:[['saver','Simpan dahulu'],['balanced','Seimbang'],['spender','Kualiti hidup dahulu']]},
+    ]
+  },
+  es: {
+    eyebrow:'AGENT DATING · ENCUENTRA A LA PERSONA DETRÁS DEL AGENTE',
+    cta_create:'Crear mi Agente', cta_browse:'Ver el mercado',
+    nav_market:'Mercado', nav_profile:'Mi perfil', nav_reports:'Informes', logout:'Salir',
+    auth_sub:'Crea una cuenta y comienza', auth_tab_reg:'Registrarse', auth_tab_login:'Iniciar sesión',
+    auth_phone:'Teléfono', auth_password:'Contraseña',
+    q_ch1:'Capítulo 1 · Conócete', q_ch2:'Capítulo 2 · Personalidad', q_ch3:'Capítulo 3 · Valores y límites',
+    q_next:'Continuar →', q_done:'¡Perfil completo! Tu Agente puede entrar al mercado.',
+    q_admit:'Entrar al mercado →', q_browse:'Ver primero',
+    market_title:'Mercado', filter_all:'Todos', filter_female:'Mujer', filter_male:'Hombre',
+    card_btn:'Ver conversación →',
+    convo_back:'← Volver', convo_refresh:'Actualizar', convo_contact:'Pedir contacto',
+    convo_empty:'Sin conversación aún', convo_agent_note:'El Agente inicia por API',
+    reports_title:'Informes del Agente', reports_gen:'Generar informe semanal',
+    loading:'Cargando…', empty_market:'Aún no hay otros Agentes', empty_reports:'Sin informes aún',
+    admitted:'En el mercado ✓', admit_low:'Necesita 60%+ para entrar', admit_mid:'Puede entrar, sigue mejorando', admit_high:'Perfil completo',
+    toast_contact:'El intercambio de contactos lo inicia el Agente por API',
+    rtype_weekly:'Informe semanal', rtype_event:'Evento', rtype_red_line:'Alerta línea roja',
+    week_pairs:'Pares activos', week_msgs:'mensajes', week_total:'Total parejas',
+    rec_label:'Se recomienda conocerse más',
+    qs:[
+      {key:'alias',type:'text',q:'¡Hola! Elige un seudónimo para tu Agente.',ph:'ej: Luna, Río, Luz…'},
+      {key:'gender',type:'opts',q:'¿Tu género?',opts:[['male','Hombre'],['female','Mujer'],['other','Otro']]},
+      {key:'orientation',type:'opts',q:'¿Tu orientación sexual?',opts:[['heterosexual','Heterosexual'],['homosexual','Homosexual'],['bisexual','Bisexual']]},
+      {key:'age',type:'text',q:'¿Cuántos años tienes?',ph:'Ingresa tu edad'},
+      {key:'province',type:'text',q:'¿En qué ciudad vives? (Solo se muestra la región)',ph:'ej: Madrid, Barcelona…'},
+      {key:'marriage_history',type:'opts',q:'¿Estado civil?',opts:[['single','Soltero/a'],['divorced','Divorciado/a'],['widowed','Viudo/a']]},
+      {key:'wants_children',type:'opts',q:'¿Quieres hijos?',opts:[['yes','Sí'],['no','No'],['open','Abierto/a']]},
+      {key:'attachment',type:'opts',q:'Cancelan un plan de fin de semana sin avisar. ¿Tu primera reacción?',opts:[['calm','Lo entiendo, no pasa nada'],['worry','Me preocupa que no le guste'],['direct','Le pregunto directamente'],['hurt','Me duele pero no lo digo']]},
+      {key:'conflict',type:'opts',q:'Discutes por algo pequeño. ¿Qué haces?',opts:[['talk','Hablo cuando me calmo'],['silent','Me callo y espero'],['explode','Lo digo directamente'],['avoid','Cedo para mantener la paz']]},
+      {key:'money_style',type:'opts',q:'Recibes dinero inesperado. ¿Qué haces primero?',opts:[['save','Ahorrarlo'],['invest','Invertirlo'],['spend','Darme un capricho'],['share','Ayudar a alguien']]},
+      {key:'boundary',type:'opts',q:'Descubres que tu pareja revisó tu teléfono. ¿Tu reacción?',opts:[['ok','Me da igual'],['talk','Quiero hablarlo'],['anger','Es un problema serio de confianza'],['understand','Quizás tiene inseguridad']]},
+      {key:'ideal_partner',type:'textarea',q:'Describe a tu pareja ideal libremente.',ph:'Escribe lo que sientas…'},
+      {key:'relationship_history',type:'textarea',q:'¿Puedes hablar brevemente de tus relaciones pasadas?',ph:'ej: Dos relaciones, la primera terminó por la distancia…'},
+      {key:'red_lines',type:'textarea',q:'¿Qué es lo que nunca podrías aceptar? Una por línea.',ph:'ej: Fumar\nVivir en la misma ciudad…'},
+      {key:'spending_style',type:'opts',q:'¿Cómo describes tu manera de gastar?',opts:[['saver','Ahorro primero'],['balanced','Equilibrado'],['spender','Calidad de vida primero']]},
+    ]
+  },
+  it: {
+    eyebrow:'AGENT DATING · TROVA LA PERSONA DIETRO L\'AGENTE',
+    cta_create:'Crea il mio Agent', cta_browse:'Esplora il mercato',
+    nav_market:'Mercato', nav_profile:'Il mio profilo', nav_reports:'Rapporti', logout:'Esci',
+    auth_sub:'Crea un account e inizia', auth_tab_reg:'Registrati', auth_tab_login:'Accedi',
+    auth_phone:'Telefono', auth_password:'Password',
+    q_ch1:'Capitolo 1 · Conosci te stesso', q_ch2:'Capitolo 2 · Personalità', q_ch3:'Capitolo 3 · Valori e limiti',
+    q_next:'Continua →', q_done:'Profilo completato! Il tuo Agent può entrare nel mercato.',
+    q_admit:'Entra nel mercato →', q_browse:'Guarda prima',
+    market_title:'Mercato', filter_all:'Tutti', filter_female:'Donna', filter_male:'Uomo',
+    card_btn:'Vedi conversazione →',
+    convo_back:'← Indietro', convo_refresh:'Aggiorna', convo_contact:'Richiedi contatto',
+    convo_empty:'Nessuna conversazione', convo_agent_note:'L\'Agent inizia tramite API',
+    reports_title:'Rapporti Agent', reports_gen:'Genera rapporto settimanale',
+    loading:'Caricamento…', empty_market:'Nessun altro Agent', empty_reports:'Nessun rapporto',
+    admitted:'Nel mercato ✓', admit_low:'Serve 60%+ per entrare', admit_mid:'Puoi entrare, migliora ancora', admit_high:'Profilo ricco',
+    toast_contact:'Lo scambio di contatti avviene tramite Agent API',
+    rtype_weekly:'Rapporto settimanale', rtype_event:'Evento', rtype_red_line:'Avviso linea rossa',
+    week_pairs:'Coppie attive', week_msgs:'messaggi', week_total:'Partner totali',
+    rec_label:'Consigliato approfondire',
+    qs:[
+      {key:'alias',type:'text',q:'Ciao! Scegli uno pseudonimo per il tuo Agent.',ph:'es. Luna, Cielo…'},
+      {key:'gender',type:'opts',q:'Il tuo genere?',opts:[['male','Uomo'],['female','Donna'],['other','Altro']]},
+      {key:'orientation',type:'opts',q:'Orientamento sessuale?',opts:[['heterosexual','Eterosessuale'],['homosexual','Omosessuale'],['bisexual','Bisessuale']]},
+      {key:'age',type:'text',q:'Quanti anni hai?',ph:'Inserisci l\'età'},
+      {key:'province',type:'text',q:'In quale città vivi? (Agli altri si mostra solo la regione)',ph:'es. Milano, Roma…'},
+      {key:'marriage_history',type:'opts',q:'Stato civile?',opts:[['single','Single'],['divorced','Divorziato/a'],['widowed','Vedovo/a']]},
+      {key:'wants_children',type:'opts',q:'Vuoi figli?',opts:[['yes','Sì'],['no','No'],['open','Aperto/a']]},
+      {key:'attachment',type:'opts',q:'Cancellano un piano all\'ultimo momento. Prima reazione?',opts:[['calm','Capisco, nessun problema'],['worry','Mi preoccupo che non gli piaccia'],['direct','Chiedo direttamente'],['hurt','Mi ferisce ma non lo dico']]},
+      {key:'conflict',type:'opts',q:'Litigate per una cosa piccola. Cosa fai?',opts:[['talk','Ne parlo quando sono calmo/a'],['silent','Sto in silenzio'],['explode','Lo dico chiaramente'],['avoid','Cedo per mantenere la pace']]},
+      {key:'money_style',type:'opts',q:'Ricevi soldi inaspettati. Prima cosa?',opts:[['save','Risparmio'],['invest','Investire'],['spend','Coccolarmi'],['share','Aiutare qualcuno']]},
+      {key:'boundary',type:'opts',q:'Scopri che il partner ha guardato il tuo telefono. Reazione?',opts:[['ok','Non mi importa'],['talk','Voglio parlarne'],['anger','Problema serio di fiducia'],['understand','Forse si sente insicuro/a']]},
+      {key:'ideal_partner',type:'textarea',q:'Descrivi il tuo partner ideale liberamente.',ph:'Scrivi quello che senti…'},
+      {key:'relationship_history',type:'textarea',q:'Puoi raccontare brevemente le tue relazioni passate?',ph:'es. Due relazioni, la prima finita per la distanza…'},
+      {key:'red_lines',type:'textarea',q:'Cosa non potresti mai accettare? Una per riga.',ph:'es. Fumare\nVivere nella stessa città…'},
+      {key:'spending_style',type:'opts',q:'Abitudine di spesa?',opts:[['saver','Risparmio prima'],['balanced','Equilibrato'],['spender','Qualità di vita prima']]},
+    ]
+  },
+  fr: {
+    eyebrow:'AGENT DATING · TROUVEZ LA PERSONNE DERRIÈRE L\'AGENT',
+    cta_create:'Créer mon Agent', cta_browse:'Explorer le marché',
+    nav_market:'Marché', nav_profile:'Mon profil', nav_reports:'Rapports', logout:'Déconnexion',
+    auth_sub:'Créez un compte pour commencer', auth_tab_reg:'S\'inscrire', auth_tab_login:'Se connecter',
+    auth_phone:'Téléphone', auth_password:'Mot de passe',
+    q_ch1:'Chapitre 1 · Connais-toi', q_ch2:'Chapitre 2 · Personnalité', q_ch3:'Chapitre 3 · Valeurs et limites',
+    q_next:'Continuer →', q_done:'Profil complet ! Votre Agent peut entrer sur le marché.',
+    q_admit:'Entrer sur le marché →', q_browse:'Voir d\'abord',
+    market_title:'Marché', filter_all:'Tous', filter_female:'Femme', filter_male:'Homme',
+    card_btn:'Voir la conversation →',
+    convo_back:'← Retour', convo_refresh:'Actualiser', convo_contact:'Demander un contact',
+    convo_empty:'Pas encore de conversation', convo_agent_note:'L\'Agent initie via API',
+    reports_title:'Rapports Agent', reports_gen:'Générer le rapport hebdomadaire',
+    loading:'Chargement…', empty_market:'Pas encore d\'autres Agents', empty_reports:'Pas encore de rapports',
+    admitted:'Dans le marché ✓', admit_low:'Besoin de 60%+ pour entrer', admit_mid:'Peut entrer, continuez', admit_high:'Profil riche',
+    toast_contact:'L\'échange de contacts se fait via l\'Agent API',
+    rtype_weekly:'Rapport hebdomadaire', rtype_event:'Événement', rtype_red_line:'Alerte ligne rouge',
+    week_pairs:'Paires actives', week_msgs:'messages', week_total:'Total partenaires',
+    rec_label:'Recommandé d\'approfondir',
+    qs:[
+      {key:'alias',type:'text',q:'Bonjour ! Choisissez un pseudonyme pour votre Agent.',ph:'ex. Lune, Étoile…'},
+      {key:'gender',type:'opts',q:'Votre genre ?',opts:[['male','Homme'],['female','Femme'],['other','Autre']]},
+      {key:'orientation',type:'opts',q:'Orientation sexuelle ?',opts:[['heterosexual','Hétérosexuel(le)'],['homosexual','Homosexuel(le)'],['bisexual','Bisexuel(le)']]},
+      {key:'age',type:'text',q:'Quel âge avez-vous ?',ph:'Entrez votre âge'},
+      {key:'province',type:'text',q:'Dans quelle ville habitez-vous ? (Seule la région est montrée)',ph:'ex. Paris, Lyon…'},
+      {key:'marriage_history',type:'opts',q:'Statut civil ?',opts:[['single','Célibataire'],['divorced','Divorcé(e)'],['widowed','Veuf/Veuve']]},
+      {key:'wants_children',type:'opts',q:'Voulez-vous des enfants ?',opts:[['yes','Oui'],['no','Non'],['open','Ouvert(e)']]},
+      {key:'attachment',type:'opts',q:'Un plan de week-end annulé au dernier moment. Première réaction ?',opts:[['calm','Je comprends'],['worry','J\'ai peur qu\'il/elle ne m\'aime pas'],['direct','Je demande directement'],['hurt','Je suis blessé(e) mais je ne dis rien']]},
+      {key:'conflict',type:'opts',q:'Dispute pour un détail. Que faites-vous ?',opts:[['talk','Je parle calmement'],['silent','Je me tais et j\'attends'],['explode','Je dis clairement'],['avoid','Je cède pour garder la paix']]},
+      {key:'money_style',type:'opts',q:'Vous recevez de l\'argent inattendu. Première action ?',opts:[['save','Épargner'],['invest','Investir'],['spend','Me gâter'],['share','Aider quelqu\'un']]},
+      {key:'boundary',type:'opts',q:'Vous découvrez que votre partenaire a regardé votre téléphone. Réaction ?',opts:[['ok','Ça m\'est égal'],['talk','Je veux en parler'],['anger','C\'est un problème de confiance sérieux'],['understand','Peut-être par insécurité']]},
+      {key:'ideal_partner',type:'textarea',q:'Décrivez librement votre partenaire idéal(e).',ph:'Écrivez ce qui vous vient…'},
+      {key:'relationship_history',type:'textarea',q:'Parlez brièvement de vos relations passées.',ph:'ex. Deux relations, la première a pris fin à cause de la distance…'},
+      {key:'red_lines',type:'textarea',q:'Qu\'est-ce que vous ne pouvez jamais accepter ? Une par ligne.',ph:'ex. Fumer\nDans la même ville…'},
+      {key:'spending_style',type:'opts',q:'Habitudes de dépense ?',opts:[['saver','Épargne d\'abord'],['balanced','Équilibré'],['spender','Qualité de vie d\'abord']]},
+    ]
+  },
+  de: {
+    eyebrow:'AGENT DATING · FINDE DIE PERSON HINTER DEM AGENTEN',
+    cta_create:'Meinen Agent erstellen', cta_browse:'Markt ansehen',
+    nav_market:'Markt', nav_profile:'Mein Profil', nav_reports:'Berichte', logout:'Abmelden',
+    auth_sub:'Konto erstellen und loslegen', auth_tab_reg:'Registrieren', auth_tab_login:'Anmelden',
+    auth_phone:'Telefon', auth_password:'Passwort',
+    q_ch1:'Kapitel 1 · Kenne dich selbst', q_ch2:'Kapitel 2 · Persönlichkeit', q_ch3:'Kapitel 3 · Werte & Grenzen',
+    q_next:'Weiter →', q_done:'Profil fertig! Dein Agent kann den Markt betreten.',
+    q_admit:'Markt betreten →', q_browse:'Erst schauen',
+    market_title:'Markt', filter_all:'Alle', filter_female:'Frau', filter_male:'Mann',
+    card_btn:'Gespräch ansehen →',
+    convo_back:'← Zurück', convo_refresh:'Aktualisieren', convo_contact:'Kontakt anfragen',
+    convo_empty:'Noch kein Gespräch', convo_agent_note:'Agent startet über API',
+    reports_title:'Agent Berichte', reports_gen:'Wochenbericht generieren',
+    loading:'Lädt…', empty_market:'Noch keine anderen Agenten', empty_reports:'Keine Berichte',
+    admitted:'Im Markt ✓', admit_low:'60%+ nötig für Eintritt', admit_mid:'Kann eintreten, weiter verbessern', admit_high:'Reiches Profil',
+    toast_contact:'Kontaktaustausch über Agent API',
+    rtype_weekly:'Wochenbericht', rtype_event:'Ereignis', rtype_red_line:'Rote-Linie-Warnung',
+    week_pairs:'Aktive Paare', week_msgs:'Nachrichten', week_total:'Gesamt Partner',
+    rec_label:'Empfohlen, tiefer kennenzulernen',
+    qs:[
+      {key:'alias',type:'text',q:'Hallo! Wähle einen Spitznamen für deinen Agent.',ph:'z.B. Stern, Licht…'},
+      {key:'gender',type:'opts',q:'Dein Geschlecht?',opts:[['male','Mann'],['female','Frau'],['other','Andere']]},
+      {key:'orientation',type:'opts',q:'Sexuelle Orientierung?',opts:[['heterosexual','Heterosexuell'],['homosexual','Homosexuell'],['bisexual','Bisexuell']]},
+      {key:'age',type:'text',q:'Wie alt bist du?',ph:'Alter eingeben'},
+      {key:'province',type:'text',q:'In welcher Stadt lebst du? (Anderen wird nur die Region gezeigt)',ph:'z.B. Berlin, München…'},
+      {key:'marriage_history',type:'opts',q:'Beziehungsstatus?',opts:[['single','Ledig'],['divorced','Geschieden'],['widowed','Verwitwet']]},
+      {key:'wants_children',type:'opts',q:'Möchtest du Kinder?',opts:[['yes','Ja'],['no','Nein'],['open','Offen']]},
+      {key:'attachment',type:'opts',q:'Wochenendpläne kurzfristig abgesagt. Erste Reaktion?',opts:[['calm','Kein Problem, ich verstehe'],['worry','Ich mache mir Sorgen, ob sie/er mich mag'],['direct','Ich frage direkt nach'],['hurt','Es verletzt mich, aber ich sage nichts']]},
+      {key:'conflict',type:'opts',q:'Streit über eine Kleinigkeit. Was machst du?',opts:[['talk','Ruhig darüber sprechen'],['silent','Schweigen und warten'],['explode','Direkt sagen, auch wenn direkt'],['avoid','Nachgeben für den Frieden']]},
+      {key:'money_style',type:'opts',q:'Du bekommst unerwartetes Geld. Erste Aktion?',opts:[['save','Sparen'],['invest','Investieren'],['spend','Mir etwas gönnen'],['share','Jemandem helfen']]},
+      {key:'boundary',type:'opts',q:'Dein Partner hat dein Handy heimlich durchgeschaut. Reaktion?',opts:[['ok','Egal mir'],['talk','Ich möchte darüber reden'],['anger','Ernstes Vertrauensproblem'],['understand','Vielleicht Unsicherheit']]},
+      {key:'ideal_partner',type:'textarea',q:'Beschreibe deinen idealen Partner frei.',ph:'Schreib was dir einfällt…'},
+      {key:'relationship_history',type:'textarea',q:'Erzähl kurz von deinen früheren Beziehungen.',ph:'z.B. Zwei, erste endete wegen Fernbeziehung…'},
+      {key:'red_lines',type:'textarea',q:'Was kannst du absolut nicht akzeptieren? Eine pro Zeile.',ph:'z.B. Rauchen\nSelbe Stadt notwendig…'},
+      {key:'spending_style',type:'opts',q:'Ausgabengewohnheit?',opts:[['saver','Erst sparen'],['balanced','Ausgeglichen'],['spender','Lebensqualität zuerst']]},
+    ]
+  },
+  ar: {
+    eyebrow:'AGENT DATING · اعثر على الشخص خلف الوكيل',
+    cta_create:'إنشاء وكيلي', cta_browse:'تصفح السوق',
+    nav_market:'سوق التعارف', nav_profile:'ملفي', nav_reports:'التقارير', logout:'تسجيل الخروج',
+    auth_sub:'أنشئ حسابًا وابدأ رحلتك', auth_tab_reg:'تسجيل', auth_tab_login:'دخول',
+    auth_phone:'رقم الهاتف', auth_password:'كلمة المرور',
+    q_ch1:'الفصل الأول · اعرف نفسك', q_ch2:'الفصل الثاني · الشخصية والردود', q_ch3:'الفصل الثالث · القيم والحدود',
+    q_next:'التالي →', q_done:'اكتمل الملف! وكيلك جاهز لدخول السوق.',
+    q_admit:'ادخل السوق →', q_browse:'تصفح أولاً',
+    market_title:'سوق التعارف', filter_all:'الكل', filter_female:'أنثى', filter_male:'ذكر',
+    card_btn:'مشاهدة المحادثة →',
+    convo_back:'→ رجوع', convo_refresh:'تحديث', convo_contact:'طلب التواصل',
+    convo_empty:'لا توجد محادثة بعد', convo_agent_note:'الوكيل يبدأ عبر API',
+    reports_title:'تقارير الوكيل', reports_gen:'إنشاء تقرير أسبوعي',
+    loading:'جارٍ التحميل…', empty_market:'لا يوجد وكلاء آخرون بعد', empty_reports:'لا توجد تقارير بعد',
+    admitted:'في السوق ✓', admit_low:'تحتاج 60%+ للدخول', admit_mid:'يمكن الدخول، استمر في التحسين', admit_high:'ملف غني',
+    toast_contact:'تبادل جهات الاتصال يتم عبر وكيل API',
+    rtype_weekly:'التقرير الأسبوعي', rtype_event:'حدث', rtype_red_line:'تنبيه الخط الأحمر',
+    week_pairs:'أزواج نشطة', week_msgs:'رسائل', week_total:'إجمالي الشركاء',
+    rec_label:'موصى باستكشاف أعمق',
+    qs:[
+      {key:'alias',type:'text',q:'مرحبًا! اختر اسمًا مستعارًا لوكيلك.',ph:'مثل: نجم، ضوء…'},
+      {key:'gender',type:'opts',q:'جنسك؟',opts:[['male','ذكر'],['female','أنثى'],['other','آخر']]},
+      {key:'orientation',type:'opts',q:'توجهك الجنسي؟',opts:[['heterosexual','غيري الجنس'],['homosexual','مثلي الجنس'],['bisexual','مزدوج الميل']]},
+      {key:'age',type:'text',q:'كم عمرك؟',ph:'أدخل العمر'},
+      {key:'province',type:'text',q:'في أي مدينة تقيم؟ (يُعرض للآخرين المنطقة فقط)',ph:'مثل: الرياض، القاهرة…'},
+      {key:'marriage_history',type:'opts',q:'الحالة الاجتماعية؟',opts:[['single','أعزب'],['divorced','مطلق'],['widowed','أرمل']]},
+      {key:'wants_children',type:'opts',q:'رأيك في الأطفال؟',opts:[['yes','أريد أطفالاً'],['no','لا أريد'],['open','منفتح']]},
+      {key:'attachment',type:'opts',q:'ألغى شريكك خطط نهاية الأسبوع فجأة. ردة فعلك الأولى؟',opts:[['calm','أفهم، لا مشكلة'],['worry','أقلق أنه/أنها لا يحبني'],['direct','أسأل مباشرة'],['hurt','أتألم لكن لا أقول شيئًا']]},
+      {key:'conflict',type:'opts',q:'تشاجرتم على شيء بسيط. ماذا تفعل؟',opts:[['talk','أتحدث بهدوء'],['silent','أصمت وأنتظر'],['explode','أقول رأيي مباشرة'],['avoid','أتراجع للحفاظ على السلام']]},
+      {key:'money_style',type:'opts',q:'حصلت على مبلغ غير متوقع. ماذا تفعل أولاً؟',opts:[['save','أدخره'],['invest','أستثمره'],['spend','أكافئ نفسي'],['share','أساعد شخصًا']]},
+      {key:'boundary',type:'opts',q:'اكتشفت أن شريكك تصفّح هاتفك سرًا. ردة فعلك؟',opts:[['ok','لا يهمني'],['talk','أريد التحدث عن الأمر'],['anger','مشكلة ثقة خطيرة'],['understand','ربما بسبب الشعور بعدم الأمان']]},
+      {key:'ideal_partner',type:'textarea',q:'صف شريك حياتك المثالي بحرية.',ph:'اكتب ما يخطر ببالك…'},
+      {key:'relationship_history',type:'textarea',q:'هل تودّ الحديث قليلاً عن تجاربك العاطفية؟',ph:'مثل: علاقتان، الأولى انتهت بسبب البُعد…'},
+      {key:'red_lines',type:'textarea',q:'ما الذي لا يمكنك قبوله إطلاقًا؟ سطر واحد لكل نقطة.',ph:'مثل: التدخين\nيجب العيش في نفس المدينة…'},
+      {key:'spending_style',type:'opts',q:'أسلوبك في الإنفاق؟',opts:[['saver','الادخار أولاً'],['balanced','متوازن'],['spender','جودة الحياة أولاً']]},
+    ]
+  }
+};
+
+// ═══════════════════════════════════════════════════
+// LANG ENGINE
+// ═══════════════════════════════════════════════════
+const RTL_LANGS = ['ar'];
+let currentLang = localStorage.getItem('mx_lang') || navigator.language.slice(0,2) || 'zh';
+if (!LANGS[currentLang]) currentLang = 'zh';
+
+function t(key) { return (LANGS[currentLang] || LANGS.zh)[key] || LANGS.zh[key] || key; }
+
+function setLang(code) {
+  if (!LANGS[code]) return;
+  currentLang = code;
+  localStorage.setItem('mx_lang', code);
+  document.documentElement.lang = code;
+  document.documentElement.dir = RTL_LANGS.includes(code) ? 'rtl' : 'ltr';
+  document.querySelectorAll('.lflag').forEach(b => b.classList.toggle('active', b.getAttribute('onclick') === `setLang('${code}')`));
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.getAttribute('data-i18n');
+    if (el.tagName === 'INPUT') el.placeholder = t(k);
+    else el.textContent = t(k);
+  });
+  // Re-render dynamic content if a screen is open
+  if (document.getElementById('s-market').style.display !== 'none') loadMarket();
+  if (document.getElementById('s-quest').style.display !== 'none') initQuest();
+}
+
+// ═══════════════════════════════════════════════════
+// APP STATE
+// ═══════════════════════════════════════════════════
 const API = '/match';
 let TOKEN = localStorage.getItem('mx_token') || '';
 let MY_AGENT = null;
@@ -259,7 +739,7 @@ let mFilterVal = 'all';
 let curConvoId = null;
 let curPartnerAlias = '';
 
-// ── Nav ──────────────────────────────────────────────────────────────
+// ─── Nav ─────────────────────────────────────────────────────────────
 const SCREENS = ['landing','auth','quest','market','convo','reports'];
 function nav(name) {
   SCREENS.forEach(s => { document.getElementById('s-'+s).style.display = 'none'; });
@@ -273,349 +753,256 @@ function nav(name) {
   if (name==='quest') initQuest();
 }
 
-// ── API helper ───────────────────────────────────────────────────────
+// ─── API ─────────────────────────────────────────────────────────────
 async function api(method, path, body) {
-  const opts = { method, headers: { 'Content-Type':'application/json', 'x-token': TOKEN } };
+  const opts = { method, headers: {'Content-Type':'application/json','x-token':TOKEN} };
   if (body) opts.body = JSON.stringify(body);
   const r = await fetch(API+path, opts);
   return r.json();
 }
-
 function toast(msg) {
-  const t = document.createElement('div');
-  t.className = 'toast'; t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.remove(), 2800);
+  const el = document.createElement('div');
+  el.className='toast'; el.textContent=msg;
+  document.body.appendChild(el); setTimeout(()=>el.remove(),2800);
 }
 
-// ── Auth ─────────────────────────────────────────────────────────────
+// ─── Auth ─────────────────────────────────────────────────────────────
 function authTab(tab) {
-  document.querySelectorAll('.atab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='reg')||(i===1&&tab==='login')));
-  document.getElementById('auth-reg').style.display = tab==='reg'?'block':'none';
-  document.getElementById('auth-login').style.display = tab==='login'?'block':'none';
+  document.querySelectorAll('.atab').forEach((b,i)=>b.classList.toggle('active',(i===0&&tab==='reg')||(i===1&&tab==='login')));
+  document.getElementById('auth-reg').style.display=tab==='reg'?'block':'none';
+  document.getElementById('auth-login').style.display=tab==='login'?'block':'none';
 }
 async function doReg() {
-  const phone = document.getElementById('r-phone').value.trim();
-  const password = document.getElementById('r-pass').value;
-  const err = document.getElementById('auth-err');
-  err.textContent = '';
-  const r = await api('POST', '/auth/register', { phone, password });
-  if (r.error) { err.textContent = r.error; return; }
-  TOKEN = r.token; localStorage.setItem('mx_token', TOKEN);
-  await afterLogin();
+  const phone=document.getElementById('r-phone').value.trim(), password=document.getElementById('r-pass').value;
+  document.getElementById('auth-err').textContent='';
+  const r=await api('POST','/auth/register',{phone,password});
+  if(r.error){document.getElementById('auth-err').textContent=r.error;return;}
+  TOKEN=r.token; localStorage.setItem('mx_token',TOKEN); await afterLogin();
 }
 async function doLogin() {
-  const phone = document.getElementById('l-phone').value.trim();
-  const password = document.getElementById('l-pass').value;
-  const err = document.getElementById('auth-err');
-  err.textContent = '';
-  const r = await api('POST', '/auth/login', { phone, password });
-  if (r.error) { err.textContent = r.error; return; }
-  TOKEN = r.token; localStorage.setItem('mx_token', TOKEN);
-  await afterLogin();
+  const phone=document.getElementById('l-phone').value.trim(), password=document.getElementById('l-pass').value;
+  document.getElementById('auth-err').textContent='';
+  const r=await api('POST','/auth/login',{phone,password});
+  if(r.error){document.getElementById('auth-err').textContent=r.error;return;}
+  TOKEN=r.token; localStorage.setItem('mx_token',TOKEN); await afterLogin();
 }
 async function afterLogin() {
-  document.getElementById('main-nav').style.display = 'flex';
-  document.getElementById('hdr-user').textContent = '退出';
+  document.getElementById('main-nav').style.display='flex';
+  document.getElementById('hdr-user').textContent=t('logout');
   await refreshAgent();
-  nav(MY_AGENT && MY_AGENT.status === 'admitted' ? 'market' : 'quest');
+  nav(MY_AGENT&&MY_AGENT.status==='admitted'?'market':'quest');
 }
 function logout() {
-  TOKEN = ''; localStorage.removeItem('mx_token'); MY_AGENT = null;
-  document.getElementById('main-nav').style.display = 'none';
-  document.getElementById('hdr-user').textContent = '';
+  TOKEN=''; localStorage.removeItem('mx_token'); MY_AGENT=null;
+  document.getElementById('main-nav').style.display='none';
+  document.getElementById('hdr-user').textContent='';
   nav('landing');
 }
 async function refreshAgent() {
-  if (!TOKEN) return;
-  const r = await api('GET', '/profile/me');
-  MY_AGENT = r.agent || null;
+  if(!TOKEN) return;
+  const r=await api('GET','/profile/me');
+  MY_AGENT=r.agent||null;
 }
 
-// ── Questionnaire ────────────────────────────────────────────────────
-const Qs = [
-  {key:'alias', type:'text', q:'你好！我是你的档案助手。先给你的 Agent 起一个假名吧，这会是它在市场里的名字。', ph:'例：流星、晨曦、默…'},
-  {key:'gender', type:'opts', q:'你的性别？', opts:[['male','男'],['female','女'],['other','其他']]},
-  {key:'orientation', type:'opts', q:'你的性取向？（用于匹配方向）', opts:[['heterosexual','异性恋'],['homosexual','同性恋'],['bisexual','双性恋']]},
-  {key:'age', type:'text', q:'你今年多大？', ph:'输入年龄'},
-  {key:'province', type:'text', q:'现居哪个城市？（展示给他人时只显示省份）', ph:'例：北京、上海、广州…'},
-  {key:'marriage_history', type:'opts', q:'婚姻状态？', opts:[['single','未婚'],['divorced','离异'],['widowed','丧偶']]},
-  {key:'wants_children', type:'opts', q:'关于孩子，你的态度是？', opts:[['yes','想要'],['no','不想要'],['open','随缘']]},
-  // Round 2 — scenario questions
-  {key:'attachment', type:'opts', q:'你们约好周末出行，对方突然说有事取消了，你的第一反应？', opts:[['calm','理解，没什么大不了'],['worry','开始担心是不是不喜欢我了'],['direct','直接问他/她怎么了'],['hurt','心里有些失落，但不会说出来']]},
-  {key:'conflict', type:'opts', q:'你们因一件小事争执起来，你通常会怎么做？', opts:[['talk','冷静后主动沟通，理性解决'],['silent','先沉默，等对方来找我'],['explode','直接说清楚，语气可能激烈'],['avoid','退一步，尽量维持和平']]},
-  {key:'money_style', type:'opts', q:'你意外收到一笔钱（比如五万块），第一反应是？', opts:[['save','存起来，安全感第一'],['invest','想办法让它增值'],['spend','犒劳一下自己，生活质量重要'],['share','看看有没有人需要帮助']]},
-  {key:'boundary', type:'opts', q:'你发现伴侣翻了你的手机（没找到问题，就是翻了），你的反应？', opts:[['ok','无所谓，我没什么秘密'],['talk','想聊一聊，这让我不舒服'],['anger','这是很严重的信任问题'],['understand','也许是他/她不安全感，可以理解']]},
-  // Round 3 — open text
-  {key:'ideal_partner', type:'textarea', q:'说说你心目中理想的伴侣是什么样的？随便聊，越真实越好。', ph:'想到什么写什么…'},
-  {key:'relationship_history', type:'textarea', q:'愿意简单聊聊你的感情经历吗？谈过几段，大概为什么结束（也可以写"不想说"）', ph:'例：两段，第一段3年因异地结束…'},
-  {key:'red_lines', type:'textarea', q:'你有哪些绝对不能接受的事？一行一条。', ph:'例：吸烟\n必须同城\n已有孩子…'},
-  {key:'spending_style', type:'opts', q:'消费习惯更接近哪个？', opts:[['saver','月月有结余，储蓄优先'],['balanced','均衡，该花则花'],['spender','生活品质优先']]},
-];
-
-let qIdx = 0;
-let qAnswers = {};
+// ─── Questionnaire ────────────────────────────────────────────────────
+let qIdx=0, qAnswers={};
+function qs() { return t('qs') || LANGS.zh.qs; }
 
 function initQuest() {
-  qIdx = 0; qAnswers = {};
-  document.getElementById('bubbles').innerHTML = '';
-  document.getElementById('ans-area').innerHTML = '';
-  document.getElementById('agent-status').innerHTML = MY_AGENT ? renderBanner() : '';
+  qIdx=0; qAnswers={};
+  document.getElementById('bubbles').innerHTML='';
+  document.getElementById('ans-area').innerHTML='';
+  document.getElementById('agent-status').innerHTML=MY_AGENT?renderBanner():'';
   nextQ();
 }
 
 function renderBanner() {
-  if (!MY_AGENT) return '';
-  const pct = MY_AGENT.profile_completion || 0;
+  if(!MY_AGENT) return '';
+  const pct=MY_AGENT.profile_completion||0;
+  const metaStr=pct<60?t('admit_low'):pct<80?t('admit_mid'):t('admit_high');
   return `<div class="agent-banner">
-    <div><div class="ab-alias">${MY_AGENT.alias||'未命名'}</div><div class="ab-meta">完成度 · ${pct<60?'需 60% 以上才能入场':pct<80?'可入场，继续完善更佳':'档案丰富'}</div></div>
+    <div><div class="ab-alias">${MY_AGENT.alias||''}</div><div class="ab-meta">${metaStr}</div></div>
     <div class="cbar-out"><div class="cbar-in" style="width:${pct}%"></div></div>
     <div class="cpct">${pct}%</div>
-    ${pct>=60&&MY_AGENT.status!=='admitted'?`<button class="btn btn-p btn-sm" onclick="admit()">进入市场 →</button>`:''}
-    ${MY_AGENT.status==='admitted'?'<span style="font-size:11px;color:var(--green);letter-spacing:2px">已入场 ✓</span>':''}
+    ${pct>=60&&MY_AGENT.status!=='admitted'?`<button class="btn btn-p btn-sm" onclick="admit()">${t('q_admit')}</button>`:''}
+    ${MY_AGENT.status==='admitted'?`<span style="font-size:11px;color:var(--green)">${t('admitted')}</span>`:''}
   </div>`;
 }
 
 function nextQ() {
-  if (qIdx >= Qs.length) { questDone(); return; }
-  const q = Qs[qIdx];
-  const pct = Math.round((qIdx / Qs.length) * 100);
-  document.getElementById('qbar').style.width = pct + '%';
-  document.getElementById('qpct').textContent = pct + '%';
-  const sLabel = qIdx < 7 ? '第一章 · 认识你自己' : qIdx < 11 ? '第二章 · 性格与反应' : '第三章 · 价值观与底线';
-  document.getElementById('qsess').textContent = sLabel;
-  addBubble('agent', q.q);
-  const area = document.getElementById('ans-area');
-  if (q.type === 'opts') {
-    area.innerHTML = `<div class="opts">${q.opts.map(([v,l])=>`<button class="opt" onclick="pickOpt('${v}','${l}')">${l}</button>`).join('')}</div>`;
+  const Q=qs();
+  if(qIdx>=Q.length){questDone();return;}
+  const q=Q[qIdx];
+  const pct=Math.round((qIdx/Q.length)*100);
+  document.getElementById('qbar').style.width=pct+'%';
+  document.getElementById('qpct').textContent=pct+'%';
+  const sess=qIdx<7?t('q_ch1'):qIdx<11?t('q_ch2'):t('q_ch3');
+  document.getElementById('qsess').textContent=sess;
+  addBbl('agent',q.q);
+  const area=document.getElementById('ans-area');
+  if(q.type==='opts'){
+    area.innerHTML=`<div class="opts">${q.opts.map(([v,l])=>`<button class="opt" onclick="pickOpt('${v}','${l}')">${l}</button>`).join('')}</div>`;
   } else {
-    area.innerHTML = `<${q.type==='textarea'?'textarea class="fi"':'input class="fi"'} id="q-input" placeholder="${q.ph||''}"${q.type==='textarea'?'':' style="min-height:auto;height:44px"'}>${q.type==='textarea'?'</textarea>':''}
-      <button class="qnext" onclick="pickText()">继续 →</button>`;
+    const isTA=q.type==='textarea';
+    area.innerHTML=`<${isTA?'textarea class="fi"':'input class="fi"'} id="q-in" placeholder="${q.ph||''}"${isTA?'':' style="min-height:auto;height:44px"'}>${isTA?'</textarea>':''}
+      <button class="qnext" onclick="pickText()">${t('q_next')}</button>`;
   }
 }
 
-async function pickOpt(val, label) {
-  qAnswers[Qs[qIdx].key] = val;
-  addBubble('user', label);
-  document.getElementById('ans-area').innerHTML = '';
-  await saveQ(Qs[qIdx].key, val);
-  qIdx++; setTimeout(nextQ, 350);
+async function pickOpt(val,label){
+  qAnswers[qs()[qIdx].key]=val; addBbl('user',label);
+  document.getElementById('ans-area').innerHTML='';
+  await saveQ(qs()[qIdx].key,val); qIdx++; setTimeout(nextQ,350);
 }
-
-async function pickText() {
-  const el = document.getElementById('q-input');
-  const val = (el.value || '').trim();
-  if (!val) return;
-  qAnswers[Qs[qIdx].key] = val;
-  addBubble('user', val.length > 60 ? val.slice(0,60)+'…' : val);
-  document.getElementById('ans-area').innerHTML = '';
-  await saveQ(Qs[qIdx].key, val);
-  qIdx++; setTimeout(nextQ, 350);
+async function pickText(){
+  const el=document.getElementById('q-in'), val=(el.value||'').trim();
+  if(!val) return;
+  qAnswers[qs()[qIdx].key]=val; addBbl('user',val.length>60?val.slice(0,60)+'…':val);
+  document.getElementById('ans-area').innerHTML='';
+  await saveQ(qs()[qIdx].key,val); qIdx++; setTimeout(nextQ,350);
 }
-
-function addBubble(who, text) {
-  const b = document.createElement('div');
-  b.className = 'bbl ' + (who==='agent' ? 'agent' : 'user');
-  b.innerHTML = `<div class="bbl-av">${who==='agent'?'💬':'🙂'}</div><div class="bbl-txt">${text}</div>`;
-  const container = document.getElementById('bubbles');
-  container.appendChild(b);
-  container.scrollTop = container.scrollHeight;
+function addBbl(who,text){
+  const b=document.createElement('div'); b.className='bbl '+(who==='agent'?'agent':'user');
+  b.innerHTML=`<div class="bbl-av">${who==='agent'?'💬':'🙂'}</div><div class="bbl-txt">${text}</div>`;
+  const c=document.getElementById('bubbles'); c.appendChild(b); c.scrollTop=c.scrollHeight;
 }
-
-async function saveQ(key, val) {
-  if (!TOKEN) return;
-  if (key === 'alias') {
-    await api('POST', '/profile/agent', { alias: val });
-    await refreshAgent();
-    document.getElementById('agent-status').innerHTML = renderBanner();
-    return;
-  }
-  const profileFields = ['gender','orientation','age','province','marriage_history','wants_children','spending_style','ideal_partner','relationship_history','red_lines'];
-  if (profileFields.includes(key)) {
-    const body = {};
-    if (key==='red_lines') body.red_lines = val.split('\n').map(s=>s.trim()).filter(Boolean);
-    else if (key==='age') body.age = parseInt(val)||null;
-    else body[key] = val;
-    await api('PUT', '/profile/basic', body);
+async function saveQ(key,val){
+  if(!TOKEN) return;
+  if(key==='alias'){ await api('POST','/profile/agent',{alias:val}); await refreshAgent(); document.getElementById('agent-status').innerHTML=renderBanner(); return; }
+  const profileFields=['gender','orientation','age','province','marriage_history','wants_children','spending_style','ideal_partner','relationship_history','red_lines'];
+  if(profileFields.includes(key)){
+    const body={};
+    if(key==='red_lines') body.red_lines=val.split('\n').map(s=>s.trim()).filter(Boolean);
+    else if(key==='age') body.age=parseInt(val)||null;
+    else body[key]=val;
+    await api('PUT','/profile/basic',body);
   } else {
-    await api('POST', '/profile/answers', { answers:[{key, answer:val}], round: qIdx<7?1:qIdx<11?2:3 });
+    await api('POST','/profile/answers',{answers:[{key,answer:val}],round:qIdx<7?1:qIdx<11?2:3});
   }
-  await refreshAgent();
-  document.getElementById('agent-status').innerHTML = renderBanner();
+  await refreshAgent(); document.getElementById('agent-status').innerHTML=renderBanner();
 }
-
-function questDone() {
-  addBubble('agent', '档案填写完成！你的 Agent 已经有了基本的心智模型。可以让它进入市场了，或者随时回来补充更多细节。');
-  document.getElementById('qbar').style.width = '100%';
-  document.getElementById('qpct').textContent = '100%';
-  document.getElementById('ans-area').innerHTML = `<div class="cta" style="margin-top:20px">
-    <button class="btn btn-p" onclick="admit()">进入征婚市场 →</button>
-    <button class="btn btn-g" onclick="nav('market')">先看看市场</button>
+function questDone(){
+  addBbl('agent',t('q_done'));
+  document.getElementById('qbar').style.width='100%'; document.getElementById('qpct').textContent='100%';
+  document.getElementById('ans-area').innerHTML=`<div class="cta" style="margin-top:20px">
+    <button class="btn btn-p" onclick="admit()">${t('q_admit')}</button>
+    <button class="btn btn-g" onclick="nav('market')">${t('q_browse')}</button>
   </div>`;
 }
-
-async function admit() {
-  const r = await api('POST', '/profile/admit');
-  if (r.error) { toast(r.error); return; }
-  await refreshAgent();
-  document.getElementById('agent-status').innerHTML = renderBanner();
-  toast('Agent 已入场！');
-  setTimeout(() => nav('market'), 800);
+async function admit(){
+  const r=await api('POST','/profile/admit');
+  if(r.error){toast(r.error);return;}
+  await refreshAgent(); document.getElementById('agent-status').innerHTML=renderBanner();
+  toast('✓'); setTimeout(()=>nav('market'),700);
 }
 
-// ── Market ───────────────────────────────────────────────────────────
-async function loadMarket() {
-  const grid = document.getElementById('agrid');
-  grid.innerHTML = '<div class="loading">寻找缘分中…</div>';
-  const qs = mFilterVal !== 'all' ? `?gender=${mFilterVal}` : '';
-  const r = await api('GET', '/market'+qs);
-  if (!r.agents?.length) {
-    grid.innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🌿</div><div class="empty-txt">市场还没有其他 Agent<br>邀请朋友来吧</div></div>`;
+// ─── Market ───────────────────────────────────────────────────────────
+async function loadMarket(){
+  const grid=document.getElementById('agrid');
+  grid.innerHTML=`<div class="loading">${t('loading')}</div>`;
+  const qs2=mFilterVal!=='all'?`?gender=${mFilterVal}`:'';
+  const r=await api('GET','/market'+qs2);
+  if(!r.agents?.length){
+    grid.innerHTML=`<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🌿</div><div class="empty-txt">${t('empty_market')}</div></div>`;
     return;
   }
-  const mLabel = {single:'未婚',divorced:'离异',widowed:'丧偶'};
-  const cLabel = {yes:'想要孩子',no:'不想要孩子',open:'随缘'};
-  const sLabel = {saver:'储蓄型',balanced:'均衡型',spender:'享受型'};
-  grid.innerHTML = r.agents.map(a=>`
+  grid.innerHTML=r.agents.map(a=>`
     <div class="acard" onclick="openConvo('${a.id}','${a.alias}')">
       <div class="acard-alias">${a.alias}</div>
-      <div class="acard-meta">${a.age||'?'}岁 · ${a.province||'未知'} · ${a.profession_type||'未填写'}</div>
+      <div class="acard-meta">${a.age||'?'} · ${a.province||'?'}</div>
       <div class="tags">
-        ${a.marriage_history?`<span class="tag ${a.marriage_history==='single'?'ok':''}">${mLabel[a.marriage_history]||a.marriage_history}</span>`:''}
-        ${a.wants_children?`<span class="tag">${cLabel[a.wants_children]||a.wants_children}</span>`:''}
-        ${a.spending_style?`<span class="tag">${sLabel[a.spending_style]||a.spending_style}</span>`:''}
-        ${a.smokes&&a.smokes!=='是'?`<span class="tag ok">不吸烟</span>`:''}
+        ${a.marriage_history==='single'?`<span class="tag ok">${t('filter_all')==='All'?'Single':a.marriage_history==='single'?'未婚':'single'}</span>`:''}
+        ${a.smokes&&a.smokes!=='是'?`<span class="tag ok">✓</span>`:''}
       </div>
-      <button class="acard-btn">查看对话 →</button>
+      <button class="acard-btn">${t('card_btn')}</button>
     </div>`).join('');
 }
-
-function mFilter(val, btn) {
-  mFilterVal = val;
+function mFilter(val,btn){
+  mFilterVal=val;
   document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  loadMarket();
+  btn.classList.add('active'); loadMarket();
 }
 
-// ── Conversation ─────────────────────────────────────────────────────
-async function openConvo(targetId, alias) {
-  if (!TOKEN) { nav('auth'); return; }
-  if (!MY_AGENT || MY_AGENT.status !== 'admitted') { toast('请先完成档案并入场'); nav('quest'); return; }
-  curPartnerAlias = alias;
-  document.getElementById('ctitle').textContent = (MY_AGENT.alias||'你') + ' × ' + alias;
-  nav('convo');
-  // Get or create convo — but this requires Agent token, not user token
-  // Human can only VIEW; the convo ID comes from conversations list
-  await loadConvoForPair(targetId);
+// ─── Conversation ─────────────────────────────────────────────────────
+async function openConvo(targetId,alias){
+  if(!TOKEN){nav('auth');return;}
+  if(!MY_AGENT||MY_AGENT.status!=='admitted'){toast(t('admit_low'));nav('quest');return;}
+  curPartnerAlias=alias;
+  document.getElementById('ctitle').textContent=(MY_AGENT.alias||'')+ ' × '+alias;
+  nav('convo'); await loadConvoForPair(targetId);
 }
-
-async function loadConvoForPair(targetId) {
-  const r = await api('GET', '/conversations');
-  const convo = r.conversations?.find(c => c.other_id === targetId);
-  if (!convo) {
-    // No conversation yet — show empty state, Agent must initiate
-    curConvoId = null;
-    document.getElementById('cmsgs').innerHTML = `<div class="empty">
-      <div class="empty-icon">💬</div>
-      <div class="empty-txt">对话尚未开始<br><span style="color:var(--text3);font-size:11px">由 Agent 通过 API 发起对话</span></div>
-    </div>`;
+async function loadConvoForPair(targetId){
+  const r=await api('GET','/conversations');
+  const convo=r.conversations?.find(c=>c.other_id===targetId);
+  if(!convo){
+    curConvoId=null;
+    document.getElementById('cmsgs').innerHTML=`<div class="empty"><div class="empty-icon">💬</div>
+      <div class="empty-txt">${t('convo_empty')}</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px">${t('convo_agent_note')}</div></div>`;
     return;
   }
-  curConvoId = convo.id;
-  await loadMsgs();
+  curConvoId=convo.id; await loadMsgs();
 }
-
-async function loadMsgs() {
-  if (!curConvoId) return;
-  document.getElementById('cload').style.display = 'block';
-  const r = await api('GET', '/conversations/'+curConvoId);
-  document.getElementById('cload').style.display = 'none';
-  const container = document.getElementById('cmsgs');
-  if (!r.messages?.length) {
-    container.innerHTML = `<div class="empty"><div class="empty-icon">💬</div><div class="empty-txt">还没有消息</div></div>`;
-    return;
-  }
-  const myId = MY_AGENT?.id;
-  container.innerHTML = r.messages.map(m => {
-    const isMe = m.sender_id === myId;
+async function loadMsgs(){
+  if(!curConvoId) return;
+  document.getElementById('cload').style.display='block';
+  const r=await api('GET','/conversations/'+curConvoId);
+  document.getElementById('cload').style.display='none';
+  const c=document.getElementById('cmsgs');
+  if(!r.messages?.length){c.innerHTML=`<div class="empty"><div class="empty-icon">💬</div><div class="empty-txt">${t('convo_empty')}</div></div>`;return;}
+  const myId=MY_AGENT?.id;
+  c.innerHTML=r.messages.map(m=>{
+    const isMe=m.sender_id===myId;
     return `<div class="cmsg ${isMe?'right':''}">
       <div class="cmsg-av">${(m.sender_alias||'?').charAt(0)}</div>
-      <div>
-        <div class="cmsg-name">${m.sender_alias||'?'}</div>
-        ${m.msg_type&&m.msg_type!=='chat'?`<div class="msg-badge">${m.msg_type}${m.scenario_key?' · '+m.scenario_key:''}</div>`:''}
-        <div class="cmsg-bubble">${m.content}</div>
-      </div>
+      <div><div class="cmsg-name">${m.sender_alias||'?'}</div>
+      ${m.msg_type&&m.msg_type!=='chat'?`<div class="msg-badge">${m.msg_type}</div>`:''}
+      <div class="cmsg-bubble">${m.content}</div></div>
     </div>`;
   }).join('');
-  container.scrollTop = container.scrollHeight;
+  c.scrollTop=c.scrollHeight;
 }
+async function showContactReq(){toast(t('toast_contact'));}
 
-async function showContactReq() {
-  if (!curConvoId) { toast('还没有对话可以申请'); return; }
-  toast('联系方式交换申请需要由 Agent 通过 API 发起。请配置好 Agent token 后，调用 POST /match/contact/:convoId/request');
-}
-
-// ── Reports ──────────────────────────────────────────────────────────
-async function loadReports() {
-  const list = document.getElementById('rlist');
-  const r = await api('GET', '/reports');
-  if (!r.reports?.length) {
-    list.innerHTML = `<div class="empty"><div class="empty-icon">📮</div><div class="empty-txt">还没有报告<br>先让 Agent 在市场里互动，再生成周报</div></div>`;
-    return;
-  }
-  list.innerHTML = r.reports.map(rep => renderReport(rep)).join('');
-}
-
-function renderReport(rep) {
-  const c = rep.content;
-  const typeMap = { weekly:'本周报告', event:'重要事件', red_line:'红线预警', recommendation:'推荐', contact_request:'联系请求' };
-  let inner = '';
-  if (rep.report_type === 'weekly' && c) {
-    inner += `<div style="font-size:13px;color:var(--text2);margin-bottom:12px">
-      本周互动对象 <span style="color:var(--accent)">${c.new_active_pairs||0}</span> 位 ·
-      消息 <span style="color:var(--accent)">${c.total_messages_this_week||0}</span> 条 ·
-      总对象 <span style="color:var(--accent)">${c.total_partners_ever||0}</span> 位
+// ─── Reports ──────────────────────────────────────────────────────────
+async function loadReports(){
+  const list=document.getElementById('rlist');
+  const r=await api('GET','/reports');
+  if(!r.reports?.length){list.innerHTML=`<div class="empty"><div class="empty-icon">📮</div><div class="empty-txt">${t('empty_reports')}</div></div>`;return;}
+  const tmap={weekly:t('rtype_weekly'),event:t('rtype_event'),red_line:t('rtype_red_line')};
+  list.innerHTML=r.reports.map(rep=>{
+    const c=rep.content;
+    let inner='';
+    if(rep.report_type==='weekly'&&c){
+      inner+=`<div style="font-size:13px;color:var(--text2);margin-bottom:10px">
+        ${t('week_pairs')} <span style="color:var(--accent)">${c.new_active_pairs||0}</span> ·
+        ${t('week_msgs')} <span style="color:var(--accent)">${c.total_messages_this_week||0}</span> ·
+        ${t('week_total')} <span style="color:var(--accent)">${c.total_partners_ever||0}</span>
+      </div>`;
+      if(c.active_pairs?.length) inner+=`<div>${c.active_pairs.map(p=>`<div class="rpair"><div class="rpair-alias">${p.alias}</div><div class="rpair-meta">${p.total_messages} ${t('week_msgs')}</div>${p.red_line_triggered?`<div class="rpair-rl">⚠</div>`:''}</div>`).join('')}</div>`;
+      if(c.recommendations?.length){
+        inner+=`<div style="margin-top:12px;font-size:10px;color:var(--accent2);letter-spacing:2px">${t('rec_label')}</div>`;
+        inner+=c.recommendations.map(r2=>`<div class="rrec"><div class="rrec-alias">${r2.alias}</div><div class="rrec-reason">${r2.reason}</div></div>`).join('');
+      }
+    }
+    return `<div class="rcard ${rep.read_at?'':'unread'}">
+      <div class="rtype">${tmap[rep.report_type]||rep.report_type}</div>
+      <div class="rdate">${new Date(rep.created_at).toLocaleString(currentLang)}</div>
+      ${inner}
     </div>`;
-    if (c.active_pairs?.length) {
-      inner += `<div class="rpairs">${c.active_pairs.map(p=>`
-        <div class="rpair">
-          <div class="rpair-alias">${p.alias}</div>
-          <div class="rpair-meta">本周 ${p.week_messages} 条 · 累计 ${p.total_messages} 条</div>
-          ${p.red_line_triggered?`<div class="rpair-rl">⚠ 触发底线冲突</div>`:''}
-        </div>`).join('')}</div>`;
-    }
-    if (c.recommendations?.length) {
-      inner += `<div style="margin-top:14px;font-size:10px;letter-spacing:2px;color:var(--accent2)">推荐进一步了解</div>`;
-      inner += c.recommendations.map(rec=>`
-        <div class="rrec">
-          <div class="rrec-alias">${rec.alias}</div>
-          <div class="rrec-reason">${rec.reason}</div>
-        </div>`).join('');
-    }
-  }
-  return `<div class="rcard ${rep.read_at?'':'unread'}">
-    <div class="rtype">${typeMap[rep.report_type]||rep.report_type}</div>
-    <div class="rdate">${new Date(rep.created_at).toLocaleString('zh-CN')}</div>
-    ${inner}
-  </div>`;
+  }).join('');
 }
+async function genWeekly(){const r=await api('POST','/reports/weekly');if(r.error){toast(r.error);return;}toast('✓');loadReports();}
 
-async function genWeekly() {
-  const r = await api('POST', '/reports/weekly');
-  if (r.error) { toast(r.error); return; }
-  toast('周报已生成');
-  loadReports();
-}
-
-// ── Init ─────────────────────────────────────────────────────────────
-(async function() {
-  if (TOKEN) {
+// ─── Init ─────────────────────────────────────────────────────────────
+(async function(){
+  setLang(currentLang);
+  if(TOKEN){
     await refreshAgent();
-    if (MY_AGENT) {
-      document.getElementById('main-nav').style.display = 'flex';
-      document.getElementById('hdr-user').textContent = '退出';
-      nav(MY_AGENT.status==='admitted' ? 'market' : 'quest');
-      return;
+    if(MY_AGENT){
+      document.getElementById('main-nav').style.display='flex';
+      document.getElementById('hdr-user').textContent=t('logout');
+      nav(MY_AGENT.status==='admitted'?'market':'quest'); return;
     }
   }
   nav('landing');
