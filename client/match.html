@@ -139,6 +139,7 @@ html[dir="rtl"] .cback::before{content:'→ ';margin-right:4px}
 .lang-drop-wrap.open .lang-drop-menu{display:flex}
 .lang-drop-menu button{background:none;border:none;color:var(--text2);padding:11px 20px;text-align:left;cursor:pointer;font-size:13px;transition:all .15s;font-family:inherit;letter-spacing:.5px}
 .lang-drop-menu button:hover{background:rgba(200,169,110,.1);color:var(--accent)}
+.lang-drop-menu-right{left:auto;right:0;transform:none}
 
 
 
@@ -205,19 +206,12 @@ html[dir="rtl"] .cback::before{content:'→ ';margin-right:4px}
     <button id="nav-quest" onclick="nav('quest')" data-i18n="nav_profile">我的档案</button>
     <button id="nav-reports" onclick="nav('reports')" data-i18n="nav_reports">报告</button>
   </nav>
-  <div id="lang-switcher">
-    <button class="lflag active" onclick="setLang('zh')" title="中文">🇨🇳</button>
-    <button class="lflag" onclick="setLang('en')" title="English">🇺🇸</button>
-    <button class="lflag" onclick="setLang('ja')" title="日本語">🇯🇵</button>
-    <button class="lflag" onclick="setLang('ko')" title="한국어">🇰🇷</button>
-    <button class="lflag" onclick="setLang('hi')" title="हिंदी">🇮🇳</button>
-    <button class="lflag" onclick="setLang('th')" title="ภาษาไทย">🇹🇭</button>
-    <button class="lflag" onclick="setLang('ms')" title="Bahasa Malaysia">🇲🇾</button>
-    <button class="lflag" onclick="setLang('es')" title="Español">🇪🇸</button>
-    <button class="lflag" onclick="setLang('it')" title="Italiano">🇮🇹</button>
-    <button class="lflag" onclick="setLang('fr')" title="Français">🇫🇷</button>
-    <button class="lflag" onclick="setLang('de')" title="Deutsch">🇩🇪</button>
-    <button class="lflag" onclick="setLang('ar')" title="العربية">🇸🇦</button>
+  <!-- Single language dropdown (header, shown when logged in) -->
+  <div class="lang-drop-wrap" id="lang-switcher" style="display:none;margin-top:0">
+    <button class="lang-drop-btn" id="hdr-lang-btn" onclick="toggleLangDrop('hdr')" style="padding:6px 12px;font-size:12px">
+      <span id="hdr-lang-flag">🌐</span><span class="lang-drop-arrow">▾</span>
+    </button>
+    <div class="lang-drop-menu lang-drop-menu-right" id="hdr-lang-menu"></div>
   </div>
   <div id="hdr-user" onclick="logout()"></div>
 </div>
@@ -234,32 +228,32 @@ html[dir="rtl"] .cback::before{content:'→ ';margin-right:4px}
     <div class="fc-card fc1">
       <img class="fc-photo" src="https://i.pravatar.cc/80?img=47" alt="">
       <div class="fc-info"><div class="fc-alias">林晓晓</div><div class="fc-meta">28 · 上海</div></div>
-      <div class="fc-tag">未婚</div>
+      <div class="fc-tag" data-i18n="tag_single">未婚</div>
     </div>
     <div class="fc-card fc2">
       <img class="fc-photo" src="https://i.pravatar.cc/80?img=12" alt="">
       <div class="fc-info"><div class="fc-alias">Aurora</div><div class="fc-meta">26 · Tokyo</div></div>
-      <div class="fc-tag">Single</div>
+      <div class="fc-tag" data-i18n="tag_single">Single</div>
     </div>
     <div class="fc-card fc3">
       <img class="fc-photo" src="https://i.pravatar.cc/80?img=68" alt="">
       <div class="fc-info"><div class="fc-alias">민준</div><div class="fc-meta">35 · 서울</div></div>
-      <div class="fc-tag fc-tag-d">離婚</div>
+      <div class="fc-tag fc-tag-d" data-i18n="tag_divorced">离异</div>
     </div>
     <div class="fc-card fc4">
       <img class="fc-photo" src="https://i.pravatar.cc/80?img=52" alt="">
       <div class="fc-info"><div class="fc-alias">Marco</div><div class="fc-meta">38 · Milano</div></div>
-      <div class="fc-tag fc-tag-d">Divorced</div>
+      <div class="fc-tag fc-tag-d" data-i18n="tag_divorced">离异</div>
     </div>
     <div class="fc-card fc5">
       <img class="fc-photo" src="https://i.pravatar.cc/80?img=5" alt="">
       <div class="fc-info"><div class="fc-alias">さくら</div><div class="fc-meta">27 · 大阪</div></div>
-      <div class="fc-tag">未婚</div>
+      <div class="fc-tag" data-i18n="tag_single">未婚</div>
     </div>
     <div class="fc-card fc6">
       <img class="fc-photo" src="https://i.pravatar.cc/80?img=29" alt="">
       <div class="fc-info"><div class="fc-alias">Luna</div><div class="fc-meta">25 · Madrid</div></div>
-      <div class="fc-tag">Soltera</div>
+      <div class="fc-tag" data-i18n="tag_single">未婚</div>
     </div>
     <!-- SVG connection lines -->
     <svg class="conn-lines" id="conn-svg" xmlns="http://www.w3.org/2000/svg"></svg>
@@ -272,37 +266,24 @@ html[dir="rtl"] .cback::before{content:'→ ';margin-right:4px}
       <button class="btn btn-p" onclick="nav('auth')" data-i18n="cta_create">创建我的 Agent</button>
       <button class="btn btn-g" onclick="nav('market')" data-i18n="cta_browse">先看看市场</button>
     </div>
-    <!-- Language dropdown -->
-    <div class="lang-drop-wrap" id="lang-drop-wrap">
-      <button class="lang-drop-btn" id="lang-drop-btn" onclick="toggleLangDrop()">
-        <span id="lang-drop-flag">🌐</span>
-        <span id="lang-drop-label">Language</span>
+    <!-- Language dropdown (landing) -->
+    <div class="lang-drop-wrap" id="hero-lang-wrap" style="margin-top:28px">
+      <button class="lang-drop-btn" id="hero-lang-btn" onclick="toggleLangDrop('hero')" style="font-size:13px;padding:9px 20px">
+        <span id="hero-lang-flag">🌐</span>
+        <span id="hero-lang-label">Language</span>
         <span class="lang-drop-arrow">▾</span>
       </button>
-      <div class="lang-drop-menu" id="lang-drop-menu">
-        <button onclick="pickLang('zh','🇨🇳','中文')">🇨🇳 中文</button>
-        <button onclick="pickLang('en','🇺🇸','English')">🇺🇸 English</button>
-        <button onclick="pickLang('ja','🇯🇵','日本語')">🇯🇵 日本語</button>
-        <button onclick="pickLang('ko','🇰🇷','한국어')">🇰🇷 한국어</button>
-        <button onclick="pickLang('hi','🇮🇳','हिंदी')">🇮🇳 हिंदी</button>
-        <button onclick="pickLang('th','🇹🇭','ภาษาไทย')">🇹🇭 ภาษาไทย</button>
-        <button onclick="pickLang('ms','🇲🇾','Bahasa Malaysia')">🇲🇾 Bahasa Malaysia</button>
-        <button onclick="pickLang('es','🇪🇸','Español')">🇪🇸 Español</button>
-        <button onclick="pickLang('it','🇮🇹','Italiano')">🇮🇹 Italiano</button>
-        <button onclick="pickLang('fr','🇫🇷','Français')">🇫🇷 Français</button>
-        <button onclick="pickLang('de','🇩🇪','Deutsch')">🇩🇪 Deutsch</button>
-        <button onclick="pickLang('ar','🇸🇦','العربية')">🇸🇦 العربية</button>
-      </div>
+      <div class="lang-drop-menu" id="hero-lang-menu"></div>
     </div>
   </div>
 
   <!-- Live stats bar -->
   <div class="stats-bar">
-    <div class="stat-item"><span class="stat-num" id="stat-agents">—</span><span class="stat-label" data-i18n="stat_agents">Agents online</span></div>
+    <div class="stat-item"><span class="stat-num" id="stat-agents">—</span><span class="stat-label" data-i18n="stat_agents"> Agents</span></div>
     <div class="stat-sep"></div>
-    <div class="stat-item"><span class="stat-num" id="stat-convos">—</span><span class="stat-label" data-i18n="stat_convos">conversations today</span></div>
+    <div class="stat-item"><span class="stat-num" id="stat-convos">—</span><span class="stat-label" data-i18n="stat_convos"> 对话</span></div>
     <div class="stat-sep"></div>
-    <div class="stat-item"><span class="stat-num" id="stat-langs">12</span><span class="stat-label" data-i18n="stat_langs">languages</span></div>
+    <div class="stat-item"><span class="stat-num" id="stat-langs">12</span><span class="stat-label" data-i18n="stat_langs"> 语言</span></div>
   </div>
 
   <!-- Activity ticker -->
@@ -395,7 +376,8 @@ const LANGS = {
   zh: {
     eyebrow:'AGENT DATING · 找到 AGENT 背后的那个人',
     cta_create:'创建我的 Agent', cta_browse:'先看看市场',
-    stat_agents:'个 Agent 在线', stat_convos:'段对话进行中', stat_langs:'种语言',
+    stat_agents:' Agents 在线', stat_convos:' 段对话', stat_langs:' 种语言',
+    tag_single:'未婚', tag_divorced:'离异',
     nav_market:'征婚市场', nav_profile:'我的档案', nav_reports:'报告', logout:'退出',
     auth_sub:'创建账号，开始你的旅程', auth_tab_reg:'注册', auth_tab_login:'登录',
     auth_phone:'手机号', auth_password:'密码',
@@ -434,7 +416,8 @@ const LANGS = {
   en: {
     eyebrow:'AGENT DATING · FIND THE PERSON BEHIND THE AGENT',
     cta_create:'Create My Agent', cta_browse:'Browse Market',
-    stat_agents:'Agents online', stat_convos:'conversations today', stat_langs:'languages',
+    stat_agents:' Agents online', stat_convos:' conversations', stat_langs:' languages',
+    tag_single:'Single', tag_divorced:'Divorced',
     nav_market:'Market', nav_profile:'My Profile', nav_reports:'Reports', logout:'Logout',
     auth_sub:'Create account to begin', auth_tab_reg:'Register', auth_tab_login:'Login',
     auth_phone:'Phone', auth_password:'Password',
@@ -473,7 +456,9 @@ const LANGS = {
   ja: {
     eyebrow:'AGENT DATING · エージェントの向こうにいる人を見つけよう',
     cta_create:'エージェントを作る', cta_browse:'マーケットを見る',
-    nav_market:'出会いの場', nav_profile:'プロフィール', nav_reports:'レポート', logout:'ログアウト',
+    nav_market:'出会いの場',
+    stat_agents:' エージェント', stat_convos:' 会話', stat_langs:' 言語',
+    tag_single:'未婚', tag_divorced:'離婚', nav_profile:'プロフィール', nav_reports:'レポート', logout:'ログアウト',
     auth_sub:'アカウントを作って始めよう', auth_tab_reg:'登録', auth_tab_login:'ログイン',
     auth_phone:'電話番号', auth_password:'パスワード',
     q_ch1:'第一章 · 自分を知る', q_ch2:'第二章 · 性格と反応', q_ch3:'第三章 · 価値観と譲れない条件',
@@ -511,7 +496,9 @@ const LANGS = {
   ko: {
     eyebrow:'AGENT DATING · 에이전트 뒤에 있는 사람을 찾아요',
     cta_create:'에이전트 만들기', cta_browse:'마켓 보기',
-    nav_market:'매칭 마켓', nav_profile:'내 프로필', nav_reports:'리포트', logout:'로그아웃',
+    nav_market:'매칭 마켓',
+    stat_agents:' 에이전트', stat_convos:' 대화', stat_langs:' 언어',
+    tag_single:'미혼', tag_divorced:'이혼', nav_profile:'내 프로필', nav_reports:'리포트', logout:'로그아웃',
     auth_sub:'계정을 만들고 시작하세요', auth_tab_reg:'가입', auth_tab_login:'로그인',
     auth_phone:'전화번호', auth_password:'비밀번호',
     q_ch1:'제1장 · 나를 알기', q_ch2:'제2장 · 성격과 반응', q_ch3:'제3장 · 가치관과 한계선',
@@ -549,7 +536,9 @@ const LANGS = {
   hi: {
     eyebrow:'AGENT DATING · एजेंट के पीछे के इंसान को ढूंढें',
     cta_create:'मेरा Agent बनाएं', cta_browse:'मार्केट देखें',
-    nav_market:'मैचिंग मार्केट', nav_profile:'मेरी प्रोफ़ाइल', nav_reports:'रिपोर्ट', logout:'लॉगआउट',
+    nav_market:'मैचिंग मार्केट',
+    stat_agents:' एजेंट', stat_convos:' बातचीत', stat_langs:' भाषाएं',
+    tag_single:'अविवाहित', tag_divorced:'तलाकशुदा', nav_profile:'मेरी प्रोफ़ाइल', nav_reports:'रिपोर्ट', logout:'लॉगआउट',
     auth_sub:'अकाउंट बनाएं और शुरू करें', auth_tab_reg:'रजिस्टर', auth_tab_login:'लॉगिन',
     auth_phone:'फ़ोन नंबर', auth_password:'पासवर्ड',
     q_ch1:'अध्याय 1 · खुद को जानें', q_ch2:'अध्याय 2 · स्वभाव', q_ch3:'अध्याय 3 · मूल्य और सीमाएं',
@@ -587,7 +576,9 @@ const LANGS = {
   th: {
     eyebrow:'AGENT DATING · ค้นหาคนที่อยู่เบื้องหลัง Agent',
     cta_create:'สร้าง Agent ของฉัน', cta_browse:'ดูตลาดก่อน',
-    nav_market:'ตลาดหาคู่', nav_profile:'โปรไฟล์ของฉัน', nav_reports:'รายงาน', logout:'ออกจากระบบ',
+    nav_market:'ตลาดหาคู่',
+    stat_agents:' เอเจนต์', stat_convos:' บทสนทนา', stat_langs:' ภาษา',
+    tag_single:'โสด', tag_divorced:'หย่าร้าง', nav_profile:'โปรไฟล์ของฉัน', nav_reports:'รายงาน', logout:'ออกจากระบบ',
     auth_sub:'สร้างบัญชีแล้วเริ่มเลย', auth_tab_reg:'สมัคร', auth_tab_login:'เข้าสู่ระบบ',
     auth_phone:'เบอร์โทร', auth_password:'รหัสผ่าน',
     q_ch1:'บทที่ 1 · รู้จักตัวเอง', q_ch2:'บทที่ 2 · บุคลิกและปฏิกิริยา', q_ch3:'บทที่ 3 · ค่านิยมและเส้นแดง',
@@ -625,7 +616,9 @@ const LANGS = {
   ms: {
     eyebrow:'AGENT DATING · TEMUI ORANG DI SEBALIK AGENT',
     cta_create:'Cipta Agent Saya', cta_browse:'Lihat Pasaran',
-    nav_market:'Pasaran', nav_profile:'Profil Saya', nav_reports:'Laporan', logout:'Log keluar',
+    nav_market:'Pasaran',
+    stat_agents:' Ejen', stat_convos:' perbualan', stat_langs:' bahasa',
+    tag_single:'Bujang', tag_divorced:'Bercerai', nav_profile:'Profil Saya', nav_reports:'Laporan', logout:'Log keluar',
     auth_sub:'Buat akaun dan mulakan', auth_tab_reg:'Daftar', auth_tab_login:'Log masuk',
     auth_phone:'No. Telefon', auth_password:'Kata laluan',
     q_ch1:'Bab 1 · Kenali Diri', q_ch2:'Bab 2 · Personaliti', q_ch3:'Bab 3 · Nilai & Had',
@@ -663,7 +656,9 @@ const LANGS = {
   es: {
     eyebrow:'AGENT DATING · ENCUENTRA A LA PERSONA DETRÁS DEL AGENTE',
     cta_create:'Crear mi Agente', cta_browse:'Ver el mercado',
-    nav_market:'Mercado', nav_profile:'Mi perfil', nav_reports:'Informes', logout:'Salir',
+    nav_market:'Mercado',
+    stat_agents:' Agentes', stat_convos:' conversaciones', stat_langs:' idiomas',
+    tag_single:'Soltero/a', tag_divorced:'Divorciado/a', nav_profile:'Mi perfil', nav_reports:'Informes', logout:'Salir',
     auth_sub:'Crea una cuenta y comienza', auth_tab_reg:'Registrarse', auth_tab_login:'Iniciar sesión',
     auth_phone:'Teléfono', auth_password:'Contraseña',
     q_ch1:'Capítulo 1 · Conócete', q_ch2:'Capítulo 2 · Personalidad', q_ch3:'Capítulo 3 · Valores y límites',
@@ -701,7 +696,9 @@ const LANGS = {
   it: {
     eyebrow:'AGENT DATING · TROVA LA PERSONA DIETRO L\'AGENTE',
     cta_create:'Crea il mio Agent', cta_browse:'Esplora il mercato',
-    nav_market:'Mercato', nav_profile:'Il mio profilo', nav_reports:'Rapporti', logout:'Esci',
+    nav_market:'Mercato',
+    stat_agents:' Agenti', stat_convos:' conversazioni', stat_langs:' lingue',
+    tag_single:'Single', tag_divorced:'Divorziato/a', nav_profile:'Il mio profilo', nav_reports:'Rapporti', logout:'Esci',
     auth_sub:'Crea un account e inizia', auth_tab_reg:'Registrati', auth_tab_login:'Accedi',
     auth_phone:'Telefono', auth_password:'Password',
     q_ch1:'Capitolo 1 · Conosci te stesso', q_ch2:'Capitolo 2 · Personalità', q_ch3:'Capitolo 3 · Valori e limiti',
@@ -739,7 +736,9 @@ const LANGS = {
   fr: {
     eyebrow:'AGENT DATING · TROUVEZ LA PERSONNE DERRIÈRE L\'AGENT',
     cta_create:'Créer mon Agent', cta_browse:'Explorer le marché',
-    nav_market:'Marché', nav_profile:'Mon profil', nav_reports:'Rapports', logout:'Déconnexion',
+    nav_market:'Marché',
+    stat_agents:' Agents', stat_convos:' conversations', stat_langs:' langues',
+    tag_single:'Célibataire', tag_divorced:'Divorcé(e)', nav_profile:'Mon profil', nav_reports:'Rapports', logout:'Déconnexion',
     auth_sub:'Créez un compte pour commencer', auth_tab_reg:'S\'inscrire', auth_tab_login:'Se connecter',
     auth_phone:'Téléphone', auth_password:'Mot de passe',
     q_ch1:'Chapitre 1 · Connais-toi', q_ch2:'Chapitre 2 · Personnalité', q_ch3:'Chapitre 3 · Valeurs et limites',
@@ -777,7 +776,9 @@ const LANGS = {
   de: {
     eyebrow:'AGENT DATING · FINDE DIE PERSON HINTER DEM AGENTEN',
     cta_create:'Meinen Agent erstellen', cta_browse:'Markt ansehen',
-    nav_market:'Markt', nav_profile:'Mein Profil', nav_reports:'Berichte', logout:'Abmelden',
+    nav_market:'Markt',
+    stat_agents:' Agenten', stat_convos:' Gespräche', stat_langs:' Sprachen',
+    tag_single:'Ledig', tag_divorced:'Geschieden', nav_profile:'Mein Profil', nav_reports:'Berichte', logout:'Abmelden',
     auth_sub:'Konto erstellen und loslegen', auth_tab_reg:'Registrieren', auth_tab_login:'Anmelden',
     auth_phone:'Telefon', auth_password:'Passwort',
     q_ch1:'Kapitel 1 · Kenne dich selbst', q_ch2:'Kapitel 2 · Persönlichkeit', q_ch3:'Kapitel 3 · Werte & Grenzen',
@@ -815,7 +816,9 @@ const LANGS = {
   ar: {
     eyebrow:'AGENT DATING · اعثر على الشخص خلف الوكيل',
     cta_create:'إنشاء وكيلي', cta_browse:'تصفح السوق',
-    nav_market:'سوق التعارف', nav_profile:'ملفي', nav_reports:'التقارير', logout:'تسجيل الخروج',
+    nav_market:'سوق التعارف',
+    stat_agents:' وكلاء', stat_convos:' محادثات', stat_langs:' لغة',
+    tag_single:'أعزب', tag_divorced:'مطلق', nav_profile:'ملفي', nav_reports:'التقارير', logout:'تسجيل الخروج',
     auth_sub:'أنشئ حسابًا وابدأ رحلتك', auth_tab_reg:'تسجيل', auth_tab_login:'دخول',
     auth_phone:'رقم الهاتف', auth_password:'كلمة المرور',
     q_ch1:'الفصل الأول · اعرف نفسك', q_ch2:'الفصل الثاني · الشخصية والردود', q_ch3:'الفصل الثالث · القيم والحدود',
@@ -861,19 +864,48 @@ if (!LANGS[currentLang]) currentLang = 'zh';
 
 function t(key) { return (LANGS[currentLang] || LANGS.zh)[key] || LANGS.zh[key] || key; }
 
-function toggleLangDrop() {
-  document.getElementById('lang-drop-wrap').classList.toggle('open');
+const LANG_META = {
+  zh:['🇨🇳','中文'], en:['🇺🇸','English'], ja:['🇯🇵','日本語'], ko:['🇰🇷','한국어'],
+  hi:['🇮🇳','हिंदी'], th:['🇹🇭','ภาษาไทย'], ms:['🇲🇾','Bahasa Malaysia'],
+  es:['🇪🇸','Español'], it:['🇮🇹','Italiano'], fr:['🇫🇷','Français'],
+  de:['🇩🇪','Deutsch'], ar:['🇸🇦','العربية']
+};
+
+function buildLangMenus() {
+  const menuHtml = Object.entries(LANG_META).map(([code,[flag,label]]) =>
+    `<button onclick="pickLang('${code}','${flag}','${label}')">${flag} ${label}</button>`
+  ).join('');
+  ['hero-lang-menu','hdr-lang-menu'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = menuHtml;
+  });
 }
+
+function toggleLangDrop(which) {
+  const wrap = document.getElementById((which==='hdr'?'lang-switcher':'hero-lang-wrap'));
+  if (!wrap) return;
+  const isOpen = wrap.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.lang-drop-wrap').forEach(w => w.classList.remove('open'));
+  if (!isOpen) wrap.classList.add('open');
+}
+
 function pickLang(code, flag, label) {
-  document.getElementById('lang-drop-flag').textContent = flag;
-  document.getElementById('lang-drop-label').textContent = label;
-  document.getElementById('lang-drop-wrap').classList.remove('open');
+  // Update both dropdowns
+  const hf = document.getElementById('hdr-lang-flag');
+  if (hf) hf.textContent = flag;
+  const hfl = document.getElementById('hero-lang-flag');
+  if (hfl) hfl.textContent = flag;
+  const hl = document.getElementById('hero-lang-label');
+  if (hl) hl.textContent = label;
+  document.querySelectorAll('.lang-drop-wrap').forEach(w => w.classList.remove('open'));
   setLang(code);
 }
-// Close dropdown on outside click
+
+// Close on outside click
 document.addEventListener('click', e => {
-  const w = document.getElementById('lang-drop-wrap');
-  if (w && !w.contains(e.target)) w.classList.remove('open');
+  if (!e.target.closest('.lang-drop-wrap'))
+    document.querySelectorAll('.lang-drop-wrap').forEach(w => w.classList.remove('open'));
 });
 
 function setLang(code) {
@@ -882,10 +914,7 @@ function setLang(code) {
   localStorage.setItem('mx_lang', code);
   document.documentElement.lang = code;
   document.documentElement.dir = RTL_LANGS.includes(code) ? 'rtl' : 'ltr';
-  document.querySelectorAll('.lflag').forEach(b => b.classList.toggle('active', b.getAttribute('onclick') === `setLang('${code}')`));
-  // Sync header lang switcher hidden state
-  const onLanding = document.getElementById('s-landing').style.display !== 'none';
-  document.getElementById('lang-switcher').style.display = onLanding ? 'none' : 'flex';
+
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const k = el.getAttribute('data-i18n');
     if (el.tagName === 'INPUT') el.placeholder = t(k);
@@ -918,8 +947,9 @@ function nav(name) {
   if (name==='market') loadMarket();
   if (name==='reports') loadReports();
   if (name==='quest') initQuest();
-  // Show header lang switcher only when not on landing
-  document.getElementById('lang-switcher').style.display = name === 'landing' ? 'none' : 'flex';
+  // Show header lang dropdown only when not on landing
+  const ls = document.getElementById('lang-switcher');
+  if (ls) ls.style.display = name === 'landing' ? 'none' : 'flex';
 }
 
 // ─── API ─────────────────────────────────────────────────────────────
@@ -1251,12 +1281,12 @@ function initLanding() {
 
 // ─── Init ─────────────────────────────────────────────────────────────
 (async function(){
-  const LANG_META = {zh:['🇨🇳','中文'],en:['🇺🇸','English'],ja:['🇯🇵','日本語'],ko:['🇰🇷','한국어'],hi:['🇮🇳','हिंदी'],th:['🇹🇭','ภาษาไทย'],ms:['🇲🇾','Bahasa Malaysia'],es:['🇪🇸','Español'],it:['🇮🇹','Italiano'],fr:['🇫🇷','Français'],de:['🇩🇪','Deutsch'],ar:['🇸🇦','العربية']};
+  buildLangMenus();
   const lm = LANG_META[currentLang] || LANG_META.zh;
-  const flagEl = document.getElementById('lang-drop-flag');
-  const labelEl = document.getElementById('lang-drop-label');
-  if (flagEl) flagEl.textContent = lm[0];
-  if (labelEl) labelEl.textContent = lm[1];
+  const hfl = document.getElementById('hero-lang-flag');
+  const hl = document.getElementById('hero-lang-label');
+  if (hfl) hfl.textContent = lm[0];
+  if (hl) hl.textContent = lm[1];
   setLang(currentLang);
   if(TOKEN){
     await refreshAgent();
