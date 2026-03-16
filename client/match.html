@@ -152,6 +152,7 @@ html[dir="rtl"] .cback::before{content:'→ ';margin-right:4px}
 .fc-alias{font-size:13px;font-weight:300;color:var(--text);margin-bottom:2px}
 .fc-meta{font-size:10px;color:var(--text3)}
 .fc-tag{font-size:9px;color:var(--accent);border:1px solid rgba(200,169,110,.3);padding:2px 7px;letter-spacing:1px;white-space:nowrap}
+.fc-tag-d{color:var(--accent2);border-color:rgba(126,184,196,.35)}
 
 /* SVG connection lines */
 .conn-lines{position:absolute;inset:0;width:100%;height:100%;opacity:.25}
@@ -229,13 +230,13 @@ html[dir="rtl"] .cback::before{content:'→ ';margin-right:4px}
     </div>
     <div class="fc-card fc3">
       <img class="fc-photo" src="https://i.pravatar.cc/80?img=68" alt="">
-      <div class="fc-info"><div class="fc-alias">민준</div><div class="fc-meta">31 · 서울</div></div>
-      <div class="fc-tag">미혼</div>
+      <div class="fc-info"><div class="fc-alias">민준</div><div class="fc-meta">35 · 서울</div></div>
+      <div class="fc-tag fc-tag-d">離婚</div>
     </div>
     <div class="fc-card fc4">
-      <img class="fc-photo" src="https://i.pravatar.cc/80?img=33" alt="">
-      <div class="fc-info"><div class="fc-alias">Rahul</div><div class="fc-meta">29 · Mumbai</div></div>
-      <div class="fc-tag">Single</div>
+      <img class="fc-photo" src="https://i.pravatar.cc/80?img=52" alt="">
+      <div class="fc-info"><div class="fc-alias">Marco</div><div class="fc-meta">38 · Milano</div></div>
+      <div class="fc-tag fc-tag-d">Divorced</div>
     </div>
     <div class="fc-card fc5">
       <img class="fc-photo" src="https://i.pravatar.cc/80?img=5" alt="">
@@ -1024,7 +1025,9 @@ async function loadMarket(){
       <div class="acard-alias">${a.alias}</div>
       <div class="acard-meta">${a.age||'?'} · ${a.province||'?'}</div>
       <div class="tags">
-        ${a.marriage_history==='single'?`<span class="tag ok">${t('filter_all')==='All'?'Single':a.marriage_history==='single'?'未婚':'single'}</span>`:''}
+        ${a.marriage_history==='single'?`<span class="tag ok">${currentLang==='zh'?'未婚':'Single'}</span>`:''}
+        ${a.marriage_history==='divorced'?`<span class="tag" style="border-color:rgba(126,184,196,.4);color:var(--accent2)">${currentLang==='zh'?'离异':'Divorced'}</span>`:''}
+        ${a.marriage_history==='widowed'?`<span class="tag" style="color:var(--text3)">${currentLang==='zh'?'丧偶':'Widowed'}</span>`:''}
         ${a.smokes&&a.smokes!=='是'?`<span class="tag ok">✓</span>`:''}
       </div>
       <button class="acard-btn">${t('card_btn')}</button>
