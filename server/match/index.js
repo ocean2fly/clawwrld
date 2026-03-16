@@ -1,6 +1,24 @@
 'use strict';
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const path = require('path');
+const db = require('../db');
+
+const photoStorage = multer.diskStorage({
+  destination: '/opt/clawworld/uploads/match/',
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname) || '.jpg';
+    cb(null, `${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`);
+  }
+});
+const upload = multer({
+  storage: photoStorage,
+  limits: { fileSize: 8 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    cb(null, /image\/(jpeg|png|webp|gif)/.test(file.mimetype));
+  }
+});
 
 const { register, login, guestRegister, requireUser, requireAgent, requireAny, issueAgentToken } = require('./auth');
 const { createAgent, getAgentByUser, updateBasic, saveAnswers, recompile, admitAgent, toPublicProfile, toPromptSummary } = require('./profile');
@@ -100,6 +118,82 @@ router.get('/profile/token', requireUser, async (req, res) => {
     const result = await issueAgentToken(req.userId);
     res.json({ ...result, note: '此 token 只显示一次，请立即配置到你的 Agent。重新请求将使旧 token 失效。' });
   } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+// ─── Photo upload ────────────────────────────────────────────────────
+router.post('/profile/photos', requireUser, upload.array('photos', 9), async (req, res) => {
+  try {
+    if (!req.files || !req.files.length) return res.status(400).json({ error: '请选择图片' });
+    const urls = req.files.map(f => `/uploads/match/${f.filename}`);
+    // Append to existing photos
+    await db.query(
+      `UPDATE mx_agents SET photos = COALESCE(photos,'[]'::jsonb) || $1::jsonb WHERE user_id=$2`,
+      [JSON.stringify(urls), req.userId]
+    );
+    const r = await db.query('SELECT photos FROM mx_agents WHERE user_id=$1', [req.userId]);
+    res.json({ photos: r.rows[0]?.photos || [] });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+router.delete('/profile/photos/:idx', requireUser, async (req, res) => {
+  try {
+    const idx = parseInt(req.params.idx);
+    await db.query(
+      `UPDATE mx_agents SET photos = photos - $1 WHERE user_id=$2`,
+      [idx, req.userId]
+    );
+    const r = await db.query('SELECT photos FROM mx_agents WHERE user_id=$1', [req.userId]);
+    res.json({ photos: r.rows[0]?.photos || [] });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// ─── Custom prompt (owner adjusts agent mind) ─────────────────────────
+router.get('/profile/prompt', requireUser, async (req, res) => {
+  try {
+    const r = await db.query('SELECT compiled_prompt, custom_prompt FROM mx_agents WHERE user_id=$1', [req.userId]);
+    if (!r.rows.length) return res.status(404).json({ error: 'Agent 不存在' });
+    res.json({ compiled_prompt: r.rows[0].compiled_prompt, custom_prompt: r.rows[0].custom_prompt });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+router.put('/profile/prompt', requireUser, async (req, res) => {
+  try {
+    const { custom_prompt } = req.body;
+    await db.query('UPDATE mx_agents SET custom_prompt=$1 WHERE user_id=$2', [custom_prompt, req.userId]);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// ─── Agent reporting to owner ─────────────────────────────────────────
+// Agent POSTs a report; owner reads via GET
+router.post('/report-to-owner', requireAgent, async (req, res) => {
+  try {
+    const { summary } = req.body;
+    if (!summary) return res.status(400).json({ error: '请填写汇报内容' });
+    await db.query(
+      `INSERT INTO mx_reports (agent_id, report_type, generated_at, content)
+       VALUES ($1, 'agent_report', NOW(), $2)`,
+      [req.agentId, JSON.stringify({ summary, ts: Date.now() })]
+    );
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+router.get('/agent-reports', requireUser, async (req, res) => {
+  try {
+    const r = await db.query(
+      `SELECT r.id, r.generated_at, r.content
+       FROM mx_reports r JOIN mx_agents a ON r.agent_id=a.id
+       WHERE a.user_id=$1 AND r.report_type='agent_report'
+       ORDER BY r.generated_at DESC LIMIT 50`,
+      [req.userId]
+    );
+    res.json({ reports: r.rows.map(row => ({
+      id: row.id,
+      ts: row.generated_at,
+      summary: JSON.parse(row.content).summary
+    }))});
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // ─── Market (Human + Agent) ──────────────────────────────────────────

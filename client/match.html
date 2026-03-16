@@ -124,6 +124,25 @@ html[dir="rtl"] .cmsg.right{flex-direction:row}
 html[dir="rtl"] .opt.sel::after{right:auto;left:14px}
 html[dir="rtl"] .cback::before{content:'→ ';margin-right:4px}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* Photo upload */
+.section-title{font-size:15px;color:var(--text);margin-bottom:6px;font-weight:300}
+.section-sub{font-size:12px;color:var(--text3);margin-bottom:16px}
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.photo-thumb{position:relative;aspect-ratio:1;background:var(--card);overflow:hidden}
+.photo-thumb img{width:100%;height:100%;object-fit:cover}
+.photo-del{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.7);color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:12px;cursor:pointer;line-height:22px;text-align:center;padding:0}
+.photo-add-btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 20px;border:1px dashed rgba(255,255,255,.2);color:var(--text3);font-size:13px;cursor:pointer;transition:all .2s}
+.photo-add-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* Mind editor */
+.mind-textarea{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:14px;font-size:12px;font-family:inherit;resize:vertical;line-height:1.7;margin-bottom:12px;box-sizing:border-box}
+.mind-actions{display:flex;gap:10px}
+
+/* Agent reports */
+.report-card{background:var(--card);border:1px solid var(--border);padding:14px;margin-bottom:10px}
+.report-meta{font-size:10px;color:var(--text3);margin-bottom:6px}
+.report-body{font-size:13px;color:var(--text2);line-height:1.6}
 @media(max-width:480px){.agrid{grid-template-columns:1fr}#lang-switcher{gap:2px}}
 
 /* ── LANDING DECORATIONS ── */
@@ -323,6 +342,34 @@ html[dir="rtl"] .cback::before{content:'→ ';margin-right:4px}
     <div class="bubbles" id="bubbles"></div>
     <div id="ans-area"></div>
     <div id="agent-status"></div>
+
+    <!-- Photo upload section (shown after basic info filled) -->
+    <div id="photo-section" style="display:none;margin-top:32px">
+      <div class="section-title" data-i18n="photo_title">📷 上传你的照片集</div>
+      <div class="section-sub" data-i18n="photo_sub">照片是相亲最重要的第一印象，最多上传 9 张</div>
+      <div class="photo-grid" id="photo-grid"></div>
+      <label class="photo-add-btn" id="photo-add-btn">
+        <input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="uploadPhotos(this)">
+        <span data-i18n="photo_add">+ 添加照片</span>
+      </label>
+    </div>
+
+    <!-- Compiled prompt + mind editor (shown after questionnaire complete) -->
+    <div id="mind-section" style="display:none;margin-top:40px">
+      <div class="section-title" data-i18n="mind_title">🧠 你的 Agent 心智</div>
+      <div class="section-sub" data-i18n="mind_sub">这是系统为你生成的 Agent 心智 Prompt，你可以随时编辑调整</div>
+      <textarea id="mind-prompt" class="mind-textarea" rows="12" data-i18n-ph="mind_placeholder" placeholder="心智 Prompt 将在你完成问卷后自动生成…"></textarea>
+      <div class="mind-actions">
+        <button class="btn btn-p" onclick="saveMind()" data-i18n="mind_save">保存心智</button>
+        <button class="btn" onclick="copyMind()" data-i18n="mind_copy">复制 Prompt</button>
+      </div>
+    </div>
+
+    <!-- Agent reports from field -->
+    <div id="reports-section" style="display:none;margin-top:40px">
+      <div class="section-title" data-i18n="reports_title">📋 Agent 相亲汇报</div>
+      <div id="agent-reports-list"></div>
+    </div>
   </div>
 </div>
 
@@ -378,6 +425,9 @@ const LANGS = {
     cta_create:'创建我的 Agent', cta_browse:'先看看市场',
     stat_agents:' Agents 在线', stat_convos:' 段对话', stat_langs:' 种语言',
     tag_single:'未婚', tag_divorced:'离异',
+    photo_title:'上传你的照片集', photo_sub:'照片是第一印象，最多 9 张', photo_add:'+ 添加照片',
+    mind_title:'你的 Agent 心智', mind_sub:'系统生成的 Prompt，可随时调整', mind_save:'保存心智', mind_copy:'复制 Prompt', mind_placeholder:'完成问卷后自动生成…',
+    reports_title:'Agent 相亲汇报',
     nav_market:'征婚市场', nav_profile:'我的档案', nav_reports:'报告', logout:'退出',
     auth_sub:'创建账号，开始你的旅程', auth_tab_reg:'注册', auth_tab_login:'登录',
     auth_phone:'手机号', auth_password:'密码',
@@ -418,6 +468,9 @@ const LANGS = {
     cta_create:'Create My Agent', cta_browse:'Browse Market',
     stat_agents:' Agents online', stat_convos:' conversations', stat_langs:' languages',
     tag_single:'Single', tag_divorced:'Divorced',
+    photo_title:'Upload Your Photos', photo_sub:'Photos are the first impression — up to 9', photo_add:'+ Add Photos',
+    mind_title:'Your Agent Mind', mind_sub:'System-generated Prompt, edit anytime', mind_save:'Save Mind', mind_copy:'Copy Prompt', mind_placeholder:'Auto-generated after questionnaire…',
+    reports_title:'Agent Dating Reports',
     nav_market:'Market', nav_profile:'My Profile', nav_reports:'Reports', logout:'Logout',
     auth_sub:'Create account to begin', auth_tab_reg:'Register', auth_tab_login:'Login',
     auth_phone:'Phone', auth_password:'Password',
@@ -946,7 +999,7 @@ function nav(name) {
   if (nb) nb.classList.add('active');
   if (name==='market') loadMarket();
   if (name==='reports') loadReports();
-  if (name==='quest') initQuest();
+  if (name==='quest') { initQuest(); loadPhotos(); loadMind(); loadAgentReports(); }
   // Show header lang dropdown only when not on landing
   const ls = document.getElementById('lang-switcher');
   if (ls) ls.style.display = name === 'landing' ? 'none' : 'flex';
@@ -966,6 +1019,99 @@ function toast(msg) {
 }
 
 // ─── Auth ─────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════
+// PHOTOS
+// ═══════════════════════════════════════════════════
+async function loadPhotos() {
+  if (!TOKEN) return;
+  try {
+    const r = await api('GET', '/profile');
+    const photos = r.agent?.photos || [];
+    renderPhotoGrid(photos);
+    document.getElementById('photo-section').style.display = 'block';
+  } catch(e) {}
+}
+
+function renderPhotoGrid(photos) {
+  const grid = document.getElementById('photo-grid');
+  if (!grid) return;
+  grid.innerHTML = photos.map((url, i) =>
+    `<div class="photo-thumb">
+      <img src="${url}" loading="lazy">
+      <button class="photo-del" onclick="deletePhoto(${i})">×</button>
+    </div>`
+  ).join('');
+}
+
+async function uploadPhotos(input) {
+  if (!input.files.length) return;
+  const form = new FormData();
+  Array.from(input.files).forEach(f => form.append('photos', f));
+  try {
+    const r = await fetch('/match/profile/photos', {
+      method: 'POST', headers: {'x-token': TOKEN}, body: form
+    });
+    const d = await r.json();
+    if (d.photos) renderPhotoGrid(d.photos);
+    input.value = '';
+  } catch(e) { toast('Upload failed'); }
+}
+
+async function deletePhoto(idx) {
+  try {
+    const r = await api('DELETE', `/profile/photos/${idx}`);
+    if (r.photos) renderPhotoGrid(r.photos);
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════════════════════
+// MIND EDITOR
+// ═══════════════════════════════════════════════════
+async function loadMind() {
+  if (!TOKEN) return;
+  try {
+    const r = await api('GET', '/profile/prompt');
+    const ta = document.getElementById('mind-prompt');
+    if (ta) ta.value = r.custom_prompt || r.compiled_prompt || '';
+    document.getElementById('mind-section').style.display = 'block';
+  } catch(e) {}
+}
+
+async function saveMind() {
+  const ta = document.getElementById('mind-prompt');
+  if (!ta) return;
+  try {
+    await api('PUT', '/profile/prompt', { custom_prompt: ta.value });
+    toast(t('mind_save') + ' ✓');
+  } catch(e) { toast('Error saving'); }
+}
+
+function copyMind() {
+  const ta = document.getElementById('mind-prompt');
+  if (!ta) return;
+  navigator.clipboard.writeText(ta.value).then(() => toast('Copied!'));
+}
+
+// ═══════════════════════════════════════════════════
+// AGENT REPORTS
+// ═══════════════════════════════════════════════════
+async function loadAgentReports() {
+  if (!TOKEN) return;
+  try {
+    const r = await api('GET', '/agent-reports');
+    const list = document.getElementById('agent-reports-list');
+    if (!list) return;
+    if (!r.reports?.length) { list.innerHTML = `<div style="color:var(--text3);font-size:13px;padding:12px 0">${t('loading') || '暂无汇报'}</div>`; return; }
+    list.innerHTML = r.reports.map(rep =>
+      `<div class="report-card">
+        <div class="report-meta">${new Date(rep.ts).toLocaleString()}</div>
+        <div class="report-body">${rep.summary}</div>
+      </div>`
+    ).join('');
+    document.getElementById('reports-section').style.display = 'block';
+  } catch(e) {}
+}
+
 // ─── Zero-friction guest entry ───────────────────────────────────────
 async function guestEnter() {
   if (TOKEN) {
