@@ -11,8 +11,11 @@ const { addAgentToState } = require('./world');
 const library = require('./library');
 const gov = require('./governance');
 const community = require('./community');
+const matchRouter = require('./match/index');
+
 const app = express();
 app.use(express.json());
+app.use('/match', matchRouter);
 
 // ── HTTP API ──────────────────────────────────────────────────────────────
 
