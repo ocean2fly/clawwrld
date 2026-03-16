@@ -341,8 +341,8 @@ body {
     <div id="detail-bar-center"></div>
     <div style="display:flex;align-items:center;gap:6px">
       <div id="detail-bar-right" style="font-size:9px;letter-spacing:2px;color:var(--text3)"></div>
-      <button class="view-toggle" id="btn-2d" onclick="setView('2d')">2D</button>
-      <button class="view-toggle active" id="btn-3d" onclick="setView('3d')">3D ASCII</button>
+      <button class="view-toggle active" id="btn-2d" onclick="setView('2d')">2D</button>
+      <button class="view-toggle" id="btn-3d" onclick="setView('3d')">3D ASCII</button>
     </div>
   </div>
   <!-- map hero -->
@@ -533,10 +533,9 @@ async function loadDetail(worldId, name, era) {
     connectMapWs(worldId);
     clearInterval(window._mapRefreshTimer);
     window._mapRefreshTimer=setInterval(function(){ refreshMap(worldId); }, 18000);
-    // Init 3D if in 3D mode
-    if(currentView==='3d'){
-      var asc=document.getElementById('ascii3d');
-      if(window._3D && !window._3D.running) setTimeout(function(){ window._3D.init(asc); }, 80);
+    // Init 3D only if user already switched to 3D mode
+    if(currentView==='3d' && window._3D && !window._3D.running){
+      setTimeout(function(){ window._3D.init(document.getElementById('ascii3d')); }, 80);
     }
   } catch(e){
     buildMapGrid(); connectMapWs(worldId);
@@ -976,7 +975,7 @@ window._3D={
 
 <script>
 // ── View toggle ─────────────────────────────────────────────────
-var currentView = '3d';
+var currentView = '2d';
 function setView(v) {
   currentView = v;
   document.getElementById('btn-2d').classList.toggle('active', v==='2d');
@@ -989,6 +988,7 @@ function setView(v) {
     }
   } else {
     asc.classList.remove('open');
+    if(window._3D && window._3D.running) window._3D.stop();
   }
 }
 </script>
