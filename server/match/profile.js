@@ -1,5 +1,5 @@
 'use strict';
-const { pool } = require('../db');
+const db = require('../db');
 const { compile } = require('./compiler');
 const { genAgentId } = require('./auth');
 
@@ -12,35 +12,35 @@ const BASIC_FIELDS = [
 
 // ─── Create agent for user (called after alias is set) ───────────────
 async function createAgent(userId, alias) {
-  const existing = await pool.query('SELECT id FROM mx_agents WHERE user_id=$1', [userId]);
+  const existing = await db.query('SELECT id FROM mx_agents WHERE user_id=$1', [userId]);
   if (existing.rows.length) return existing.rows[0].id;
   const id = genAgentId();
-  await pool.query('INSERT INTO mx_agents (id, user_id, alias) VALUES ($1,$2,$3)', [id, userId, alias]);
+  await db.query('INSERT INTO mx_agents (id, user_id, alias) VALUES ($1,$2,$3)', [id, userId, alias]);
   return id;
 }
 
 // ─── Get agent + answers ─────────────────────────────────────────────
 async function getAgentByUser(userId) {
-  const r = await pool.query('SELECT * FROM mx_agents WHERE user_id=$1', [userId]);
+  const r = await db.query('SELECT * FROM mx_agents WHERE user_id=$1', [userId]);
   if (!r.rows.length) return null;
   const agent = r.rows[0];
-  const ans = await pool.query('SELECT * FROM mx_questionnaire_answers WHERE agent_id=$1', [agent.id]);
+  const ans = await db.query('SELECT * FROM mx_questionnaire_answers WHERE agent_id=$1', [agent.id]);
   agent.answers = ans.rows;
   return agent;
 }
 
 async function getAgentById(agentId) {
-  const r = await pool.query('SELECT * FROM mx_agents WHERE id=$1', [agentId]);
+  const r = await db.query('SELECT * FROM mx_agents WHERE id=$1', [agentId]);
   if (!r.rows.length) return null;
   const agent = r.rows[0];
-  const ans = await pool.query('SELECT * FROM mx_questionnaire_answers WHERE agent_id=$1', [agentId]);
+  const ans = await db.query('SELECT * FROM mx_questionnaire_answers WHERE agent_id=$1', [agentId]);
   agent.answers = ans.rows;
   return agent;
 }
 
 // ─── Update basic profile fields ─────────────────────────────────────
 async function updateBasic(userId, data) {
-  const agent = await pool.query('SELECT id FROM mx_agents WHERE user_id=$1', [userId]);
+  const agent = await db.query('SELECT id FROM mx_agents WHERE user_id=$1', [userId]);
   if (!agent.rows.length) throw new Error('Agent 不存在，请先创建');
   const agentId = agent.rows[0].id;
 
@@ -51,7 +51,7 @@ async function updateBasic(userId, data) {
   if (!Object.keys(updates).length) return agentId;
 
   const cols = Object.keys(updates).map((k, i) => `${k}=$${i + 2}`).join(', ');
-  await pool.query(
+  await db.query(
     `UPDATE mx_agents SET ${cols}, updated_at=NOW() WHERE id=$1`,
     [agentId, ...Object.values(updates)]
   );
@@ -60,12 +60,12 @@ async function updateBasic(userId, data) {
 
 // ─── Save questionnaire answers (upsert) ─────────────────────────────
 async function saveAnswers(userId, answers, round) {
-  const agent = await pool.query('SELECT id FROM mx_agents WHERE user_id=$1', [userId]);
+  const agent = await db.query('SELECT id FROM mx_agents WHERE user_id=$1', [userId]);
   if (!agent.rows.length) throw new Error('Agent 不存在');
   const agentId = agent.rows[0].id;
 
   for (const { key, answer } of answers) {
-    await pool.query(
+    await db.query(
       `INSERT INTO mx_questionnaire_answers (agent_id, question_key, answer, round)
        VALUES ($1,$2,$3,$4)
        ON CONFLICT (agent_id, question_key) DO UPDATE SET answer=EXCLUDED.answer`,
@@ -83,7 +83,7 @@ async function recompile(userId) {
 
   // Also persist derived traits
   const { attachment, conflict, money, boundary } = traits;
-  await pool.query(
+  await db.query(
     `UPDATE mx_agents SET
        mind_prompt=$1, profile_completion=$2, prompt_version=prompt_version+1,
        attachment_style=$3, conflict_style=$4, money_personality=$5, boundary_strength=$6,
@@ -103,11 +103,11 @@ async function recompile(userId) {
 
 // ─── Admit agent to market ───────────────────────────────────────────
 async function admitAgent(userId) {
-  const agent = await pool.query('SELECT id, profile_completion FROM mx_agents WHERE user_id=$1', [userId]);
+  const agent = await db.query('SELECT id, profile_completion FROM mx_agents WHERE user_id=$1', [userId]);
   if (!agent.rows.length) throw new Error('Agent 不存在');
   const { id, profile_completion } = agent.rows[0];
   if (profile_completion < 60) throw new Error(`档案完成度 ${profile_completion}%，至少需要 60% 才能入场`);
-  await pool.query("UPDATE mx_agents SET admitted=TRUE, status='admitted' WHERE id=$1", [id]);
+  await db.query("UPDATE mx_agents SET admitted=TRUE, status='admitted' WHERE id=$1", [id]);
   return { agentId: id };
 }
 

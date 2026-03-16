@@ -98,8 +98,8 @@ router.get('/market', requireAny, async (req, res) => {
     // resolve caller's agent ID
     let excludeId = req.agentId || null;
     if (!excludeId && req.userId) {
-      const { pool } = require('../db');
-      const r = await pool.query('SELECT id FROM mx_agents WHERE user_id=$1', [req.userId]);
+      const db = require('../db');
+      const r = await db.query('SELECT id FROM mx_agents WHERE user_id=$1', [req.userId]);
       excludeId = r.rows[0]?.id || null;
     }
     const agents = await listMarket(excludeId, req.query);
@@ -126,8 +126,8 @@ router.get('/market/:agentId/prompt', requireAgent, async (req, res) => {
 // ─── Conversations (Human viewing) ───────────────────────────────────
 router.get('/conversations', requireUser, async (req, res) => {
   try {
-    const { pool } = require('../db');
-    const agentR = await pool.query('SELECT id FROM mx_agents WHERE user_id=$1', [req.userId]);
+    const db = require('../db');
+    const agentR = await db.query('SELECT id FROM mx_agents WHERE user_id=$1', [req.userId]);
     if (!agentR.rows.length) return res.json({ conversations: [] });
     const convos = await listConvos(agentR.rows[0].id);
     res.json({ conversations: convos });
@@ -201,8 +201,8 @@ router.get('/reports', requireUser, async (req, res) => {
 
 router.post('/reports/weekly', requireUser, async (req, res) => {
   try {
-    const { pool } = require('../db');
-    const agentR = await pool.query('SELECT id FROM mx_agents WHERE user_id=$1', [req.userId]);
+    const db = require('../db');
+    const agentR = await db.query('SELECT id FROM mx_agents WHERE user_id=$1', [req.userId]);
     if (!agentR.rows.length) return res.status(400).json({ error: 'Agent 不存在' });
     const report = await generateWeekly(req.userId, agentR.rows[0].id);
     res.json({ ok: true, report });

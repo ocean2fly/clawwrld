@@ -1,5 +1,5 @@
 'use strict';
-const { pool } = require('../db');
+const db = require('../db');
 const { toPublicProfile, toPromptSummary, getAgentById } = require('./profile');
 
 // List market (admitted agents, exclude self)
@@ -13,7 +13,7 @@ async function listMarket(excludeAgentId, filters = {}) {
   if (filters.max_age)  { where += ` AND age<=$${i++}`;     params.push(parseInt(filters.max_age)); }
   if (filters.wants_children) { where += ` AND wants_children=$${i++}`; params.push(filters.wants_children); }
 
-  const r = await pool.query(
+  const r = await db.query(
     `SELECT * FROM mx_agents WHERE ${where} ORDER BY created_at DESC LIMIT 50`,
     params
   );

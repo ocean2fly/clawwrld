@@ -1,5 +1,5 @@
 'use strict';
-const { pool } = require('../db');
+const db = require('../db');
 
 // Rule-based weekly report — no AI
 async function generateWeekly(userId, agentId) {
@@ -7,7 +7,7 @@ async function generateWeekly(userId, agentId) {
   const weekAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
 
   // Conversations this week
-  const convosR = await pool.query(
+  const convosR = await db.query(
     `SELECT c.*,
        CASE WHEN c.agent_a=$1 THEN b.alias ELSE a.alias END as other_alias,
        CASE WHEN c.agent_a=$1 THEN c.agent_b ELSE c.agent_a END as other_id
@@ -26,7 +26,7 @@ async function generateWeekly(userId, agentId) {
 
   for (const c of convosR.rows) {
     // Count messages this week in this convo
-    const msgR = await pool.query(
+    const msgR = await db.query(
       'SELECT COUNT(*) as cnt FROM mx_messages WHERE convo_id=$1 AND created_at>$2',
       [c.id, weekAgo]
     );
@@ -34,7 +34,7 @@ async function generateWeekly(userId, agentId) {
     totalMessages += weekMsgs;
 
     // Check for red_line messages
-    const rlR = await pool.query(
+    const rlR = await db.query(
       "SELECT COUNT(*) as cnt FROM mx_messages WHERE convo_id=$1 AND msg_type='red_line' AND created_at>$2",
       [c.id, weekAgo]
     );
@@ -42,7 +42,7 @@ async function generateWeekly(userId, agentId) {
     redLineCount += rlCount;
 
     // Get last few messages for topic hint
-    const lastR = await pool.query(
+    const lastR = await db.query(
       'SELECT content FROM mx_messages WHERE convo_id=$1 ORDER BY created_at DESC LIMIT 3',
       [c.id]
     );
@@ -60,7 +60,7 @@ async function generateWeekly(userId, agentId) {
   }
 
   // Total partner count ever
-  const totalR = await pool.query(
+  const totalR = await db.query(
     'SELECT COUNT(*) as cnt FROM mx_conversations WHERE agent_a=$1 OR agent_b=$1',
     [agentId]
   );
@@ -87,7 +87,7 @@ async function generateWeekly(userId, agentId) {
   };
 
   // Save to inbox
-  const r = await pool.query(
+  const r = await db.query(
     'INSERT INTO mx_reports (user_id, agent_id, report_type, content) VALUES ($1,$2,$3,$4) RETURNING id',
     [userId, agentId, 'weekly', JSON.stringify(content)]
   );
@@ -96,12 +96,12 @@ async function generateWeekly(userId, agentId) {
 
 // Get reports for a user
 async function getReports(userId, limit) {
-  const r = await pool.query(
+  const r = await db.query(
     'SELECT * FROM mx_reports WHERE user_id=$1 ORDER BY created_at DESC LIMIT $2',
     [userId, limit || 20]
   );
   // Mark as read
-  await pool.query('UPDATE mx_reports SET read_at=NOW() WHERE user_id=$1 AND read_at IS NULL', [userId]);
+  await db.query('UPDATE mx_reports SET read_at=NOW() WHERE user_id=$1 AND read_at IS NULL', [userId]);
   return r.rows;
 }
 
